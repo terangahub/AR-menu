@@ -36,6 +36,11 @@ model User {
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   email        String     @unique
+  // Lie l'identité Clerk (authentification) à ce profil restaurant — non
+  // présent dans le modèle de la section 8, nécessaire pour le dashboard
+  // (section 10, 18). Nullable : un profil peut être créé avant la première
+  // connexion (invitation d'équipe, section 10.7).
+  clerkUserId  String?    @unique
   role         String     @default("owner") // owner | staff | superadmin
   createdAt    DateTime   @default(now())
 }

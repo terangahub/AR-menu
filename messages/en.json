@@ -21,5 +21,58 @@
     "rotateHint": "Rotate and zoom before activating AR",
     "arUnavailable": "AR unavailable on this device — showing 2D",
     "back": "Back to menu"
+  },
+  "Dashboard": {
+    "noRestaurant": "No restaurant linked to this account.",
+    "nav": {
+      "dishes": "Dishes",
+      "qrcodes": "QR codes"
+    },
+    "dishes": {
+      "title": "Dishes",
+      "search": "Search a dish",
+      "allCategories": "All categories",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "addDish": "Add a dish",
+      "empty": "No dishes match.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Delete this dish permanently?",
+      "arReady": "AR ready",
+      "noModel": "No 3D model"
+    },
+    "dishForm": {
+      "newTitle": "New dish",
+      "editTitle": "Edit dish",
+      "nameFr": "Name (FR)",
+      "nameEn": "Name (EN)",
+      "descriptionFr": "Description (FR)",
+      "descriptionEn": "Description (EN)",
+      "categoryFr": "Category (FR)",
+      "categoryEn": "Category (EN)",
+      "ingredientsFr": "Ingredients (FR)",
+      "ingredientsEn": "Ingredients (EN)",
+      "price": "Price ($)",
+      "prepTimeMinutes": "Prep time (min)",
+      "allergens": "Allergens",
+      "available": "Available for sale",
+      "photo": "Photo",
+      "model3dGlb": "3D model (.glb)",
+      "model3dUsdz": "iOS model (.usdz, optional)",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "qrcodes": {
+      "title": "QR codes",
+      "table": "Table",
+      "tableNumber": "Table number",
+      "generate": "Generate",
+      "download": "Download PNG",
+      "print": "Print / PDF",
+      "scans": "{count} scans",
+      "empty": "No QR codes yet."
+    }
   }
 }
