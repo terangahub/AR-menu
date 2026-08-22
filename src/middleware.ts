@@ -1,16 +1,23 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
+
+const handleI18nRouting = createMiddleware(routing);
 
 // Routes protégées : dashboard restaurateur (Owner/Staff) et super admin
 // (SuperAdmin) — section 18 du cahier des charges. Le menu public (F01-F06)
 // reste accessible sans authentification.
 const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-  "/superadmin(.*)",
+  "/:locale/dashboard(.*)",
+  "/:locale/superadmin(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
     await auth.protect();
+  }
+  if (!req.nextUrl.pathname.startsWith("/api")) {
+    return handleI18nRouting(req);
   }
 });
 
