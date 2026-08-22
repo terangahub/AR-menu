@@ -1,0 +1,25 @@
+{
+  "HomePage": {
+    "title": "Vorae",
+    "tagline": "Voyez avant de choisir.",
+    "cta": "Réserver une démo"
+  },
+  "Menu": {
+    "categoryAll": "Tout",
+    "unavailable": "Indisponible",
+    "allergenFilter": "Filtrer par allergène",
+    "regimeFilter": "Filtrer par régime",
+    "viewInAr": "Voir en AR",
+    "empty": "Aucun plat pour l'instant."
+  },
+  "Dish": {
+    "ingredients": "Ingrédients",
+    "allergens": "Allergènes",
+    "prepTime": "Temps de préparation",
+    "prepTimeMinutes": "{minutes} min",
+    "viewInAr": "Voir en AR",
+    "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
+    "arUnavailable": "AR non disponible sur cet appareil — affichage 2D",
+    "back": "Retour au menu"
+  }
+}

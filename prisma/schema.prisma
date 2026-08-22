@@ -41,32 +41,43 @@ model User {
 }
 
 model Dish {
-  id             String   @id @default(cuid())
-  restaurantId   String
-  restaurant     Restaurant @relation(fields: [restaurantId], references: [id])
-  name           String
-  nameEn         String?
-  description    String?
-  price          Decimal
-  imageUrl       String?
-  model3dGlbUrl  String?
-  model3dUsdzUrl String?
-  isArReady      Boolean  @default(false)
-  isAvailable    Boolean  @default(true)
-  allergens      DishAllergen[]
-  scans          ScanEvent[]
-  createdAt      DateTime @default(now())
+  id              String         @id @default(cuid())
+  restaurantId    String
+  restaurant      Restaurant     @relation(fields: [restaurantId], references: [id])
+  name            String
+  nameEn          String?
+  description     String?
+  descriptionEn   String?
+  // category, ingredients, prepTimeMinutes : référencés par F02/F05
+  // (catégorie, fiche plat) mais absents du modèle de données de la
+  // section 8 — ajoutés pour compléter le schéma. Variantes *En pour le
+  // bilingue FR/EN complet (F06) — description/ingrédients/catégorie
+  // n'avaient pas d'équivalent anglais, contrairement à name/nameEn.
+  category        String?
+  categoryEn      String?
+  ingredients     String?
+  ingredientsEn   String?
+  prepTimeMinutes Int?
+  price           Decimal
+  imageUrl        String?
+  model3dGlbUrl   String?
+  model3dUsdzUrl  String?
+  isArReady       Boolean        @default(false)
+  isAvailable     Boolean        @default(true)
+  allergens       DishAllergen[]
+  scans           ScanEvent[]
+  createdAt       DateTime       @default(now())
 }
 
 // Table d'allergènes de référence (partagée entre tous les restaurants),
 // reliée aux plats via la table de jointure DishAllergen (section 8 y fait
 // référence sans la définir explicitement).
 model Allergen {
-  id      String         @id @default(cuid())
-  code    String         @unique // ex: "gluten", "peanuts", "shellfish"
-  nameFr  String
-  nameEn  String
-  dishes  DishAllergen[]
+  id     String         @id @default(cuid())
+  code   String         @unique // ex: "gluten", "peanuts", "shellfish"
+  nameFr String
+  nameEn String
+  dishes DishAllergen[]
 }
 
 model DishAllergen {
@@ -79,12 +90,12 @@ model DishAllergen {
 }
 
 model QrCode {
-  id           String     @id @default(cuid())
+  id           String      @id @default(cuid())
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
   tableNumber  String?
   targetUrl    String
-  scansCount   Int        @default(0)
+  scansCount   Int         @default(0)
   scans        ScanEvent[]
 }
 
@@ -105,9 +116,9 @@ model Subscription {
   id                   String     @id @default(cuid())
   restaurantId         String     @unique
   restaurant           Restaurant @relation(fields: [restaurantId], references: [id])
-  tier                 String     // essentiel | croissance | prestige
-  billingCycle         String     // monthly | annual
-  status               String     // trialing | active | past_due | canceled
+  tier                 String // essentiel | croissance | prestige
+  billingCycle         String // monthly | annual
+  status               String // trialing | active | past_due | canceled
   includedDishSlots    Int
   extraDishCount       Int        @default(0)
   stripeSubscriptionId String?
@@ -120,7 +131,7 @@ model Invoice {
   restaurantId    String
   stripeInvoiceId String
   amount          Decimal
-  status          String   // paid | open | failed
+  status          String // paid | open | failed
   pdfUrl          String?
   issuedAt        DateTime @default(now())
 }
@@ -130,9 +141,9 @@ model DishCaptureOrder {
   restaurantId  String
   restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
   dishCount     Int
-  packageType   String     // a_la_carte | forfait_demarrage | forfait_menu_complet | recapture
+  packageType   String // a_la_carte | forfait_demarrage | forfait_menu_complet | recapture
   amount        Decimal
-  status        String     // scheduled | in_progress | delivered
+  status        String // scheduled | in_progress | delivered
   scheduledDate DateTime?
   completedAt   DateTime?
 }
