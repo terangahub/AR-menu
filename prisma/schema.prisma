@@ -1,0 +1,147 @@
+// Vorae — schéma de données (cahier des charges v2.0, section 8)
+// Base : Neon PostgreSQL serverless (DATABASE_URL en variable d'environnement)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id                 String   @id @default(cuid())
+  name               String
+  slug               String   @unique
+  logoUrl            String?
+  primaryColor       String?
+  city               String   @default("Montréal")
+  email              String
+  defaultLocale      String   @default("fr")
+  stripeCustomerId   String?
+  whiteLabelParentId String?
+  createdAt          DateTime @default(now())
+
+  users         User[]
+  dishes        Dish[]
+  qrCodes       QrCode[]
+  subscription  Subscription?
+  captureOrders DishCaptureOrder[]
+  notes         SuperAdminNote[]
+}
+
+model User {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  email        String     @unique
+  role         String     @default("owner") // owner | staff | superadmin
+  createdAt    DateTime   @default(now())
+}
+
+model Dish {
+  id             String   @id @default(cuid())
+  restaurantId   String
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id])
+  name           String
+  nameEn         String?
+  description    String?
+  price          Decimal
+  imageUrl       String?
+  model3dGlbUrl  String?
+  model3dUsdzUrl String?
+  isArReady      Boolean  @default(false)
+  isAvailable    Boolean  @default(true)
+  allergens      DishAllergen[]
+  scans          ScanEvent[]
+  createdAt      DateTime @default(now())
+}
+
+// Table d'allergènes de référence (partagée entre tous les restaurants),
+// reliée aux plats via la table de jointure DishAllergen (section 8 y fait
+// référence sans la définir explicitement).
+model Allergen {
+  id      String         @id @default(cuid())
+  code    String         @unique // ex: "gluten", "peanuts", "shellfish"
+  nameFr  String
+  nameEn  String
+  dishes  DishAllergen[]
+}
+
+model DishAllergen {
+  dishId     String
+  dish       Dish     @relation(fields: [dishId], references: [id])
+  allergenId String
+  allergen   Allergen @relation(fields: [allergenId], references: [id])
+
+  @@id([dishId, allergenId])
+}
+
+model QrCode {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  tableNumber  String?
+  targetUrl    String
+  scansCount   Int        @default(0)
+  scans        ScanEvent[]
+}
+
+model ScanEvent {
+  id          String   @id @default(cuid())
+  qrCodeId    String
+  qrCode      QrCode   @relation(fields: [qrCodeId], references: [id])
+  dishId      String?
+  dish        Dish?    @relation(fields: [dishId], references: [id])
+  arActivated Boolean  @default(false)
+  deviceType  String?
+  timestamp   DateTime @default(now())
+}
+
+// --- Facturation & abonnements ---
+
+model Subscription {
+  id                   String     @id @default(cuid())
+  restaurantId         String     @unique
+  restaurant           Restaurant @relation(fields: [restaurantId], references: [id])
+  tier                 String     // essentiel | croissance | prestige
+  billingCycle         String     // monthly | annual
+  status               String     // trialing | active | past_due | canceled
+  includedDishSlots    Int
+  extraDishCount       Int        @default(0)
+  stripeSubscriptionId String?
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime   @default(now())
+}
+
+model Invoice {
+  id              String   @id @default(cuid())
+  restaurantId    String
+  stripeInvoiceId String
+  amount          Decimal
+  status          String   // paid | open | failed
+  pdfUrl          String?
+  issuedAt        DateTime @default(now())
+}
+
+model DishCaptureOrder {
+  id            String     @id @default(cuid())
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+  dishCount     Int
+  packageType   String     // a_la_carte | forfait_demarrage | forfait_menu_complet | recapture
+  amount        Decimal
+  status        String     // scheduled | in_progress | delivered
+  scheduledDate DateTime?
+  completedAt   DateTime?
+}
+
+model SuperAdminNote {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  authorId     String
+  content      String
+  createdAt    DateTime   @default(now())
+}
