@@ -47,11 +47,16 @@ model Dish {
   name            String
   nameEn          String?
   description     String?
+  descriptionEn   String?
   // category, ingredients, prepTimeMinutes : référencés par F02/F05
   // (catégorie, fiche plat) mais absents du modèle de données de la
-  // section 8 — ajoutés pour compléter le schéma.
+  // section 8 — ajoutés pour compléter le schéma. Variantes *En pour le
+  // bilingue FR/EN complet (F06) — description/ingrédients/catégorie
+  // n'avaient pas d'équivalent anglais, contrairement à name/nameEn.
   category        String?
+  categoryEn      String?
   ingredients     String?
+  ingredientsEn   String?
   prepTimeMinutes Int?
   price           Decimal
   imageUrl        String?

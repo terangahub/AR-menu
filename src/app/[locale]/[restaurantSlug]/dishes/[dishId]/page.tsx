@@ -34,6 +34,10 @@ export default async function DishPage({
   }
 
   const name = locale === "en" && dish.nameEn ? dish.nameEn : dish.name;
+  const description =
+    locale === "en" && dish.descriptionEn ? dish.descriptionEn : dish.description;
+  const ingredients =
+    locale === "en" && dish.ingredientsEn ? dish.ingredientsEn : dish.ingredients;
   const allergens = dish.allergens.map((a) => a.allergen);
 
   return (
@@ -61,12 +65,12 @@ export default async function DishPage({
         </span>
       </div>
 
-      {dish.description && <p className="text-muted-foreground">{dish.description}</p>}
+      {description && <p className="text-muted-foreground">{description}</p>}
 
-      {dish.ingredients && (
+      {ingredients && (
         <div>
           <h2 className="text-sm font-medium">{t("ingredients")}</h2>
-          <p className="text-sm text-muted-foreground">{dish.ingredients}</p>
+          <p className="text-sm text-muted-foreground">{ingredients}</p>
         </div>
       )}
 

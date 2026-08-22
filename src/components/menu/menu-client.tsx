@@ -11,7 +11,9 @@ export type MenuDish = {
   name: string;
   nameEn: string | null;
   description: string | null;
+  descriptionEn: string | null;
   category: string | null;
+  categoryEn: string | null;
   price: number;
   imageUrl: string | null;
   isArReady: boolean;
@@ -35,13 +37,21 @@ export function MenuClient({
     new Set()
   );
 
-  const categories = useMemo(
-    () =>
-      Array.from(
-        new Set(dishes.map((d) => d.category).filter((c): c is string => !!c))
-      ),
-    [dishes]
-  );
+  // La clé de filtrage reste toujours la catégorie française (canonique) —
+  // seul le libellé affiché change selon la locale, via categoryEn.
+  const categories = useMemo(() => {
+    const labelByCategory = new Map<string, string>();
+    for (const d of dishes) {
+      if (!d.category) continue;
+      if (!labelByCategory.has(d.category)) {
+        labelByCategory.set(
+          d.category,
+          locale === "en" && d.categoryEn ? d.categoryEn : d.category
+        );
+      }
+    }
+    return Array.from(labelByCategory.entries());
+  }, [dishes, locale]);
 
   const allergenOptions = useMemo(() => {
     const map = new Map<string, Allergen>();
@@ -80,17 +90,17 @@ export function MenuClient({
           >
             {t("categoryAll")}
           </button>
-          {categories.map((c) => (
+          {categories.map(([key, label]) => (
             <button
-              key={c}
-              onClick={() => setCategory(c)}
+              key={key}
+              onClick={() => setCategory(key)}
               className={`rounded-full border px-4 py-1.5 text-sm ${
-                category === c
+                category === key
                   ? "bg-primary text-primary-foreground"
                   : "border-border"
               }`}
             >
-              {c}
+              {label}
             </button>
           ))}
         </div>
@@ -116,7 +126,15 @@ export function MenuClient({
         <p className="text-muted-foreground">{t("empty")}</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((dish) => (
+          {filtered.map((dish) => {
+            const name =
+              locale === "en" && dish.nameEn ? dish.nameEn : dish.name;
+            const description =
+              locale === "en" && dish.descriptionEn
+                ? dish.descriptionEn
+                : dish.description;
+
+            return (
             <Link
               key={dish.id}
               href={
@@ -127,16 +145,14 @@ export function MenuClient({
               className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4 text-card-foreground transition-colors hover:border-primary"
             >
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-medium">
-                  {locale === "en" && dish.nameEn ? dish.nameEn : dish.name}
-                </h3>
+                <h3 className="font-medium">{name}</h3>
                 <span className="whitespace-nowrap text-sm text-muted-foreground">
                   {dish.price.toFixed(2)} $
                 </span>
               </div>
-              {dish.description && (
+              {description && (
                 <p className="line-clamp-2 text-sm text-muted-foreground">
-                  {dish.description}
+                  {description}
                 </p>
               )}
               {dish.isArReady && (
@@ -145,7 +161,8 @@ export function MenuClient({
                 </span>
               )}
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
