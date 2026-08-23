@@ -19,7 +19,8 @@ contexte.
 |---|---|---|
 | Sprint 0 | ✅ Mergé | Next.js 14 + TS + Tailwind + shadcn/ui, Prisma, Clerk, CI, PR workflow |
 | Sprint 1 | ✅ Mergé | Menu 2D public, fiche plat + AR (`<model-viewer>`) + fallback 2D, i18n FR/EN |
-| Sprint 2 | 🔄 En cours (branche `feature/s2-dashboard-crud-plats`) | Dashboard restaurateur : CRUD plats, upload photo/3D, QR codes |
+| Sprint 2 | ✅ Mergé | Dashboard restaurateur : CRUD plats, upload photo/3D, QR codes |
+| Sprint 3 | 🔄 En cours (branche `feature/s3-analytics-design-system`) | Analytics par plat, système de design Vorae (palette + Fraunces + toggle dark/light) |
 
 ---
 
@@ -50,8 +51,11 @@ src/
       [restaurantSlug]/          ← menu public 2D (F02)
         dishes/[dishId]/         ← fiche plat + AR (F03-F05)
       dashboard/                 ← protégé par middleware Clerk, force-dynamic
+        page.tsx                 ← vue d'ensemble (10.1)
         dishes/                  ← CRUD plats (10.2)
         qrcodes/                 ← génération QR (10.4)
+        analytics/               ← tableau global triable + export CSV (10.3)
+        analytics/[dishId]/      ← analytics par plat : tendance, heure de pointe (10.3)
     api/
       menu/[restaurantSlug]/     ← GET menu public
       dishes/                    ← GET liste (dashboard) / POST création
@@ -60,17 +64,20 @@ src/
       dishes/[id]/model3d/       ← upload .glb (+.usdz optionnel) → Cloudinary
       qrcodes/                   ← GET liste / POST création
       qrcodes/[id]/              ← DELETE
-      qrcodes/[id]/png/          ← régénère le PNG à la volée
+      qrcodes/[id]/png/          ← régénère le PNG à la volée (Content-Disposition: attachment)
       scan/                      ← POST tracking scan (rate-limited)
       allergens/                 ← GET table de référence
+      analytics/export/          ← GET export CSV (Content-Disposition: attachment)
   components/
     menu/                        ← composants du menu public
-    dashboard/                   ← composants du dashboard
+    dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart)
+    theme-toggle.tsx             ← bascule dark/light (next-themes)
     ui/                          ← shadcn/ui (button, etc. — installés à la main, voir section 4)
   lib/
     prisma.ts                    ← client Prisma singleton
     auth.ts                      ← résout Clerk → Restaurant/User (voir section 6)
     scan.ts                      ← logique + rate limiting des scans
+    analytics.ts                 ← requêtes agrégées pour le dashboard (10.1, 10.3)
     qrcode.ts                    ← génération PNG + URL absolue
     cloudinary.ts                ← config + upload
     dish-schema.ts                ← validation zod du formulaire plat
@@ -126,6 +133,26 @@ concerné — cette liste est un résumé, pas la seule source.
 - **Rate limiting en mémoire** (`src/lib/scan.ts`) — suffisant pour une
   seule instance serveur. À remplacer par un store partagé (Upstash Redis)
   avant un déploiement multi-instance.
+- **Vue de fiche plat ajoutée en Sprint 3** — le Sprint 1 n'enregistrait un
+  `ScanEvent` avec `dishId` que lors d'une activation AR ; il n'y avait
+  donc aucune donnée pour calculer un taux d'activation AR (activations ÷
+  vues). La page fiche plat enregistre maintenant aussi un scan à
+  l'ouverture (`arActivated: false`), distinct de celui déclenché par
+  l'activation AR — voir `src/lib/analytics.ts`.
+- **Thème forcé sombre pour la landing marketing (section 13.4) — pas
+  encore appliqué.** `next-themes` est configuré en `defaultTheme="system"`
+  globalement (correct pour le dashboard, qui doit respecter la
+  préférence système + un choix persisté). La vraie landing page (Sprint
+  4) n'existe pas encore ; quand elle sera construite, il faudra soit un
+  second `ThemeProvider` scopé à ses routes avec `defaultTheme="dark"` et
+  `enableSystem={false}`, soit un mécanisme équivalent — ne pas simplement
+  changer le défaut global, ça casserait le comportement voulu du
+  dashboard.
+- **Section 13.2 ne donne pas de valeurs succès/alerte pour le mode
+  clair** — celles du mode sombre (`#3FA66C` / `#C24A3B`) sont réutilisées
+  telles quelles pour les deux modes (`--success`, `--destructive` dans
+  `globals.css`). À revoir si un vrai contrôle de contraste WCAG AA
+  (section 17.5) le juge insuffisant en mode clair.
 
 ---
 
@@ -214,8 +241,12 @@ créés via un script SQL équivalent collé directement dans Neon.
 
 ---
 
-## 8. Prochaines étapes (Sprint 3, section 21)
+## 8. Prochaines étapes (Sprint 4, section 21)
 
-Analytics par plat (section 10.3), système de design dark/light complet
-avec la palette de la section 13 (actuellement thème shadcn/ui neutre par
-défaut, pas encore la palette de marque Vorae).
+Landing page complète avec le copywriting livré (section 12) — à utiliser
+tel quel, ne pas paraphraser sans validation — et Stripe Billing (3
+paliers, mensuel/annuel, facturation à l'usage — section 15). Rappel
+important pour cette landing : forcer le thème sombre sur ses routes
+spécifiquement (voir l'écart section 4 sur `next-themes`), et appliquer les
+tokens de couleur exacts de la section 13 déjà en place depuis le Sprint 3
+— ne pas improviser de palette alternative.
