@@ -13,6 +13,7 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        card: "var(--radius-card)",
       },
       colors: {
         background: "hsl(var(--background))",
@@ -54,7 +55,8 @@ const config: Config = {
         ring: "hsl(var(--ring))",
       },
       fontFamily: {
-        serif: ["var(--font-fraunces)", "Georgia", "serif"],
+        heading: ["var(--font-heading)", "Space Grotesk", "system-ui", "sans-serif"],
+        sans: ["var(--font-body)", "Inter", "system-ui", "sans-serif"],
       },
     },
   },

@@ -2,62 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Palette Vorae — section 13.1 (sombre) / 13.2 (clair) du cahier des
-   charges, convertie en HSL pour rester compatible avec les tokens
-   `hsl(var(--x))` déjà utilisés par tailwind.config.ts.
-   `--success` n'est pas un token shadcn/ui standard — ajouté pour les
-   indicateurs positifs (section 13.1 "confirmations"). La section 13.2 ne
-   donne pas de valeurs distinctes de succès/alerte pour le mode clair ;
-   les valeurs du mode sombre sont réutilisées telles quelles (suffisamment
-   saturées pour rester lisibles sur fond clair). */
+/* Palette reflect.app (mesurée, cf. prompt fourni par le client) —
+   remplace délibérément la palette Vorae de la section 13 du cahier des
+   charges, à la demande explicite du client (voir CONTEXT.md, section 4 :
+   "Palette reflect.app, pas la palette Vorae de la section 13"). Convertie
+   en HSL pour les tokens `hsl(var(--x))` déjà en place.
+
+   reflect.app ne mesure qu'un thème sombre — aucune valeur claire n'existe
+   dans la source. Le mode clair ci-dessous est dérivé (même famille de
+   teintes, luminosité inversée) pour conserver le bascule sombre/clair du
+   dashboard (section 13.4 du cahier, toujours valide) ; ce n'est pas une
+   valeur "mesurée" au même titre que le reste. --destructive/--success
+   n'existent pas non plus dans la palette reflect.app (page marketing,
+   pas de besoin d'états d'erreur) — conservées de la palette Vorae
+   d'origine, seul le dashboard en a l'usage. */
 @layer base {
   :root {
-    --background: 45 29% 97%; /* #FAF9F6 */
-    --foreground: 0 0% 10%; /* #1A1A1A */
-    --card: 0 0% 100%; /* #FFFFFF */
-    --card-foreground: 0 0% 10%;
+    --background: 249 30% 98%;
+    --foreground: 248 40% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 248 40% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 38 67% 37%; /* or — #9C6F1F */
-    --primary-foreground: 0 0% 9%;
-    --secondary: 176 53% 26%; /* sarcelle — #1F6560 */
-    --secondary-foreground: 45 29% 97%;
-    --muted: 42 16% 88%;
-    --muted-foreground: 0 0% 36%; /* #5C5C5C */
-    --accent: 42 16% 88%; /* #E5E2DB */
-    --accent-foreground: 0 0% 10%;
-    --destructive: 7 53% 50%; /* #C24A3B */
+    --popover-foreground: 248 40% 12%;
+    --primary: 300 44% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 264 71% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 14% 93%;
+    --muted-foreground: 240 10% 40%;
+    --accent: 240 14% 93%;
+    --accent-foreground: 248 40% 12%;
+    --destructive: 7 53% 50%;
     --destructive-foreground: 0 0% 98%;
-    --success: 146 45% 45%; /* #3FA66C */
-    --success-foreground: 0 0% 9%;
-    --border: 42 16% 88%; /* #E5E2DB */
-    --input: 42 16% 88%;
-    --ring: 38 67% 37%;
-    --radius: 0.5rem;
+    --success: 146 45% 40%;
+    --success-foreground: 0 0% 98%;
+    --border: 240 14% 88%;
+    --input: 240 14% 88%;
+    --ring: 300 44% 45%;
+    --radius: 7px;
+    --radius-card: 24px;
   }
 
   [data-theme="dark"] {
-    --background: 0 0% 4%; /* #0A0A0A */
-    --foreground: 60 20% 95%; /* #F5F5F0 */
-    --card: 0 0% 9%; /* #161616 */
-    --card-foreground: 60 20% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 60 20% 95%;
-    --primary: 38 60% 45%; /* or — #B8862E */
-    --primary-foreground: 0 0% 9%;
-    --secondary: 176 50% 33%; /* sarcelle — #2A7F7A */
-    --secondary-foreground: 60 20% 95%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 63%; /* #A0A0A0 */
-    --accent: 0 0% 15%; /* #262626 */
-    --accent-foreground: 60 20% 95%;
-    --destructive: 7 53% 50%; /* #C24A3B */
-    --destructive-foreground: 60 20% 95%;
-    --success: 146 45% 45%; /* #3FA66C */
-    --success-foreground: 0 0% 9%;
-    --border: 0 0% 15%; /* #262626 */
-    --input: 0 0% 15%;
-    --ring: 38 60% 45%;
+    --background: 249 100% 4%; /* #030014 */
+    --foreground: 248 80% 96%; /* #efedfd */
+    --card: 240 50% 19%; /* #181848 */
+    --card-foreground: 248 80% 96%;
+    --popover: 240 50% 19%;
+    --popover-foreground: 248 80% 96%;
+    --primary: 300 44% 89%; /* #f0d8f0 */
+    --primary-foreground: 0 0% 7%; /* #111111, cf. spec bouton primaire */
+    --secondary: 264 71% 33%; /* #481890 */
+    --secondary-foreground: 248 80% 96%;
+    --muted: 240 50% 19%;
+    --muted-foreground: 240 14% 55%;
+    --accent: 240 14% 33%; /* #484860 */
+    --accent-foreground: 248 80% 96%;
+    --destructive: 7 53% 50%;
+    --destructive-foreground: 248 80% 96%;
+    --success: 146 45% 45%;
+    --success-foreground: 0 0% 7%;
+    --border: 240 14% 33%; /* #484860 */
+    --input: 240 14% 33%;
+    --ring: 300 44% 89%;
   }
 }
 
@@ -74,7 +81,8 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-fraunces), Georgia, serif;
+    font-family: var(--font-heading), "Space Grotesk", system-ui, sans-serif;
+    font-weight: 500;
   }
 }
 
