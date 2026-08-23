@@ -132,11 +132,27 @@ concerné — cette liste est un résumé, pas la seule source.
 ## 5. Pièges connus / à ne pas refaire
 
 - **Neon : toujours utiliser la connexion POOLED** (`-pooler` dans le
-  hostname) pour `DATABASE_URL` sur Vercel. La connexion directe a une
-  limite de connexions simultanées très basse sur le plan gratuit —
-  utilisée depuis du serverless, elle produit des erreurs 500
-  intermittentes ("Application error: a server-side exception has
-  occurred") difficiles à diagnostiquer sans ça en tête.
+  hostname) pour `DATABASE_URL` sur Vercel — bonne pratique générale pour
+  du serverless (la connexion directe a une limite de connexions
+  simultanées très basse sur le plan gratuit). Note : ce n'était **pas**
+  la cause du bug ci-dessous malgré la ressemblance des symptômes — les
+  deux pièges peuvent coexister, ne pas arrêter le diagnostic au premier
+  suspect plausible.
+- **Vercel peut créer une variable d'env comme chaîne VIDE plutôt qu'absente**
+  — au tout premier import du projet, Vercel avait auto-détecté les noms
+  de variables depuis `.env.example` (dont `NEXT_PUBLIC_APP_URL=`, sans
+  valeur) et créé l'entrée correspondante vide plutôt que de ne rien
+  créer. `process.env.NEXT_PUBLIC_APP_URL` valait donc `""`, pas
+  `undefined`. Tout code utilisant `??` pour un fallback laissait passer
+  cette chaîne vide (elle n'est pas null/undefined) — `new URL(path, "")`
+  plante avec `ERR_INVALID_URL`. Symptôme en prod : "Application error: a
+  server-side exception has occurred" sans plus de détail — le vrai
+  message (`TypeError: Invalid URL ... base: ''`) n'était visible que
+  dans Vercel → Deployments → [déploiement] → Runtime Logs, pas dans
+  l'onglet "Logs" du projet (qui est production-only). **Toujours
+  utiliser `||` (pas `??`) pour un fallback de variable d'environnement
+  potentiellement vide**, et vérifier les Runtime Logs du déploiement
+  concerné dès qu'une erreur 500 générique apparaît, avant de deviner.
 - **Aucune connexion TCP brute (Postgres, etc.) depuis l'environnement de
   dev sandboxé** utilisé pour ce projet — seul le HTTPS passe par le proxy
   réseau. Toute migration/seed Prisma contre la vraie base doit être faite
