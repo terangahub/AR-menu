@@ -6,6 +6,9 @@ import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
 type Allergen = { code: string; nameFr: string; nameEn: string };
+type CategoryOption = { category: string; categoryEn: string | null };
+
+const NEW_CATEGORY = "__new__";
 
 export type DishFormValues = {
   name: string;
@@ -42,11 +45,13 @@ export function DishForm({
   dishId,
   initialValues,
   allergens,
+  existingCategories,
 }: {
   mode: "create" | "edit";
   dishId?: string;
   initialValues?: Partial<DishFormValues>;
   allergens: Allergen[];
+  existingCategories: CategoryOption[];
 }) {
   const t = useTranslations("Dashboard.dishForm");
   const router = useRouter();
@@ -56,6 +61,25 @@ export function DishForm({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const initialCategory = initialValues?.category ?? "";
+  const matchesExisting = existingCategories.some((c) => c.category === initialCategory);
+  const [categoryChoice, setCategoryChoice] = useState<string>(
+    initialCategory === "" ? "" : matchesExisting ? initialCategory : NEW_CATEGORY
+  );
+
+  function handleCategoryChoice(choice: string) {
+    setCategoryChoice(choice);
+    if (choice === NEW_CATEGORY) return;
+    if (choice === "") {
+      set("category", "");
+      set("categoryEn", "");
+      return;
+    }
+    const match = existingCategories.find((c) => c.category === choice);
+    set("category", choice);
+    set("categoryEn", match?.categoryEn ?? "");
+  }
 
   function set<K extends keyof DishFormValues>(key: K, value: DishFormValues[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -100,7 +124,7 @@ export function DishForm({
     );
 
     if (!res.ok) {
-      setError("Error");
+      setError(t("error"));
       setSaving(false);
       return;
     }
@@ -154,19 +178,38 @@ export function DishForm({
         </Field>
 
         <Field label={t("categoryFr")}>
-          <input
-            value={values.category}
-            onChange={(e) => set("category", e.target.value)}
+          <select
+            value={categoryChoice}
+            onChange={(e) => handleCategoryChoice(e.target.value)}
             className="input"
-          />
+          >
+            <option value="">{t("noCategory")}</option>
+            {existingCategories.map((c) => (
+              <option key={c.category} value={c.category}>
+                {c.category}
+              </option>
+            ))}
+            <option value={NEW_CATEGORY}>{t("newCategory")}</option>
+          </select>
         </Field>
-        <Field label={t("categoryEn")}>
-          <input
-            value={values.categoryEn}
-            onChange={(e) => set("categoryEn", e.target.value)}
-            className="input"
-          />
-        </Field>
+        {categoryChoice === NEW_CATEGORY && (
+          <>
+            <Field label={t("categoryFr")}>
+              <input
+                value={values.category}
+                onChange={(e) => set("category", e.target.value)}
+                className="input"
+              />
+            </Field>
+            <Field label={t("categoryEn")}>
+              <input
+                value={values.categoryEn}
+                onChange={(e) => set("categoryEn", e.target.value)}
+                className="input"
+              />
+            </Field>
+          </>
+        )}
 
         <Field label={t("ingredientsFr")}>
           <input

@@ -51,6 +51,8 @@
       "descriptionEn": "Description (EN)",
       "categoryFr": "Catégorie (FR)",
       "categoryEn": "Catégorie (EN)",
+      "newCategory": "+ Nouvelle catégorie…",
+      "noCategory": "Aucune catégorie",
       "ingredientsFr": "Ingrédients (FR)",
       "ingredientsEn": "Ingrédients (EN)",
       "price": "Prix ($)",
@@ -62,7 +64,8 @@
       "model3dUsdz": "Modèle iOS (.usdz, optionnel)",
       "save": "Enregistrer",
       "saving": "Enregistrement…",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue. Réessayez."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -71,8 +74,11 @@
       "generate": "Générer",
       "download": "Télécharger PNG",
       "print": "Imprimer / PDF",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer ce QR code définitivement ?",
       "scans": "{count} scans",
-      "empty": "Aucun QR code pour l'instant."
+      "empty": "Aucun QR code pour l'instant.",
+      "error": "Une erreur est survenue. Réessayez."
     }
   }
 }

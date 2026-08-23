@@ -51,6 +51,8 @@
       "descriptionEn": "Description (EN)",
       "categoryFr": "Category (FR)",
       "categoryEn": "Category (EN)",
+      "newCategory": "+ New category…",
+      "noCategory": "No category",
       "ingredientsFr": "Ingredients (FR)",
       "ingredientsEn": "Ingredients (EN)",
       "price": "Price ($)",
@@ -62,7 +64,8 @@
       "model3dUsdz": "iOS model (.usdz, optional)",
       "save": "Save",
       "saving": "Saving…",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "error": "Something went wrong. Try again."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -71,8 +74,11 @@
       "generate": "Generate",
       "download": "Download PNG",
       "print": "Print / PDF",
+      "delete": "Delete",
+      "confirmDelete": "Delete this QR code permanently?",
       "scans": "{count} scans",
-      "empty": "No QR codes yet."
+      "empty": "No QR codes yet.",
+      "error": "Something went wrong. Try again."
     }
   }
 }

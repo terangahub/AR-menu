@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -13,14 +14,17 @@ export type QrCodeItem = {
 
 export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
   const t = useTranslations("Dashboard.qrcodes");
+  const router = useRouter();
   const [qrCodes, setQrCodes] = useState(initial);
   const [tableNumber, setTableNumber] = useState("");
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     if (!tableNumber.trim()) return;
     setCreating(true);
+    setError(null);
 
     const res = await fetch("/api/qrcodes", {
       method: "POST",
@@ -29,15 +33,41 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
     });
 
     setCreating(false);
-    if (!res.ok) return;
+    if (!res.ok) {
+      setError(t("error"));
+      return;
+    }
     const created = await res.json();
+    // Ajout optimiste + refresh du Server Component (pour rester cohérent
+    // si un autre onglet a aussi modifié la liste) plutôt que de se fier
+    // uniquement à l'un ou l'autre.
     setQrCodes((prev) => [...prev, created]);
     setTableNumber("");
+    router.refresh();
+  }
+
+  async function handleDelete(qrCode: QrCodeItem) {
+    if (!confirm(t("confirmDelete"))) return;
+    setError(null);
+    const previous = qrCodes;
+    setQrCodes((prev) => prev.filter((q) => q.id !== qrCode.id));
+
+    const res = await fetch(`/api/qrcodes/${qrCode.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      setQrCodes(previous);
+      setError(t("error"));
+      return;
+    }
+    router.refresh();
   }
 
   async function handleDownload(qrCode: QrCodeItem) {
+    setError(null);
     const res = await fetch(`/api/qrcodes/${qrCode.id}/png`);
-    if (!res.ok) return;
+    if (!res.ok) {
+      setError(t("error"));
+      return;
+    }
     const { png } = await res.json();
     const a = document.createElement("a");
     a.href = png;
@@ -61,6 +91,8 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
         </Button>
       </form>
 
+      {error && <p className="text-sm text-destructive">{error}</p>}
+
       {qrCodes.length === 0 ? (
         <p className="text-muted-foreground">{t("empty")}</p>
       ) : (
@@ -81,6 +113,9 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
                 </Button>
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/dashboard/qrcodes/${qr.id}/print`}>{t("print")}</Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(qr)}>
+                  {t("delete")}
                 </Button>
               </div>
             </div>

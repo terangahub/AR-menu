@@ -26,7 +26,9 @@ export default async function DashboardDishesPage({
     select: {
       id: true,
       name: true,
+      nameEn: true,
       category: true,
+      categoryEn: true,
       price: true,
       isAvailable: true,
       isArReady: true,
@@ -41,7 +43,7 @@ export default async function DashboardDishesPage({
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-      <DishList dishes={dashboardDishes} />
+      <DishList dishes={dashboardDishes} locale={locale} />
     </div>
   );
 }

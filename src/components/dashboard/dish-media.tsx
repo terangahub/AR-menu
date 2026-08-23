@@ -39,7 +39,7 @@ export function DishMedia({
 
     setUploading(null);
     if (!res.ok) {
-      setError("Error");
+      setError(t("error"));
       return;
     }
     router.refresh();
@@ -63,7 +63,7 @@ export function DishMedia({
 
     setUploading(null);
     if (!res.ok) {
-      setError("Error");
+      setError(t("error"));
       return;
     }
     router.refresh();

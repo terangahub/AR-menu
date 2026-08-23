@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { DishForm, type DishFormValues } from "@/components/dashboard/dish-form";
 import { DishMedia } from "@/components/dashboard/dish-media";
+import { getExistingCategories } from "@/lib/dish-categories";
 
 export default async function EditDishPage({
   params,
@@ -25,6 +26,8 @@ export default async function EditDishPage({
   if (!dish || !restaurantUser || dish.restaurantId !== restaurantUser.restaurantId) {
     notFound();
   }
+
+  const existingCategories = await getExistingCategories(restaurantUser.restaurantId);
 
   const initialValues: Partial<DishFormValues> = {
     name: dish.name,
@@ -55,6 +58,7 @@ export default async function EditDishPage({
         dishId={dish.id}
         initialValues={initialValues}
         allergens={allergens}
+        existingCategories={existingCategories}
       />
     </div>
   );
