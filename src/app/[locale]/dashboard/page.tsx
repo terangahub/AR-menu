@@ -100,7 +100,7 @@ function StatCard({
       {deltaPct != null && (
         <p
           className={`mt-1 text-xs ${
-            deltaPct >= 0 ? "text-green-600" : "text-destructive"
+            deltaPct >= 0 ? "text-success" : "text-destructive"
           }`}
         >
           {deltaPct >= 0 ? "+" : ""}

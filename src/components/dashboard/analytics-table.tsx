@@ -65,7 +65,7 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
               <td className="p-3">{row.arRate != null ? `${row.arRate}%` : "—"}</td>
               <td className="p-3">
                 {row.trend7dPct != null ? (
-                  <span className={row.trend7dPct >= 0 ? "text-green-600" : "text-destructive"}>
+                  <span className={row.trend7dPct >= 0 ? "text-success" : "text-destructive"}>
                     {row.trend7dPct >= 0 ? "↑" : "↓"} {Math.abs(row.trend7dPct)}%
                   </span>
                 ) : (

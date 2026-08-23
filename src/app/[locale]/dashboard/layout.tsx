@@ -2,6 +2,7 @@ import { UserButton } from "@clerk/nextjs";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCurrentRestaurantUser } from "@/lib/auth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Dashboard restaurateur (section 10) — protégé par le middleware Clerk
 // (src/middleware.ts) sur /:locale/dashboard(.*). Sprint 2 : gestion des
@@ -55,6 +56,7 @@ export default async function DashboardLayout({
           <span className="text-sm text-muted-foreground">
             {restaurantUser.restaurant.name}
           </span>
+          <ThemeToggle />
           <UserButton />
         </div>
       </header>

@@ -2,50 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Palette Vorae — section 13.1 (sombre) / 13.2 (clair) du cahier des
+   charges, convertie en HSL pour rester compatible avec les tokens
+   `hsl(var(--x))` déjà utilisés par tailwind.config.ts.
+   `--success` n'est pas un token shadcn/ui standard — ajouté pour les
+   indicateurs positifs (section 13.1 "confirmations"). La section 13.2 ne
+   donne pas de valeurs distinctes de succès/alerte pour le mode clair ;
+   les valeurs du mode sombre sont réutilisées telles quelles (suffisamment
+   saturées pour rester lisibles sur fond clair). */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --background: 45 29% 97%; /* #FAF9F6 */
+    --foreground: 0 0% 10%; /* #1A1A1A */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84% 60%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 38 67% 37%; /* or — #9C6F1F */
+    --primary-foreground: 0 0% 9%;
+    --secondary: 176 53% 26%; /* sarcelle — #1F6560 */
+    --secondary-foreground: 45 29% 97%;
+    --muted: 42 16% 88%;
+    --muted-foreground: 0 0% 36%; /* #5C5C5C */
+    --accent: 42 16% 88%; /* #E5E2DB */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 7 53% 50%; /* #C24A3B */
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 9%;
+    --success: 146 45% 45%; /* #3FA66C */
+    --success-foreground: 0 0% 9%;
+    --border: 42 16% 88%; /* #E5E2DB */
+    --input: 42 16% 88%;
+    --ring: 38 67% 37%;
     --radius: 0.5rem;
   }
 
   [data-theme="dark"] {
-    --background: 0 0% 4%;
-    --foreground: 60 9% 96%;
-    --card: 0 0% 9%;
-    --card-foreground: 60 9% 96%;
+    --background: 0 0% 4%; /* #0A0A0A */
+    --foreground: 60 20% 95%; /* #F5F5F0 */
+    --card: 0 0% 9%; /* #161616 */
+    --card-foreground: 60 20% 95%;
     --popover: 0 0% 9%;
-    --popover-foreground: 60 9% 96%;
-    --primary: 60 9% 96%;
+    --popover-foreground: 60 20% 95%;
+    --primary: 38 60% 45%; /* or — #B8862E */
     --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 60 9% 96%;
+    --secondary: 176 50% 33%; /* sarcelle — #2A7F7A */
+    --secondary-foreground: 60 20% 95%;
     --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 63%;
-    --accent: 0 0% 15%;
-    --accent-foreground: 60 9% 96%;
-    --destructive: 0 63% 50%;
-    --destructive-foreground: 60 9% 96%;
-    --border: 0 0% 15%;
+    --muted-foreground: 0 0% 63%; /* #A0A0A0 */
+    --accent: 0 0% 15%; /* #262626 */
+    --accent-foreground: 60 20% 95%;
+    --destructive: 7 53% 50%; /* #C24A3B */
+    --destructive-foreground: 60 20% 95%;
+    --success: 146 45% 45%; /* #3FA66C */
+    --success-foreground: 0 0% 9%;
+    --border: 0 0% 15%; /* #262626 */
     --input: 0 0% 15%;
-    --ring: 60 9% 84%;
+    --ring: 38 60% 45%;
   }
 }
 
@@ -55,6 +67,14 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-fraunces), Georgia, serif;
   }
 }
 
