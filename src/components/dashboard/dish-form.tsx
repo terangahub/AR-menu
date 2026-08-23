@@ -105,7 +105,15 @@ export function DishForm({
       return;
     }
 
-    router.push("/dashboard/dishes");
+    if (mode === "create") {
+      // Redirige vers l'édition pour permettre d'ajouter tout de suite la
+      // photo et le modèle 3D — pas de champ fichier avant que le plat
+      // n'existe (il faut son id pour les uploads).
+      const created = (await res.json()) as { id: string };
+      router.push(`/dashboard/dishes/${created.id}/edit`);
+    } else {
+      router.push("/dashboard/dishes");
+    }
     router.refresh();
   }
 
