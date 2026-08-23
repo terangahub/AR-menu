@@ -20,3 +20,7 @@ export function absoluteMenuUrl(targetUrl: string): string {
 export async function generateQrPngDataUrl(url: string): Promise<string> {
   return QRCode.toDataURL(url, { width: 512, margin: 2 });
 }
+
+export async function generateQrPngBuffer(url: string): Promise<Buffer> {
+  return QRCode.toBuffer(url, { width: 512, margin: 2 });
+}

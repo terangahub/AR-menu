@@ -61,20 +61,6 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
     router.refresh();
   }
 
-  async function handleDownload(qrCode: QrCodeItem) {
-    setError(null);
-    const res = await fetch(`/api/qrcodes/${qrCode.id}/png`);
-    if (!res.ok) {
-      setError(t("error"));
-      return;
-    }
-    const { png } = await res.json();
-    const a = document.createElement("a");
-    a.href = png;
-    a.download = `vorae-qr-table-${qrCode.tableNumber ?? qrCode.id}.png`;
-    a.click();
-  }
-
   return (
     <div className="flex flex-col gap-6">
       <form onSubmit={handleCreate} className="flex items-end gap-2">
@@ -108,8 +94,8 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
                 </span>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleDownload(qr)}>
-                  {t("download")}
+                <Button asChild variant="outline" size="sm">
+                  <a href={`/api/qrcodes/${qr.id}/png`}>{t("download")}</a>
                 </Button>
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/dashboard/qrcodes/${qr.id}/print`}>{t("print")}</Link>
