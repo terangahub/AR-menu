@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { localizedDishName } from "@/lib/dish-locale";
 
 // Analytics par plat (section 10.1, 10.3). Toute mesure basée sur
 // ScanEvent : une ligne dishId=null = un scan de menu (F01), une ligne
@@ -36,7 +37,7 @@ async function countScans(
 
 // --- Vue d'ensemble (section 10.1) ---
 
-export async function getOverviewStats(restaurantId: string) {
+export async function getOverviewStats(restaurantId: string, locale: string) {
   const [scansToday, scansYesterday, scans7d, scansPrevious7d, scans30d, scansPrevious30d] =
     await Promise.all([
       countScans(restaurantId, { since: daysAgo(1) }),
@@ -71,13 +72,13 @@ export async function getOverviewStats(restaurantId: string) {
   const topDish = topDishRow[0]?.dishId
     ? await prisma.dish.findUnique({
         where: { id: topDishRow[0].dishId },
-        select: { id: true, name: true },
+        select: { id: true, name: true, nameEn: true },
       })
     : null;
 
   const dishesMissingModel = await prisma.dish.findMany({
     where: { restaurantId, isAvailable: true, isArReady: false },
-    select: { id: true, name: true },
+    select: { id: true, name: true, nameEn: true },
     orderBy: { name: "asc" },
   });
 
@@ -88,10 +89,17 @@ export async function getOverviewStats(restaurantId: string) {
       last30d: { count: scans30d, deltaPct: percentDelta(scans30d, scansPrevious30d) },
     },
     topDishOfTheWeek: topDish
-      ? { id: topDish.id, name: topDish.name, scans: topDishRow[0]._count.dishId }
+      ? {
+          id: topDish.id,
+          name: localizedDishName(topDish.name, topDish.nameEn, locale),
+          scans: topDishRow[0]._count.dishId,
+        }
       : null,
     arActivationRate30d: dishViews30d > 0 ? Math.round((arActivations30d / dishViews30d) * 100) : null,
-    dishesMissingModel,
+    dishesMissingModel: dishesMissingModel.map((d) => ({
+      id: d.id,
+      name: localizedDishName(d.name, d.nameEn, locale),
+    })),
   };
 }
 
@@ -161,10 +169,13 @@ export type GlobalDishRow = {
   trend7dPct: number | null;
 };
 
-export async function getGlobalDishTable(restaurantId: string): Promise<GlobalDishRow[]> {
+export async function getGlobalDishTable(
+  restaurantId: string,
+  locale: string
+): Promise<GlobalDishRow[]> {
   const dishes = await prisma.dish.findMany({
     where: { restaurantId },
-    select: { id: true, name: true },
+    select: { id: true, name: true, nameEn: true },
     orderBy: { name: "asc" },
   });
 
@@ -180,7 +191,7 @@ export async function getGlobalDishTable(restaurantId: string): Promise<GlobalDi
 
       return {
         id: dish.id,
-        name: dish.name,
+        name: localizedDishName(dish.name, dish.nameEn, locale),
         scans30d,
         arRate: views > 0 ? Math.round((arViews / views) * 100) : null,
         trend7dPct: percentDelta(last7d, previous7d),

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { getDishAnalytics } from "@/lib/analytics";
+import { localizedDishName } from "@/lib/dish-locale";
 import { Link } from "@/i18n/navigation";
 import { DishTrendChart } from "@/components/dashboard/dish-trend-chart";
 
@@ -11,14 +12,17 @@ import { DishTrendChart } from "@/components/dashboard/dish-trend-chart";
 export default async function DishAnalyticsPage({
   params,
 }: {
-  params: Promise<{ dishId: string }>;
+  params: Promise<{ dishId: string; locale: string }>;
 }) {
-  const { dishId } = await params;
+  const { dishId, locale } = await params;
   const t = await getTranslations("Dashboard.analytics");
   const restaurantUser = await getCurrentRestaurantUser();
 
   const dish = restaurantUser
-    ? await prisma.dish.findUnique({ where: { id: dishId }, select: { id: true, name: true, restaurantId: true } })
+    ? await prisma.dish.findUnique({
+        where: { id: dishId },
+        select: { id: true, name: true, nameEn: true, restaurantId: true },
+      })
     : null;
 
   if (!dish || !restaurantUser || dish.restaurantId !== restaurantUser.restaurantId) {
@@ -33,7 +37,9 @@ export default async function DishAnalyticsPage({
         ← {t("backToOverview")}
       </Link>
 
-      <h1 className="text-2xl font-semibold tracking-tight">{dish.name}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {localizedDishName(dish.name, dish.nameEn, locale)}
+      </h1>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Stat label={t("today")} value={analytics.counts.today} />

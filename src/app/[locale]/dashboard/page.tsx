@@ -20,7 +20,7 @@ export default async function DashboardOverviewPage({
     return;
   }
 
-  const stats = await getOverviewStats(restaurantUser.restaurantId);
+  const stats = await getOverviewStats(restaurantUser.restaurantId, locale);
 
   return (
     <div className="flex flex-col gap-8">

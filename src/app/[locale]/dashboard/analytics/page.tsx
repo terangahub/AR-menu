@@ -19,14 +19,14 @@ export default async function DashboardAnalyticsPage({
     return;
   }
 
-  const rows = await getGlobalDishTable(restaurantUser.restaurantId);
+  const rows = await getGlobalDishTable(restaurantUser.restaurantId, locale);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <a
-          href="/api/analytics/export"
+          href={`/api/analytics/export?locale=${locale}`}
           className="text-sm text-primary hover:underline"
         >
           {t("exportCsv")}
