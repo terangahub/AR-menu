@@ -87,7 +87,7 @@ src/
   i18n/                          ← next-intl (routing, navigation, request config)
 prisma/
   schema.prisma
-  seed.ts                        ← restaurant démo "vorae-demo" + 3 plats + 1 QR code
+  seed.ts                        ← restaurant démo "demo" + 3 plats + 1 QR code
 ```
 
 ---
@@ -129,7 +129,7 @@ concerné — cette liste est un résumé, pas la seule source.
   upgrade payant vers GitHub Team.
 - **Onboarding dashboard simplifié** — pas de flux d'invitation d'équipe
   (section 10.7, hors scope Sprint 2). Le premier compte Clerk qui visite
-  `/dashboard` est auto-provisionné "owner" du restaurant `vorae-demo`
+  `/dashboard` est auto-provisionné "owner" du restaurant `demo`
   (voir `src/lib/auth.ts`). À remplacer avant d'ouvrir à plusieurs
   restaurants/plusieurs comptes.
 - **Rate limiting en mémoire** (`src/lib/scan.ts`) — suffisant pour une

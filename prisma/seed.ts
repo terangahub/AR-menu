@@ -38,11 +38,11 @@ async function main() {
   );
 
   const restaurant = await prisma.restaurant.upsert({
-    where: { slug: "vorae-demo" },
+    where: { slug: "demo" },
     update: {},
     create: {
       name: "Vorae Demo",
-      slug: "vorae-demo",
+      slug: "demo",
       city: "Montréal",
       email: "demo@vorae.app",
       defaultLocale: "fr",
