@@ -37,11 +37,17 @@ export default async function DashboardLayout({
             Vorae
           </Link>
           <nav className="flex gap-4 text-sm">
+            <Link href="/dashboard" className="hover:underline">
+              {t("nav.overview")}
+            </Link>
             <Link href="/dashboard/dishes" className="hover:underline">
               {t("nav.dishes")}
             </Link>
             <Link href="/dashboard/qrcodes" className="hover:underline">
               {t("nav.qrcodes")}
+            </Link>
+            <Link href="/dashboard/analytics" className="hover:underline">
+              {t("nav.analytics")}
             </Link>
           </nav>
         </div>

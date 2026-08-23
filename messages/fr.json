@@ -25,8 +25,43 @@
   "Dashboard": {
     "noRestaurant": "Aucun restaurant associé à ce compte.",
     "nav": {
+      "overview": "Vue d'ensemble",
       "dishes": "Plats",
-      "qrcodes": "QR codes"
+      "qrcodes": "QR codes",
+      "analytics": "Analytics"
+    },
+    "overview": {
+      "title": "Vue d'ensemble",
+      "scansToday": "Scans aujourd'hui",
+      "scans7d": "Scans (7 jours)",
+      "scans30d": "Scans (30 jours)",
+      "vsPrevious": "vs période précédente",
+      "topDishOfWeek": "Plat le plus vu cette semaine",
+      "noTopDish": "Pas encore de données cette semaine.",
+      "arActivationRate": "Taux d'activation AR (30 jours)",
+      "noArData": "Pas encore de données.",
+      "missingModelTitle": "Plats sans modèle 3D",
+      "missingModelEmpty": "Tous les plats disponibles ont un modèle 3D.",
+      "viewAnalytics": "Voir les analytics détaillées"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "backToOverview": "Retour à la vue d'ensemble",
+      "dish": "Plat",
+      "scans30d": "Scans (30j)",
+      "arRate": "Taux AR",
+      "trend7d": "Tendance 7j",
+      "exportCsv": "Exporter en CSV",
+      "detail": "Détails",
+      "today": "Aujourd'hui",
+      "last7d": "7 jours",
+      "last30d": "30 jours",
+      "last90d": "90 jours",
+      "trendChart": "Tendance (30 jours)",
+      "busiestHour": "Heure la plus consultée",
+      "busiestHourValue": "{hour}h",
+      "noBusiestHour": "Pas encore de données.",
+      "noData": "Aucun scan enregistré pour l'instant."
     },
     "dishes": {
       "title": "Plats",
