@@ -21,5 +21,64 @@
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
     "arUnavailable": "AR non disponible sur cet appareil — affichage 2D",
     "back": "Retour au menu"
+  },
+  "Dashboard": {
+    "noRestaurant": "Aucun restaurant associé à ce compte.",
+    "nav": {
+      "dishes": "Plats",
+      "qrcodes": "QR codes"
+    },
+    "dishes": {
+      "title": "Plats",
+      "search": "Rechercher un plat",
+      "allCategories": "Toutes les catégories",
+      "available": "Disponible",
+      "unavailable": "Indisponible",
+      "addDish": "Ajouter un plat",
+      "empty": "Aucun plat ne correspond.",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer ce plat définitivement ?",
+      "arReady": "AR prêt",
+      "noModel": "Pas de modèle 3D"
+    },
+    "dishForm": {
+      "newTitle": "Nouveau plat",
+      "editTitle": "Modifier le plat",
+      "nameFr": "Nom (FR)",
+      "nameEn": "Nom (EN)",
+      "descriptionFr": "Description (FR)",
+      "descriptionEn": "Description (EN)",
+      "categoryFr": "Catégorie (FR)",
+      "categoryEn": "Catégorie (EN)",
+      "newCategory": "+ Nouvelle catégorie…",
+      "noCategory": "Aucune catégorie",
+      "ingredientsFr": "Ingrédients (FR)",
+      "ingredientsEn": "Ingrédients (EN)",
+      "price": "Prix ($)",
+      "prepTimeMinutes": "Temps de préparation (min)",
+      "allergens": "Allergènes",
+      "available": "Disponible à la vente",
+      "photo": "Photo",
+      "model3dGlb": "Modèle 3D (.glb)",
+      "model3dUsdz": "Modèle iOS (.usdz, optionnel)",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue. Réessayez."
+    },
+    "qrcodes": {
+      "title": "QR codes",
+      "table": "Table",
+      "tableNumber": "Numéro de table",
+      "generate": "Générer",
+      "download": "Télécharger PNG",
+      "print": "Imprimer / PDF",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer ce QR code définitivement ?",
+      "scans": "{count} scans",
+      "empty": "Aucun QR code pour l'instant.",
+      "error": "Une erreur est survenue. Réessayez."
+    }
   }
 }
