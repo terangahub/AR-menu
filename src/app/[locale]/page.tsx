@@ -41,7 +41,7 @@ export default function Home() {
   ];
 
   return (
-    <div data-theme="dark" className="bg-background text-foreground">
+    <div data-theme="dark" className="relative grain bg-background text-foreground">
       <SiteHeader />
 
       <main>
@@ -51,6 +51,14 @@ export default function Home() {
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[600px] bg-[radial-gradient(60%_50%_at_50%_0%,hsl(var(--secondary)/0.35),transparent)]"
           />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-[-120px] -z-10 h-[520px] w-[520px] -translate-x-1/2"
+          >
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/25 via-secondary/25 to-transparent blur-3xl" />
+            <div className="absolute inset-16 animate-[spin_60s_linear_infinite] rounded-full border border-white/10" />
+            <div className="absolute inset-32 animate-[spin_90s_linear_infinite_reverse] rounded-full border border-white/[0.06]" />
+          </div>
           <div className="mx-auto max-w-[890px] text-center">
             <Reveal>
               <span className="inline-block rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
@@ -81,7 +89,11 @@ export default function Home() {
         {/* Early access / social proof */}
         <section className="px-4">
           <Reveal>
-            <div className="mx-auto flex max-w-[890px] flex-col items-center gap-2 rounded-card border border-border bg-card px-8 py-10 text-center">
+            <div className="relative mx-auto flex max-w-[890px] flex-col items-center gap-2 overflow-hidden rounded-card border border-border bg-card px-8 py-10 text-center">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-48 w-[70%] -translate-x-1/2 rounded-full bg-primary/20 blur-3xl"
+              />
               <span className="text-xs uppercase tracking-wide text-muted-foreground">
                 {t("earlyAccess.eyebrow")}
               </span>
@@ -104,7 +116,34 @@ export default function Home() {
               <p className="mx-auto mt-4 max-w-xl text-muted-foreground">{t("preview.body")}</p>
             </Reveal>
             <Reveal delayMs={120}>
-              <div className="mt-12 aspect-video w-full rounded-card border border-border bg-card" />
+              <div className="relative mx-auto mt-12 w-full max-w-xs">
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-secondary/30 blur-3xl"
+                />
+                <div className="relative aspect-[9/18] w-full rounded-[2.5rem] border border-white/10 bg-gradient-to-b from-card to-background p-2 shadow-[0_0_80px_-20px_hsl(var(--secondary)/0.7)]">
+                  <div className="relative h-full w-full overflow-hidden rounded-[2rem] bg-gradient-to-br from-secondary/50 via-background to-background">
+                    <div
+                      aria-hidden
+                      className="absolute inset-x-8 top-12 aspect-square rounded-full bg-gradient-to-br from-amber-300/80 via-orange-500/60 to-transparent blur-md"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="relative h-32 w-32">
+                        <div className="absolute inset-0 rounded-full border-2 border-primary/80" />
+                        <div className="absolute -inset-2 animate-pulse rounded-full border border-primary/30" />
+                        <span className="absolute -left-1 -top-1 h-4 w-4 rounded-tl-lg border-l-2 border-t-2 border-primary" />
+                        <span className="absolute -right-1 -top-1 h-4 w-4 rounded-tr-lg border-r-2 border-t-2 border-primary" />
+                        <span className="absolute -bottom-1 -left-1 h-4 w-4 rounded-bl-lg border-b-2 border-l-2 border-primary" />
+                        <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-br-lg border-b-2 border-r-2 border-primary" />
+                      </div>
+                    </div>
+                    <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+                      <Sparkles className="h-3 w-3" />
+                      AR
+                    </div>
+                  </div>
+                </div>
+              </div>
             </Reveal>
           </div>
         </section>
@@ -157,8 +196,23 @@ export default function Home() {
                         reversed ? "sm:flex-row-reverse" : ""
                       }`}
                     >
-                      <div className="flex aspect-square w-full max-w-xs shrink-0 items-center justify-center rounded-card border border-border bg-card">
-                        <Icon className="h-10 w-10 text-primary" />
+                      <div className="relative flex aspect-square w-full max-w-xs shrink-0 items-center justify-center overflow-hidden rounded-card border border-border bg-gradient-to-br from-card to-background">
+                        <div
+                          aria-hidden
+                          className="absolute inset-0 opacity-50"
+                          style={{
+                            backgroundImage:
+                              "radial-gradient(hsl(var(--border)) 1px, transparent 1px)",
+                            backgroundSize: "18px 18px",
+                          }}
+                        />
+                        <div
+                          aria-hidden
+                          className="absolute h-28 w-28 rounded-full bg-primary/25 blur-2xl"
+                        />
+                        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur">
+                          <Icon className="h-7 w-7 text-primary" />
+                        </div>
                       </div>
                       <div className={reversed ? "sm:text-right" : ""}>
                         <span className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -180,7 +234,11 @@ export default function Home() {
         {/* Final CTA */}
         <section className="px-4 py-24">
           <Reveal>
-            <div className="mx-auto flex max-w-[890px] flex-col items-center gap-6 rounded-card border border-border bg-card px-8 py-16 text-center">
+            <div className="relative mx-auto flex max-w-[890px] flex-col items-center gap-6 overflow-hidden rounded-card border border-border bg-card px-8 py-16 text-center">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -bottom-32 left-1/2 -z-10 h-64 w-[80%] -translate-x-1/2 rounded-full bg-secondary/30 blur-3xl"
+              />
               <h2 className="font-heading text-3xl font-medium tracking-tight sm:text-4xl">
                 {t("finalCta.title")}
               </h2>

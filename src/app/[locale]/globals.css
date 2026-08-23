@@ -90,4 +90,19 @@
   .input {
     @apply rounded-md border border-input bg-background px-3 py-1.5 text-sm;
   }
+
+  /* Grain léger sur les fonds sombres de la landing — évite le "plat" d'un
+     aplat de couleur pur, technique standard sur les sites premium sombres
+     (reflect.app en a un très subtil). SVG feTurbulence encodé en data URI,
+     aucune ressource externe. */
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
 }
