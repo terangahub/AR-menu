@@ -31,7 +31,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between border-b border-border px-6 py-3">
+      <header className="flex items-center justify-between border-b border-border px-6 py-3 print:hidden">
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="font-semibold">
             Vorae
