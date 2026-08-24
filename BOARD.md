@@ -102,6 +102,8 @@ fourni), couleurs adaptées aux tokens Vorae.
 | S45-09 | Section globe en pointillés | `DEV` | Canvas 2D, projection orthographique, rotation lente, marqueur pulsant sur Montréal. Reprise de la section "dotted across the globe" de reflect.app, fournie en vidéo. Aucune dépendance ajoutée. |
 | S45-10 | Rejouer les animations d'apparition dans les deux sens | `DEV` | Elles ne se déclenchaient qu'une fois. Deux seuils pour éviter le clignotement au ras de la limite. |
 | S45-08 | Remplacer les photos de plats des fonctionnalités par des champs défilants | `DEV` | Les photos illustraient mal le propos : une assiette de pâtes pour parler de barrière de langue. Remplacées par un champ de mots défilants qui dit littéralement le bénéfice (questions en salle, allergènes, langues), technique de la section "Hardened security" de reflect.app. |
+| S45-11 | Maquette du produit dans le hero | `DEV` | Remplace la photo de plat, jugée hors sujet : elle ne montrait pas le produit. Maquette du menu convive reconstituée en HTML, pas une capture, donc nette à toutes les densités et traduite. |
+| S45-12 | Halo horizon d'événement, hero et footer | `TODO` | Dôme lumineux repris de reflect.app, codé puis **retiré à la demande de Mouhamed** : le rendu CSS n'atteignait pas la référence. Une autre piste visuelle reste à trouver pour le bas de page. |
 
 ---
 

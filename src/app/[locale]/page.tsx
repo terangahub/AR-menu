@@ -8,7 +8,6 @@ import { ReviewsSection } from "@/components/landing/reviews-section";
 import { AboutSection } from "@/components/landing/about-section";
 import { BackToTop } from "@/components/landing/back-to-top";
 import { GlobeSection } from "@/components/landing/globe-section";
-import { EventHorizon } from "@/components/landing/event-horizon";
 import { ProductMockup } from "@/components/landing/product-mockup";
 import { FeatureField } from "@/components/landing/feature-field";
 import {
@@ -170,19 +169,12 @@ export default function Home() {
               </div>
             </Reveal>
 
-            {/* Le hero montre l'interface du produit posee sur le halo
-                d'horizon, comme reflect.app montre son application. Une
-                photo de plat achetee y figurait avant : jolie, mais elle
-                ne disait pas ce que fait Vorae. */}
+            {/* Le hero montre l'interface du produit. Une photo de plat
+                achetee y figurait avant : jolie, mais elle ne disait pas
+                ce que fait Vorae. */}
             <Reveal delayMs={340}>
               <div className="relative mx-auto mt-24 max-w-4xl">
-                <EventHorizon
-                  variant="hero"
-                  className="-inset-x-[45%] -top-24 bottom-[30%] h-auto w-auto"
-                />
-                <div className="relative z-10 pt-4">
-                  <ProductMockup />
-                </div>
+                <ProductMockup />
               </div>
             </Reveal>
           </div>
@@ -423,11 +415,6 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer, precede du meme halo d'horizon que le hero : il
-          referme la page sur le motif qui l'a ouverte. */}
-      <div className="relative h-64 overflow-hidden sm:h-80 lg:h-[22rem]">
-        <EventHorizon />
-      </div>
       <footer className="relative border-t border-white/10 px-5 py-16">
         <div className="mx-auto flex max-w-[1100px] flex-col gap-12 sm:flex-row sm:justify-between">
           <div>
