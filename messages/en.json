@@ -14,6 +14,17 @@
       "cta": "Book a demo",
       "secondaryCta": "See how it works"
     },
+    "mockup": {
+      "restaurant": "Bistro Vorae",
+      "table": "Table 4",
+      "search": "Search a dish",
+      "catAll": "All",
+      "catMains": "Mains",
+      "catStarters": "Starters",
+      "d1": "Signature bowl",
+      "d2": "Grilled salmon",
+      "d3": "Creamy tagliatelle"
+    },
     "earlyAccess": {
       "eyebrow": "Launch offer, Montreal",
       "title": "1 free AR dish, free setup",

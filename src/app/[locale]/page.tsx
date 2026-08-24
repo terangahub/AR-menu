@@ -8,6 +8,8 @@ import { ReviewsSection } from "@/components/landing/reviews-section";
 import { AboutSection } from "@/components/landing/about-section";
 import { BackToTop } from "@/components/landing/back-to-top";
 import { GlobeSection } from "@/components/landing/globe-section";
+import { EventHorizon } from "@/components/landing/event-horizon";
+import { ProductMockup } from "@/components/landing/product-mockup";
 import { FeatureField } from "@/components/landing/feature-field";
 import {
   ShieldCheck,
@@ -168,28 +170,18 @@ export default function Home() {
               </div>
             </Reveal>
 
+            {/* Le hero montre l'interface du produit posee sur le halo
+                d'horizon, comme reflect.app montre son application. Une
+                photo de plat achetee y figurait avant : jolie, mais elle
+                ne disait pas ce que fait Vorae. */}
             <Reveal delayMs={340}>
-              <div className="relative mx-auto mt-20 max-w-4xl">
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -inset-x-10 -top-10 bottom-10 -z-10 rounded-full bg-secondary/25 blur-3xl"
+              <div className="relative mx-auto mt-24 max-w-4xl">
+                <EventHorizon
+                  variant="hero"
+                  className="-inset-x-[45%] -top-24 bottom-[30%] h-auto w-auto"
                 />
-                <div className="border-gradient overflow-hidden rounded-card bg-card shadow-[0_30px_120px_-30px_hsl(var(--secondary))]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/hero-dish.jpg"
-                    alt=""
-                    className="aspect-[16/10] w-full object-cover"
-                  />
-                </div>
-                {/* Reflet sous l'image - l'illusion d'une surface polie,
-                    masqué en dégradé pour s'éteindre progressivement. */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none mx-auto h-24 w-[85%] scale-y-[-1] overflow-hidden rounded-card opacity-25 [mask-image:linear-gradient(to_top,#000,transparent)]"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/hero-dish.jpg" alt="" className="w-full object-cover" />
+                <div className="relative z-10 pt-4">
+                  <ProductMockup />
                 </div>
               </div>
             </Reveal>
@@ -431,8 +423,12 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 px-5 py-16">
+      {/* Footer, precede du meme halo d'horizon que le hero : il
+          referme la page sur le motif qui l'a ouverte. */}
+      <div className="relative h-64 overflow-hidden sm:h-80 lg:h-[22rem]">
+        <EventHorizon />
+      </div>
+      <footer className="relative border-t border-white/10 px-5 py-16">
         <div className="mx-auto flex max-w-[1100px] flex-col gap-12 sm:flex-row sm:justify-between">
           <div>
             <span className="flex items-center gap-2.5 font-heading text-lg font-medium tracking-tight">

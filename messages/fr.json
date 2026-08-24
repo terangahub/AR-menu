@@ -14,6 +14,17 @@
       "cta": "Réserver une démo",
       "secondaryCta": "Voir comment ça marche"
     },
+    "mockup": {
+      "restaurant": "Bistro Vorae",
+      "table": "Table 4",
+      "search": "Rechercher un plat",
+      "catAll": "Tout",
+      "catMains": "Plats",
+      "catStarters": "Entrées",
+      "d1": "Bol signature",
+      "d2": "Saumon grillé",
+      "d3": "Tagliatelles crémeuses"
+    },
     "earlyAccess": {
       "eyebrow": "Offre de lancement, Montréal",
       "title": "1 plat gratuit en AR, installation gratuite",
