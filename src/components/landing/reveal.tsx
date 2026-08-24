@@ -3,9 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-// Scroll-reveal minimal - spec reflect.app : fade-in + translateY(8px),
-// 350ms, une seule fois, déclenché à 30% de visibilité, respecte
-// prefers-reduced-motion (visible immédiatement dans ce cas).
+// Scroll-reveal : fade-in + translateY(8px) sur 350ms, déclenché à 30% de
+// visibilité, respecte prefers-reduced-motion (visible immédiatement).
+//
+// L'animation se rejoue dans les deux sens de défilement, à la demande du
+// client. Deux seuils au lieu d'un pour éviter le clignotement au ras de
+// la limite : l'élément apparaît quand 30% est visible, mais ne se
+// réarme que lorsqu'il est entièrement sorti du cadre (ratio 0). Avec un
+// seuil unique, un micro-scroll autour de la limite ferait clignoter
+// l'élément.
 export function Reveal({
   children,
   className,
@@ -29,12 +35,13 @@ export function Reveal({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.intersectionRatio >= 0.3) {
           setVisible(true);
-          observer.disconnect();
+        } else if (entry.intersectionRatio === 0) {
+          setVisible(false);
         }
       },
-      { threshold: 0.3 }
+      { threshold: [0, 0.3] }
     );
     observer.observe(node);
     return () => observer.disconnect();
