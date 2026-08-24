@@ -6,8 +6,8 @@ SaaS de menu en réalité augmentée pour restaurants. Marché de lancement :
 Montréal → Canada.
 
 Le cahier des charges technique complet (produit, architecture, modèle de
-données, sprints, tarification) fait foi pour toute décision de conception —
-voir le document `Vorae — Cahier des charges technique v2.0`.
+données, sprints, tarification) fait foi pour toute décision de conception :
+voir le document `Vorae - Cahier des charges technique v2.0`.
 
 ## Stack technique
 
@@ -15,7 +15,7 @@ voir le document `Vorae — Cahier des charges technique v2.0`.
 |---|---|
 | Frontend / PWA | Next.js 14 (App Router) + TypeScript + Tailwind + shadcn/ui |
 | Affichage AR | `<model-viewer>` (AR native iOS/Android, pas de WebXR) |
-| i18n | next-intl — `/fr` (défaut, Loi 96) et `/en` |
+| i18n | next-intl - `/fr` (défaut, Loi 96) et `/en` |
 | Base de données | Neon PostgreSQL (serverless) via Prisma |
 | Stockage images | Cloudinary |
 | Stockage modèles 3D | AWS S3 + CloudFront |
@@ -49,5 +49,5 @@ npm run test          # Vitest
 
 ## Contribuer
 
-Workflow Git obligatoire par Pull Request — voir [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+Workflow Git obligatoire par Pull Request - voir [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 Aucun push direct sur `main`.

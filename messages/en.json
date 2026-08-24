@@ -9,25 +9,25 @@
     "hero": {
       "eyebrow": "Augmented reality menu",
       "title": "Let your guests see the dish before they order.",
-      "subtitle": "Vorae turns your menu into a visual experience with a single scan — fewer questions for your servers, better-informed orders, zero app to download.",
+      "subtitle": "Vorae turns your menu into a visual experience with a single scan: fewer questions for your servers, better-informed orders, zero app to download.",
       "cta": "Book a demo",
       "secondaryCta": "See how it works"
     },
     "earlyAccess": {
-      "eyebrow": "Launch offer — Montreal",
+      "eyebrow": "Launch offer, Montreal",
       "title": "1 free AR dish, free setup",
       "body": "For the first 10 pilot restaurants in Montreal. Limited spots."
     },
     "preview": {
       "eyebrow": "The experience",
       "title": "One scan. A dish, full size, on the table.",
-      "body": "Guests rotate and zoom the dish before ordering — nothing to install."
+      "body": "Guests rotate and zoom the dish before ordering, nothing to install."
     },
     "howItWorks": {
       "eyebrow": "How it works",
       "title": "From scan to order",
       "step1Title": "Scan",
-      "step1Body": "The guest scans the table's QR code — no app, no account.",
+      "step1Body": "The guest scans the table's QR code, no app, no account.",
       "step2Title": "See it in AR",
       "step2Body": "The dish appears in 3D, full size, right on the table, before ordering.",
       "step3Title": "Order",
@@ -44,6 +44,45 @@
       "feature3Eyebrow": "Accessibility",
       "feature3Title": "Understood by everyone, no language barrier",
       "feature3Body": "The dish shows itself, it doesn't need translating."
+    },
+    "pricing": {
+      "eyebrow": "Pricing",
+      "title": "A price that grows with your menu, never the other way around.",
+      "cycleMonthly": "Monthly",
+      "cycleAnnual": "Annual",
+      "cycleAnnualBadge": "2 months free",
+      "perMonth": "month",
+      "perYear": "year",
+      "cta": "Get started",
+      "essentielName": "Essentiel",
+      "essentielDishes": "10 AR dishes",
+      "essentielFeature1": "Unlimited QR codes",
+      "essentielFeature2": "Basic analytics",
+      "essentielFeature3": "Email support",
+      "croissanceName": "Croissance",
+      "croissanceDishes": "30 AR dishes",
+      "croissanceFeature1": "Advanced per-dish analytics",
+      "croissanceFeature2": "Allergen filter",
+      "croissanceFeature3": "Priority support",
+      "croissanceBadge": "Most popular",
+      "prestigeName": "Prestige",
+      "prestigeDishes": "Unlimited AR dishes",
+      "prestigeFeature1": "White label",
+      "prestigeFeature2": "POS integration",
+      "prestigeFeature3": "Dedicated account manager",
+      "extraDish": "+ ${price}/month per extra dish"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "What restaurant owners ask us",
+      "q1": "Is it expensive?",
+      "a1": "Vorae pays for itself with just a few extra dishes sold each week. The 14-day free trial lets you check this yourself before committing.",
+      "q2": "How long does setup take?",
+      "a2": "The 2D menu is live as soon as your dishes are added. 3D models are produced by our capture service and go live as soon as they're ready.",
+      "q3": "Does AR work on every phone?",
+      "a3": "Native AR works on recent iPhone (Safari) and Android (Chrome) devices. If AR doesn't trigger, the 2D menu displays automatically: your guests never see an error.",
+      "q4": "What happens if I go over my dish quota?",
+      "a4": "Each extra dish beyond your included quota is billed monthly, with no service interruption. The Prestige tier has no limit."
     },
     "finalCta": {
       "title": "See the difference from your very first service.",
@@ -76,7 +115,7 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "View in AR",
     "rotateHint": "Rotate and zoom before activating AR",
-    "arUnavailable": "AR unavailable on this device — showing 2D",
+    "arUnavailable": "AR unavailable on this device: showing 2D",
     "back": "Back to menu"
   },
   "Dashboard": {
@@ -85,7 +124,8 @@
       "overview": "Overview",
       "dishes": "Dishes",
       "qrcodes": "QR codes",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "billing": "Billing"
     },
     "overview": {
       "title": "Overview",
@@ -171,6 +211,31 @@
       "scans": "{count} scans",
       "empty": "No QR codes yet.",
       "error": "Something went wrong. Try again."
+    },
+    "billing": {
+      "title": "Billing",
+      "currentPlan": "Current plan",
+      "cycleMonthly": "Monthly",
+      "cycleAnnual": "Annual",
+      "cycleAnnualBadge": "2 months free",
+      "perMonth": "month",
+      "perYear": "year",
+      "renewsOn": "Renews on {date}",
+      "managePlan": "Manage subscription",
+      "subscribe": "Subscribe",
+      "loading": "Loading…",
+      "unlimitedDishes": "Unlimited AR dishes",
+      "includedDishes": "{count} AR dishes included",
+      "invoices": "Billing history",
+      "noInvoices": "No invoices yet.",
+      "downloadInvoice": "Download",
+      "error": "Something went wrong. Try again.",
+      "status": {
+        "trialing": "Free trial",
+        "active": "Active",
+        "past_due": "Payment overdue",
+        "canceled": "Canceled"
+      }
     }
   }
 }

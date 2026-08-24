@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { dishInputSchema } from "@/lib/dish-schema";
 
-// GET /api/dishes/[id] — fiche plat + AR (section 9.1, F05).
+// GET /api/dishes/[id] - fiche plat + AR (section 9.1, F05).
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -49,7 +49,7 @@ export async function GET(
   });
 }
 
-// PUT/DELETE /api/dishes/[id] — CRUD dashboard (section 9.2, 10.2). Scopés
+// PUT/DELETE /api/dishes/[id] - CRUD dashboard (section 9.2, 10.2). Scopés
 // au restaurant de l'utilisateur connecté (RBAC, section 17.2).
 export async function PUT(
   req: NextRequest,

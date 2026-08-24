@@ -4,12 +4,12 @@ import { Link } from "@/i18n/navigation";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-// Dashboard restaurateur (section 10) — protégé par le middleware Clerk
+// Dashboard restaurateur (section 10) - protégé par le middleware Clerk
 // (src/middleware.ts) sur /:locale/dashboard(.*). Sprint 2 : gestion des
 // plats et QR codes. Vue d'ensemble/analytics : Sprint 3 (section 10.1, 10.3).
 //
 // force-dynamic (hérité par toutes les routes filles) : contenu propre à
-// chaque utilisateur connecté — sans ça, Next pré-génère ces pages une
+// chaque utilisateur connecté - sans ça, Next pré-génère ces pages une
 // seule fois au build (sans session réelle) et sert la même page figée à
 // tout le monde en production.
 export const dynamic = "force-dynamic";
@@ -49,6 +49,9 @@ export default async function DashboardLayout({
             </Link>
             <Link href="/dashboard/analytics" className="hover:underline">
               {t("nav.analytics")}
+            </Link>
+            <Link href="/dashboard/billing" className="hover:underline">
+              {t("nav.billing")}
             </Link>
           </nav>
         </div>

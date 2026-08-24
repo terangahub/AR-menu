@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { dishInputSchema } from "@/lib/dish-schema";
 
-// GET/POST /api/dishes — CRUD plats du dashboard restaurateur (section 9.2,
+// GET/POST /api/dishes - CRUD plats du dashboard restaurateur (section 9.2,
 // 10.2). Scopé au restaurant de l'utilisateur connecté (RBAC, section 17.2).
 export async function GET() {
   const restaurantUser = await getCurrentRestaurantUser();

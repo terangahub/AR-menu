@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { isRateLimited, recordScan } from "@/lib/scan";
 
-// POST /api/scan — enregistre un scan/vue (section 9.1), rate-limited
+// POST /api/scan - enregistre un scan/vue (section 9.1), rate-limited
 // (section 17.2). Utilisé par le client pour signaler une activation AR
 // (arActivated: true) depuis la fiche plat.
 const scanSchema = z.object({

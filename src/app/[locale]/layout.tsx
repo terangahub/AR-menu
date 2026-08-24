@@ -7,7 +7,7 @@ import { Space_Grotesk, Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import "./globals.css";
 
-// Typographie — palette/typo reflect.app mesurée, à la demande du client
+// Typographie - palette/typo reflect.app mesurée, à la demande du client
 // (remplace Fraunces/Geist de la section 13, voir CONTEXT.md). AeonikPro
 // (titres, dans le prompt d'origine) est une police payante non
 // disponible ici ; le prompt lui-même prévoit Space Grotesk comme
@@ -50,7 +50,7 @@ export default async function RootLayout({
           {/* attribute="data-theme" pour matcher le sélecteur Tailwind
               (`darkMode: ["selector", '[data-theme="dark"]']`) et les
               tokens CSS de globals.css. Préférence système par défaut pour
-              le dashboard (section 13.4 du cahier) — la landing marketing
+              le dashboard (section 13.4 du cahier) - la landing marketing
               force le sombre localement (voir [locale]/page.tsx), reflect.app
               n'a pas de mode clair. */}
           <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>

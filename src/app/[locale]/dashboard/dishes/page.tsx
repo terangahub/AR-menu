@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { DishList, type DashboardDish } from "@/components/dashboard/dish-list";
 
-// Gestion des plats (section 10.2) — recherche, filtre par catégorie,
+// Gestion des plats (section 10.2) - recherche, filtre par catégorie,
 // disponibilité en un clic, réordonnancement (à venir).
 export default async function DashboardDishesPage({
   params,

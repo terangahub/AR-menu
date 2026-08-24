@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-// Scroll-reveal minimal — spec reflect.app : fade-in + translateY(8px),
+// Scroll-reveal minimal - spec reflect.app : fade-in + translateY(8px),
 // 350ms, une seule fois, déclenché à 30% de visibilité, respecte
 // prefers-reduced-motion (visible immédiatement dans ce cas).
 export function Reveal({

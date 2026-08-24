@@ -2,19 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Palette reflect.app (mesurée, cf. prompt fourni par le client) —
+/* Palette reflect.app (mesurée, cf. prompt fourni par le client) :
    remplace délibérément la palette Vorae de la section 13 du cahier des
    charges, à la demande explicite du client (voir CONTEXT.md, section 4 :
    "Palette reflect.app, pas la palette Vorae de la section 13"). Convertie
    en HSL pour les tokens `hsl(var(--x))` déjà en place.
 
-   reflect.app ne mesure qu'un thème sombre — aucune valeur claire n'existe
+   reflect.app ne mesure qu'un thème sombre - aucune valeur claire n'existe
    dans la source. Le mode clair ci-dessous est dérivé (même famille de
    teintes, luminosité inversée) pour conserver le bascule sombre/clair du
    dashboard (section 13.4 du cahier, toujours valide) ; ce n'est pas une
    valeur "mesurée" au même titre que le reste. --destructive/--success
    n'existent pas non plus dans la palette reflect.app (page marketing,
-   pas de besoin d'états d'erreur) — conservées de la palette Vorae
+   pas de besoin d'états d'erreur) - conservées de la palette Vorae
    d'origine, seul le dashboard en a l'usage. */
 @layer base {
   :root {
@@ -91,7 +91,80 @@
     @apply rounded-md border border-input bg-background px-3 py-1.5 text-sm;
   }
 
-  /* Grain léger sur les fonds sombres de la landing — évite le "plat" d'un
+  /* --- Utilitaires visuels de la landing ---
+     Regroupés ici plutôt que répétés en classes Tailwind inline : ces
+     effets (bordure en dégradé, halo, texte dégradé) demandent des
+     pseudo-éléments ou du background-clip que Tailwind seul rend
+     illisible en JSX. */
+
+  /* Titre en dégradé - blanc chaud vers lavande, façon reflect.app.
+     -webkit-* requis : Safari/iOS n'applique pas encore la version
+     non préfixée de background-clip: text. */
+  .text-gradient {
+    background-image: linear-gradient(
+      180deg,
+      hsl(var(--foreground)) 30%,
+      hsl(var(--primary) / 0.75) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Bordure en dégradé sur une carte : un pseudo-élément peint le
+     dégradé et le masque ne laisse que l'épaisseur du contour. Permet
+     un contour lumineux impossible avec `border-color` seul. */
+  .border-gradient {
+    position: relative;
+  }
+  .border-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      160deg,
+      hsl(var(--primary) / 0.45),
+      hsl(var(--secondary) / 0.35) 40%,
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Carte de surface standard de la landing : léger dégradé interne pour
+     éviter l'aplat, contour subtil, et élévation au survol. */
+  .surface-card {
+    @apply relative rounded-card border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.02] transition-all duration-300;
+  }
+  .surface-card:hover {
+    @apply border-white/[0.14] from-white/[0.09] to-white/[0.03];
+    transform: translateY(-2px);
+  }
+
+  /* Halo diffus derrière un élément (orbe lumineuse). */
+  .glow-primary {
+    box-shadow: 0 0 60px -12px hsl(var(--primary) / 0.5);
+  }
+  .glow-secondary {
+    box-shadow: 0 0 80px -16px hsl(var(--secondary) / 0.75);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .surface-card,
+    .surface-card:hover {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Grain léger sur les fonds sombres de la landing - évite le "plat" d'un
      aplat de couleur pur, technique standard sur les sites premium sombres
      (reflect.app en a un très subtil). SVG feTurbulence encodé en data URI,
      aucune ressource externe. */

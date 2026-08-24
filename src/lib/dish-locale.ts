@@ -1,4 +1,4 @@
-// Résout le nom affiché d'un plat selon la locale — même règle que
+// Résout le nom affiché d'un plat selon la locale - même règle que
 // menu-client.tsx / dish-list.tsx : fallback FR si nameEn est vide.
 export function localizedDishName(
   name: string,

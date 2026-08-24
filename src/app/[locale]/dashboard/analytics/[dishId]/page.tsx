@@ -52,7 +52,7 @@ export default async function DishAnalyticsPage({
         <div className="rounded-lg border border-border p-4">
           <h2 className="text-sm font-medium text-muted-foreground">{t("arRate")}</h2>
           <p className="mt-2 text-2xl font-semibold">
-            {analytics.arActivationRate != null ? `${analytics.arActivationRate}%` : "—"}
+            {analytics.arActivationRate != null ? `${analytics.arActivationRate}%` : "-"}
           </p>
         </div>
         <div className="rounded-lg border border-border p-4">

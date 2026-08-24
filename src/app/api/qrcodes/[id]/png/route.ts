@@ -5,9 +5,9 @@ import { absoluteMenuUrl, generateQrPngBuffer } from "@/lib/qrcode";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/qrcodes/[id]/png — régénère le PNG à la volée (pas stocké en
+// GET /api/qrcodes/[id]/png - régénère le PNG à la volée (pas stocké en
 // base, coût de génération négligeable) pour le téléchargement (section
-// 10.4). Renvoie l'image brute avec Content-Disposition: attachment —
+// 10.4). Renvoie l'image brute avec Content-Disposition: attachment :
 // le déclenchement de téléchargement côté client (<a download>) n'est pas
 // fiable sur Safari iOS, en particulier avec des data URIs ; l'en-tête
 // HTTP, lui, est respecté.

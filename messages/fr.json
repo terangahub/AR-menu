@@ -9,25 +9,25 @@
     "hero": {
       "eyebrow": "Menu en réalité augmentée",
       "title": "Vos clients voient le plat avant de le choisir.",
-      "subtitle": "Vorae transforme votre menu en expérience visuelle en un seul scan — moins de questions pour vos serveurs, des commandes mieux choisies, zéro application à télécharger.",
+      "subtitle": "Vorae transforme votre menu en expérience visuelle en un seul scan : moins de questions pour vos serveurs, des commandes mieux choisies, zéro application à télécharger.",
       "cta": "Réserver une démo",
       "secondaryCta": "Voir comment ça marche"
     },
     "earlyAccess": {
-      "eyebrow": "Offre de lancement — Montréal",
+      "eyebrow": "Offre de lancement, Montréal",
       "title": "1 plat gratuit en AR, installation gratuite",
       "body": "Pour les 10 premiers restaurants pilotes de Montréal. Places limitées."
     },
     "preview": {
       "eyebrow": "L'expérience",
       "title": "Un scan. Un plat, en volume, sur la table.",
-      "body": "Le client pivote et zoome le plat avant de commander — sans rien installer."
+      "body": "Le client pivote et zoome le plat avant de commander, sans rien installer."
     },
     "howItWorks": {
       "eyebrow": "Comment ça marche",
       "title": "Du scan à la commande",
       "step1Title": "Scanner",
-      "step1Body": "Le client scanne le QR code de sa table — aucune application, aucun compte.",
+      "step1Body": "Le client scanne le QR code de sa table, aucune application, aucun compte.",
       "step2Title": "Voir en AR",
       "step2Body": "Le plat apparaît en 3D, en vraie grandeur, sur la table, avant de commander.",
       "step3Title": "Commander",
@@ -44,6 +44,45 @@
       "feature3Eyebrow": "Accessibilité",
       "feature3Title": "Compris par tous, sans barrière de langue",
       "feature3Body": "Le plat se montre, il n'a pas besoin d'être traduit."
+    },
+    "pricing": {
+      "eyebrow": "Tarifs",
+      "title": "Un prix qui grandit avec votre menu, jamais l'inverse.",
+      "cycleMonthly": "Mensuel",
+      "cycleAnnual": "Annuel",
+      "cycleAnnualBadge": "2 mois offerts",
+      "perMonth": "mois",
+      "perYear": "an",
+      "cta": "Commencer",
+      "essentielName": "Essentiel",
+      "essentielDishes": "10 plats en AR",
+      "essentielFeature1": "QR codes illimités",
+      "essentielFeature2": "Analytics de base",
+      "essentielFeature3": "Support par courriel",
+      "croissanceName": "Croissance",
+      "croissanceDishes": "30 plats en AR",
+      "croissanceFeature1": "Analytics avancées par plat",
+      "croissanceFeature2": "Filtre allergènes",
+      "croissanceFeature3": "Support prioritaire",
+      "croissanceBadge": "Le plus populaire",
+      "prestigeName": "Prestige",
+      "prestigeDishes": "Plats en AR illimités",
+      "prestigeFeature1": "Marque blanche",
+      "prestigeFeature2": "Intégration POS",
+      "prestigeFeature3": "Gestionnaire de compte dédié",
+      "extraDish": "+ {price} $/mois par plat additionnel"
+    },
+    "faq": {
+      "eyebrow": "Questions fréquentes",
+      "title": "Ce que les restaurateurs nous demandent",
+      "q1": "Est-ce que ça coûte cher ?",
+      "a1": "Vorae se rembourse avec quelques plats vendus en plus chaque semaine. L'essai gratuit de 14 jours vous permet de le vérifier vous-même avant de vous engager.",
+      "q2": "Combien de temps pour la mise en place ?",
+      "a2": "Le menu 2D est en ligne dès que vos plats sont ajoutés. Les modèles 3D sont produits par notre service de capture puis mis en ligne dès qu'ils sont prêts.",
+      "q3": "Est-ce que l'AR fonctionne sur tous les téléphones ?",
+      "a3": "L'AR native fonctionne sur iPhone (Safari) et Android (Chrome) récents. Si l'AR ne se déclenche pas, le menu 2D s'affiche automatiquement : vos clients ne voient jamais d'erreur.",
+      "q4": "Que se passe-t-il si je dépasse mon quota de plats ?",
+      "a4": "Chaque plat additionnel au-delà du quota inclus est facturé mensuellement, sans interruption de service. Le palier Prestige n'a aucune limite."
     },
     "finalCta": {
       "title": "Voyez la différence dès le premier service.",
@@ -76,7 +115,7 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "Voir en AR",
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
-    "arUnavailable": "AR non disponible sur cet appareil — affichage 2D",
+    "arUnavailable": "AR non disponible sur cet appareil : affichage 2D",
     "back": "Retour au menu"
   },
   "Dashboard": {
@@ -85,7 +124,8 @@
       "overview": "Vue d'ensemble",
       "dishes": "Plats",
       "qrcodes": "QR codes",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "billing": "Facturation"
     },
     "overview": {
       "title": "Vue d'ensemble",
@@ -171,6 +211,31 @@
       "scans": "{count} scans",
       "empty": "Aucun QR code pour l'instant.",
       "error": "Une erreur est survenue. Réessayez."
+    },
+    "billing": {
+      "title": "Facturation",
+      "currentPlan": "Palier actuel",
+      "cycleMonthly": "Mensuel",
+      "cycleAnnual": "Annuel",
+      "cycleAnnualBadge": "2 mois offerts",
+      "perMonth": "mois",
+      "perYear": "an",
+      "renewsOn": "Renouvellement le {date}",
+      "managePlan": "Gérer mon abonnement",
+      "subscribe": "S'abonner",
+      "loading": "Chargement…",
+      "unlimitedDishes": "Plats AR illimités",
+      "includedDishes": "{count} plats AR inclus",
+      "invoices": "Historique de facturation",
+      "noInvoices": "Aucune facture pour l'instant.",
+      "downloadInvoice": "Télécharger",
+      "error": "Une erreur est survenue. Réessayez.",
+      "status": {
+        "trialing": "Essai gratuit",
+        "active": "Actif",
+        "past_due": "Paiement en retard",
+        "canceled": "Annulé"
+      }
     }
   }
 }

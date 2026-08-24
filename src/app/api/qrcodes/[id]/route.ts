@@ -4,7 +4,7 @@ import { getCurrentRestaurantUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-// DELETE /api/qrcodes/[id] — retrait d'un QR code (section 10.4).
+// DELETE /api/qrcodes/[id] - retrait d'un QR code (section 10.4).
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -20,7 +20,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Les scans historiques référencent ce QR code — on les retire avec, pour
+  // Les scans historiques référencent ce QR code - on les retire avec, pour
   // ne pas laisser de lignes orphelines (pas de ON DELETE CASCADE défini).
   await prisma.scanEvent.deleteMany({ where: { qrCodeId: id } });
   await prisma.qrCode.delete({ where: { id } });

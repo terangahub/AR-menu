@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET /api/menu/[restaurantSlug] — menu public 2D (section 9.1, F02).
+// GET /api/menu/[restaurantSlug] - menu public 2D (section 9.1, F02).
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ restaurantSlug: string }> }

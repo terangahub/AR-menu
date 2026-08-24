@@ -27,7 +27,7 @@ export function ArViewer({
     glbUrl ? "loading" : "fallback"
   );
 
-  // @google/model-viewer touche `customElements`/`window` — import
+  // @google/model-viewer touche `customElements`/`window` - import
   // dynamique côté client uniquement, jamais pendant le rendu serveur.
   useEffect(() => {
     if (!glbUrl) return;

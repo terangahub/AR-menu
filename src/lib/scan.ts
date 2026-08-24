@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-// Rate limiting en mémoire — suffisant pour un seul serveur en Sprint 1
+// Rate limiting en mémoire - suffisant pour un seul serveur en Sprint 1
 // (section 17.2). À remplacer par un store partagé (ex. Upstash Redis)
 // avant un déploiement multi-instance.
 const WINDOW_MS = 60_000;
