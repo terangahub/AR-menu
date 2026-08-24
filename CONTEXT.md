@@ -20,7 +20,8 @@ contexte.
 | Sprint 0 | ✅ Mergé | Next.js 14 + TS + Tailwind + shadcn/ui, Prisma, Clerk, CI, PR workflow |
 | Sprint 1 | ✅ Mergé | Menu 2D public, fiche plat + AR (`<model-viewer>`) + fallback 2D, i18n FR/EN |
 | Sprint 2 | ✅ Mergé | Dashboard restaurateur : CRUD plats, upload photo/3D, QR codes |
-| Sprint 3 | 🔄 En cours (branche `feature/s3-analytics-design-system`) | Analytics par plat, système de design (palette reflect.app + Space Grotesk/Inter + toggle dark/light), landing page marketing (section 12, avancée depuis le Sprint 4) |
+| Sprint 3 | ✅ Mergé | Analytics par plat, système de design (palette reflect.app + Space Grotesk/Inter + toggle dark/light), landing page marketing (section 12, avancée depuis le Sprint 4) |
+| Sprint 4 | 🔄 En cours (branche `feature/s4-billing-landing-polish`) | Stripe Billing (3 paliers, section 15), section tarifs + FAQ sur la landing — reste à faire : visuels réels (voir section 4), Stripe pas encore testé en conditions réelles (clés manquantes) |
 
 ---
 
@@ -33,8 +34,9 @@ contexte.
 | **Neon** | Postgres serverless, projet `vorae` | `DATABASE_URL` dans Vercel — **utiliser la connexion POOLED** (hostname avec `-pooler`), pas la directe (voir section 5) |
 | **Clerk** | Authentification | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` dans Vercel |
 | **Cloudinary** | Stockage images ET modèles 3D (voir écart section 4) | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` dans Vercel |
+| **Stripe** | Facturation (section 15) — **compte pas encore créé par le client**, code écrit et buildé mais jamais exercé contre l'API réelle | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_{ESSENTIEL,CROISSANCE,PRESTIGE}_{MONTHLY,ANNUAL}` — 8 variables au total, voir section 4 pour la checklist de création |
 
-Pas encore créés : AWS (S3/CloudFront), Stripe, Resend.
+Pas encore créés : AWS (S3/CloudFront), Stripe (produits à créer, voir section 4), Resend.
 
 ---
 
@@ -56,6 +58,7 @@ src/
         qrcodes/                 ← génération QR (10.4)
         analytics/               ← tableau global triable + export CSV (10.3)
         analytics/[dishId]/      ← analytics par plat : tendance, heure de pointe (10.3)
+        billing/                 ← palier actuel, factures, checkout/portail Stripe (10.6)
     api/
       menu/[restaurantSlug]/     ← GET menu public
       dishes/                    ← GET liste (dashboard) / POST création
@@ -68,10 +71,13 @@ src/
       scan/                      ← POST tracking scan (rate-limited)
       allergens/                 ← GET table de référence
       analytics/export/          ← GET export CSV (Content-Disposition: attachment)
+      billing/checkout/          ← POST session Stripe Checkout (palier + cycle)
+      billing/portal/            ← POST session portail client Stripe
+      webhooks/stripe/           ← POST synchronisation Subscription/Invoice (signature vérifiée)
   components/
     menu/                        ← composants du menu public
-    dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart)
-    landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile)
+    dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart, billing-panel)
+    landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile), pricing-section.tsx (tarifs, toggle mensuel/annuel)
     theme-toggle.tsx             ← bascule dark/light (next-themes)
     ui/                          ← shadcn/ui (button, etc. — installés à la main, voir section 4)
   lib/
@@ -80,6 +86,7 @@ src/
     scan.ts                      ← logique + rate limiting des scans
     analytics.ts                 ← requêtes agrégées pour le dashboard (10.1, 10.3)
     dish-locale.ts               ← localizedDishName() — résout name/nameEn selon la locale (voir section 4)
+    billing.ts                   ← TIERS (source unique des prix, section 15.1), getStripe(), subscriptionFieldsFrom()
     qrcode.ts                    ← génération PNG + URL absolue
     cloudinary.ts                ← config + upload
     dish-schema.ts                ← validation zod du formulaire plat
@@ -181,9 +188,56 @@ concerné — cette liste est un résumé, pas la seule source.
   features), copy originale mais alignée pour les sections que le cahier
   ne couvre pas (offre de lancement en remplacement de faux témoignages/
   logos clients — aucun client réel à ce stade —, le trio "Scanner → Voir
-  en AR → Commander" dérivé du parcours client section 6.1). Stripe
-  Billing (section 15) reste à faire — c'est la seule pièce du Sprint 4
-  qui manque encore.
+  en AR → Commander" dérivé du parcours client section 6.1). Section
+  tarifs (12.1 #9) et FAQ (12.1 #10) ajoutées au Sprint 4, montants tirés
+  tels quels de la section 15.1 via `lib/billing.ts` (source unique
+  partagée avec le dashboard facturation, pour ne jamais désynchroniser
+  les deux).
+- **Stripe Billing (section 15, F10) — code écrit et buildé, jamais
+  exercé contre l'API réelle.** Aucun compte Stripe n'existe encore côté
+  client. Checklist pour débloquer (mode Test suffit pour valider avant
+  la mise en prod) :
+  1. Créer un compte Stripe (ou utiliser un compte existant), rester en
+     **mode Test** pour le développement.
+  2. Créer 3 Products : "Vorae Essentiel", "Vorae Croissance", "Vorae
+     Prestige".
+  3. Pour chacun, créer deux Prices récurrents en **CAD** (montants
+     exacts de la section 15.1) :
+     Essentiel 79 $/mois et 790 $/an · Croissance 199 $/mois et 1 990 $/an
+     · Prestige 449 $/mois et 4 490 $/an.
+  4. Copier les 6 `price_...` obtenus dans les variables
+     `STRIPE_PRICE_{ESSENTIEL,CROISSANCE,PRESTIGE}_{MONTHLY,ANNUAL}`
+     (Vercel + `.env` local).
+  5. Récupérer la clé secrète (Developers → API keys) → `STRIPE_SECRET_KEY`.
+  6. Créer un endpoint de webhook Stripe pointant vers
+     `https://<domaine>/api/webhooks/stripe`, événements à cocher :
+     `checkout.session.completed`, `customer.subscription.updated`,
+     `customer.subscription.deleted`, `invoice.paid`,
+     `invoice.payment_failed`. Copier le signing secret →
+     `STRIPE_WEBHOOK_SECRET`.
+  7. Dans Stripe → Customer Portal (Settings), autoriser les 3 Products
+     ci-dessus et activer le changement de palier — c'est ce qui permet
+     à `POST /api/billing/portal` (section 9.2, 10.6) de couvrir "changement
+     de palier en libre-service avec proratisation automatique" sans code
+     applicatif supplémentaire : la logique de proratisation est gérée
+     entièrement par Stripe.
+  - **Facturation à l'usage (section 15.2, plats additionnels au-delà du
+    quota inclus) : non implémentée.** `extraDishCount` existe dans le
+    schéma `Subscription` mais rien ne l'incrémente ni ne le reporte à
+    Stripe (`metered billing`, un second item de subscription par
+    palier). Décision de scope Sprint 4 : livrer l'abonnement de base (3
+    paliers × 2 cycles, checkout, portail, webhook) d'abord — l'usage
+    metered demande une automatisation (compter les plats actifs, reporter
+    l'usage à Stripe) qui n'a pas pu être testée sans compte Stripe réel.
+    Palier Prestige non concerné (plats illimités).
+  - Palier "illimité" (Prestige) représenté par `includedDishSlots: -1`
+    dans `lib/billing.ts`/`Subscription.includedDishSlots` (le champ
+    Prisma est un `Int` non nullable, donc pas de `null`) — tout code lisant
+    ce champ doit connaître cette convention.
+  - Service de capture 3D à la carte/forfaits (section 15.3,
+    `DishCaptureOrder`) : modèle de données existant depuis Sprint 0, mais
+    aucun flux de commande ni paiement associé — non demandé explicitement
+    pour ce sprint, à faire si le client en a besoin.
 
 ---
 
@@ -249,6 +303,12 @@ concerné — cette liste est un résumé, pas la seule source.
   reçoit la locale en query string. Vérifier ce même piège sur tout futur
   champ bilingue affiché depuis une requête serveur, pas seulement dans les
   formulaires/composants client.
+- **Le webhook Stripe doit lire le corps brut de la requête** (`req.text()`)
+  et jamais `req.json()` — la vérification de signature
+  (`stripe.webhooks.constructEvent`) recalcule un HMAC sur les octets
+  exacts reçus ; `req.json()` puis re-sérialiser donnerait un contenu
+  différent (ordre de clés, espaces) et ferait toujours échouer la
+  vérification. Voir `src/app/api/webhooks/stripe/route.ts`.
 
 ---
 
@@ -286,16 +346,32 @@ créés via un script SQL équivalent collé directement dans Neon.
 
 ## 8. Prochaines étapes (Sprint 4, section 21)
 
-La landing marketing (section 12) est livrée (voir section 4 — palette
-reflect.app, thème sombre forcé localement). Il reste :
+La landing marketing (section 12, y compris tarifs + FAQ) et l'abonnement
+Stripe de base (checkout, portail, webhook, page facturation dashboard)
+sont codés et buildés. Il reste :
 
-- **Stripe Billing** (3 paliers, mensuel/annuel, facturation à l'usage —
-  section 15) — rien n'est encore fait, aucun compte Stripe créé.
+- **Créer le compte Stripe et les 8 variables d'environnement** — voir la
+  checklist complète en section 4 ("Stripe Billing — code écrit... jamais
+  exercé contre l'API réelle"). Rien de ce qui touche à la facturation ne
+  peut être testé en conditions réelles avant ça.
+- **Facturation à l'usage (plats additionnels au-delà du quota, section
+  15.2)** — non implémentée, voir section 4 pour le détail du gap
+  (`extraDishCount` existe en base mais rien ne l'alimente ni ne le
+  reporte à Stripe en metered billing).
+- **Visuels réels pour la landing** — la refonte design (section 4,
+  palette reflect.app) utilise des compositions CSS pures (mockup
+  téléphone, halos, grille de points) faute de photos de plats ou de
+  rendus 3D disponibles pour ce projet. À remplacer par de vrais visuels
+  dès qu'ils existent (voir la liste envoyée à Mouhamed en session — photos
+  de plats, capture d'écran/vidéo de l'AR réelle, logo Vorae le cas
+  échéant).
 - Pages `/privacy` et `/terms` — les liens du footer de la landing pointent
   vers `#` en attendant (voir commentaire dans `[locale]/page.tsx`).
 - Le CTA "Réserver une démo" / "Book a demo" de la landing ne fait encore
   rien (pas de bouton fonctionnel, pas de formulaire/lien Calendly, etc.)
-  — à brancher avant mise en production réelle.
+  — à brancher avant mise en production réelle. Les CTA de la section
+  tarifs, eux, renvoient déjà vers `/dashboard` (sign-in Clerk → palier
+  choisi dans la page facturation).
 - Rappel : ne plus réintroduire la palette or/sarcelle de la section 13
   sans revalider avec le client — le remplacement par reflect.app est une
   décision explicite et documentée (section 4), pas un oubli.
