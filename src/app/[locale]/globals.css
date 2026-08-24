@@ -2,50 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Palette reflect.app (mesurée, cf. prompt fourni par le client) —
+   remplace délibérément la palette Vorae de la section 13 du cahier des
+   charges, à la demande explicite du client (voir CONTEXT.md, section 4 :
+   "Palette reflect.app, pas la palette Vorae de la section 13"). Convertie
+   en HSL pour les tokens `hsl(var(--x))` déjà en place.
+
+   reflect.app ne mesure qu'un thème sombre — aucune valeur claire n'existe
+   dans la source. Le mode clair ci-dessous est dérivé (même famille de
+   teintes, luminosité inversée) pour conserver le bascule sombre/clair du
+   dashboard (section 13.4 du cahier, toujours valide) ; ce n'est pas une
+   valeur "mesurée" au même titre que le reste. --destructive/--success
+   n'existent pas non plus dans la palette reflect.app (page marketing,
+   pas de besoin d'états d'erreur) — conservées de la palette Vorae
+   d'origine, seul le dashboard en a l'usage. */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    --background: 249 30% 98%;
+    --foreground: 248 40% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 248 40% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84% 60%;
+    --popover-foreground: 248 40% 12%;
+    --primary: 300 44% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 264 71% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 14% 93%;
+    --muted-foreground: 240 10% 40%;
+    --accent: 240 14% 93%;
+    --accent-foreground: 248 40% 12%;
+    --destructive: 7 53% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 9%;
-    --radius: 0.5rem;
+    --success: 146 45% 40%;
+    --success-foreground: 0 0% 98%;
+    --border: 240 14% 88%;
+    --input: 240 14% 88%;
+    --ring: 300 44% 45%;
+    --radius: 7px;
+    --radius-card: 24px;
   }
 
   [data-theme="dark"] {
-    --background: 0 0% 4%;
-    --foreground: 60 9% 96%;
-    --card: 0 0% 9%;
-    --card-foreground: 60 9% 96%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 60 9% 96%;
-    --primary: 60 9% 96%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 60 9% 96%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 63%;
-    --accent: 0 0% 15%;
-    --accent-foreground: 60 9% 96%;
-    --destructive: 0 63% 50%;
-    --destructive-foreground: 60 9% 96%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 60 9% 84%;
+    --background: 249 100% 4%; /* #030014 */
+    --foreground: 248 80% 96%; /* #efedfd */
+    --card: 240 50% 19%; /* #181848 */
+    --card-foreground: 248 80% 96%;
+    --popover: 240 50% 19%;
+    --popover-foreground: 248 80% 96%;
+    --primary: 300 44% 89%; /* #f0d8f0 */
+    --primary-foreground: 0 0% 7%; /* #111111, cf. spec bouton primaire */
+    --secondary: 264 71% 33%; /* #481890 */
+    --secondary-foreground: 248 80% 96%;
+    --muted: 240 50% 19%;
+    --muted-foreground: 240 14% 55%;
+    --accent: 240 14% 33%; /* #484860 */
+    --accent-foreground: 248 80% 96%;
+    --destructive: 7 53% 50%;
+    --destructive-foreground: 248 80% 96%;
+    --success: 146 45% 45%;
+    --success-foreground: 0 0% 7%;
+    --border: 240 14% 33%; /* #484860 */
+    --input: 240 14% 33%;
+    --ring: 300 44% 89%;
   }
 }
 
@@ -56,10 +75,34 @@
   body {
     @apply bg-background text-foreground;
   }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading), "Space Grotesk", system-ui, sans-serif;
+    font-weight: 500;
+  }
 }
 
 @layer components {
   .input {
     @apply rounded-md border border-input bg-background px-3 py-1.5 text-sm;
+  }
+
+  /* Grain léger sur les fonds sombres de la landing — évite le "plat" d'un
+     aplat de couleur pur, technique standard sur les sites premium sombres
+     (reflect.app en a un très subtil). SVG feTurbulence encodé en data URI,
+     aucune ressource externe. */
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   }
 }

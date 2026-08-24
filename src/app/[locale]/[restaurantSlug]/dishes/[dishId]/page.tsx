@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { recordScan } from "@/lib/scan";
 import { Link } from "@/i18n/navigation";
 import { DishArSection } from "@/components/menu/dish-ar-section";
 
@@ -31,6 +32,13 @@ export default async function DishPage({
 
   if (!dish || dish.restaurant.slug !== restaurantSlug || !dish.isAvailable) {
     notFound();
+  }
+
+  if (qr) {
+    // Vue de la fiche plat, distincte de l'activation AR (voir
+    // DishArSection) — nécessaire pour calculer le taux d'activation AR
+    // (section 10.1/10.3 : activations AR ÷ vues de fiche plat).
+    await recordScan({ qrCodeId: qr, dishId: dish.id }).catch(() => undefined);
   }
 
   const name = locale === "en" && dish.nameEn ? dish.nameEn : dish.name;

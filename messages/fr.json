@@ -1,8 +1,65 @@
 {
-  "HomePage": {
-    "title": "Vorae",
-    "tagline": "Voyez avant de choisir.",
-    "cta": "Réserver une démo"
+  "Landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "cta": "Réserver une démo"
+    },
+    "hero": {
+      "eyebrow": "Menu en réalité augmentée",
+      "title": "Vos clients voient le plat avant de le choisir.",
+      "subtitle": "Vorae transforme votre menu en expérience visuelle en un seul scan — moins de questions pour vos serveurs, des commandes mieux choisies, zéro application à télécharger.",
+      "cta": "Réserver une démo",
+      "secondaryCta": "Voir comment ça marche"
+    },
+    "earlyAccess": {
+      "eyebrow": "Offre de lancement — Montréal",
+      "title": "1 plat gratuit en AR, installation gratuite",
+      "body": "Pour les 10 premiers restaurants pilotes de Montréal. Places limitées."
+    },
+    "preview": {
+      "eyebrow": "L'expérience",
+      "title": "Un scan. Un plat, en volume, sur la table.",
+      "body": "Le client pivote et zoome le plat avant de commander — sans rien installer."
+    },
+    "howItWorks": {
+      "eyebrow": "Comment ça marche",
+      "title": "Du scan à la commande",
+      "step1Title": "Scanner",
+      "step1Body": "Le client scanne le QR code de sa table — aucune application, aucun compte.",
+      "step2Title": "Voir en AR",
+      "step2Body": "Le plat apparaît en 3D, en vraie grandeur, sur la table, avant de commander.",
+      "step3Title": "Commander",
+      "step3Body": "Une commande mieux choisie, moins de questions pour vos serveurs."
+    },
+    "features": {
+      "eyebrow": "Pourquoi Vorae",
+      "feature1Eyebrow": "Service",
+      "feature1Title": "Moins d'interruptions en salle",
+      "feature1Body": "Vos serveurs servent, ils ne décrivent plus chaque plat.",
+      "feature2Eyebrow": "Sécurité",
+      "feature2Title": "Le risque allergène, sous contrôle",
+      "feature2Body": "Chaque plat affiche clairement ce qu'il contient.",
+      "feature3Eyebrow": "Accessibilité",
+      "feature3Title": "Compris par tous, sans barrière de langue",
+      "feature3Body": "Le plat se montre, il n'a pas besoin d'être traduit."
+    },
+    "finalCta": {
+      "title": "Voyez la différence dès le premier service.",
+      "cta": "Réserver une démo",
+      "reassurance": "Essai gratuit de 14 jours · Aucune carte requise"
+    },
+    "footer": {
+      "tagline": "Voyez avant de choisir.",
+      "product": "Produit",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "legal": "Légal",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "rights": "Tous droits réservés."
+    }
   },
   "Menu": {
     "categoryAll": "Tout",
@@ -25,8 +82,43 @@
   "Dashboard": {
     "noRestaurant": "Aucun restaurant associé à ce compte.",
     "nav": {
+      "overview": "Vue d'ensemble",
       "dishes": "Plats",
-      "qrcodes": "QR codes"
+      "qrcodes": "QR codes",
+      "analytics": "Analytics"
+    },
+    "overview": {
+      "title": "Vue d'ensemble",
+      "scansToday": "Scans aujourd'hui",
+      "scans7d": "Scans (7 jours)",
+      "scans30d": "Scans (30 jours)",
+      "vsPrevious": "vs période précédente",
+      "topDishOfWeek": "Plat le plus vu cette semaine",
+      "noTopDish": "Pas encore de données cette semaine.",
+      "arActivationRate": "Taux d'activation AR (30 jours)",
+      "noArData": "Pas encore de données.",
+      "missingModelTitle": "Plats sans modèle 3D",
+      "missingModelEmpty": "Tous les plats disponibles ont un modèle 3D.",
+      "viewAnalytics": "Voir les analytics détaillées"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "backToOverview": "Retour à la vue d'ensemble",
+      "dish": "Plat",
+      "scans30d": "Scans (30j)",
+      "arRate": "Taux AR",
+      "trend7d": "Tendance 7j",
+      "exportCsv": "Exporter en CSV",
+      "detail": "Détails",
+      "today": "Aujourd'hui",
+      "last7d": "7 jours",
+      "last30d": "30 jours",
+      "last90d": "90 jours",
+      "trendChart": "Tendance (30 jours)",
+      "busiestHour": "Heure la plus consultée",
+      "busiestHourValue": "{hour}h",
+      "noBusiestHour": "Pas encore de données.",
+      "noData": "Aucun scan enregistré pour l'instant."
     },
     "dishes": {
       "title": "Plats",

@@ -1,8 +1,65 @@
 {
-  "HomePage": {
-    "title": "Vorae",
-    "tagline": "See it before you order.",
-    "cta": "Book a demo"
+  "Landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "cta": "Book a demo"
+    },
+    "hero": {
+      "eyebrow": "Augmented reality menu",
+      "title": "Let your guests see the dish before they order.",
+      "subtitle": "Vorae turns your menu into a visual experience with a single scan — fewer questions for your servers, better-informed orders, zero app to download.",
+      "cta": "Book a demo",
+      "secondaryCta": "See how it works"
+    },
+    "earlyAccess": {
+      "eyebrow": "Launch offer — Montreal",
+      "title": "1 free AR dish, free setup",
+      "body": "For the first 10 pilot restaurants in Montreal. Limited spots."
+    },
+    "preview": {
+      "eyebrow": "The experience",
+      "title": "One scan. A dish, full size, on the table.",
+      "body": "Guests rotate and zoom the dish before ordering — nothing to install."
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "From scan to order",
+      "step1Title": "Scan",
+      "step1Body": "The guest scans the table's QR code — no app, no account.",
+      "step2Title": "See it in AR",
+      "step2Body": "The dish appears in 3D, full size, right on the table, before ordering.",
+      "step3Title": "Order",
+      "step3Body": "A better-informed order, fewer questions for your servers."
+    },
+    "features": {
+      "eyebrow": "Why Vorae",
+      "feature1Eyebrow": "Service",
+      "feature1Title": "Fewer interruptions on the floor",
+      "feature1Body": "Your servers serve, they don't narrate the menu.",
+      "feature2Eyebrow": "Safety",
+      "feature2Title": "Allergen risk, under control",
+      "feature2Body": "Every dish clearly shows what's in it.",
+      "feature3Eyebrow": "Accessibility",
+      "feature3Title": "Understood by everyone, no language barrier",
+      "feature3Body": "The dish shows itself, it doesn't need translating."
+    },
+    "finalCta": {
+      "title": "See the difference from your very first service.",
+      "cta": "Book a demo",
+      "reassurance": "14-day free trial · No credit card required"
+    },
+    "footer": {
+      "tagline": "See it before you order.",
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "legal": "Legal",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "rights": "All rights reserved."
+    }
   },
   "Menu": {
     "categoryAll": "All",
@@ -25,8 +82,43 @@
   "Dashboard": {
     "noRestaurant": "No restaurant linked to this account.",
     "nav": {
+      "overview": "Overview",
       "dishes": "Dishes",
-      "qrcodes": "QR codes"
+      "qrcodes": "QR codes",
+      "analytics": "Analytics"
+    },
+    "overview": {
+      "title": "Overview",
+      "scansToday": "Scans today",
+      "scans7d": "Scans (7 days)",
+      "scans30d": "Scans (30 days)",
+      "vsPrevious": "vs previous period",
+      "topDishOfWeek": "Most viewed dish this week",
+      "noTopDish": "No data yet this week.",
+      "arActivationRate": "AR activation rate (30 days)",
+      "noArData": "No data yet.",
+      "missingModelTitle": "Dishes without a 3D model",
+      "missingModelEmpty": "Every available dish has a 3D model.",
+      "viewAnalytics": "View detailed analytics"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "backToOverview": "Back to overview",
+      "dish": "Dish",
+      "scans30d": "Scans (30d)",
+      "arRate": "AR rate",
+      "trend7d": "7d trend",
+      "exportCsv": "Export as CSV",
+      "detail": "Details",
+      "today": "Today",
+      "last7d": "7 days",
+      "last30d": "30 days",
+      "last90d": "90 days",
+      "trendChart": "Trend (30 days)",
+      "busiestHour": "Busiest hour",
+      "busiestHourValue": "{hour}:00",
+      "noBusiestHour": "No data yet.",
+      "noData": "No scans recorded yet."
     },
     "dishes": {
       "title": "Dishes",

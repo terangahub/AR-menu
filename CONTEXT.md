@@ -19,7 +19,8 @@ contexte.
 |---|---|---|
 | Sprint 0 | ✅ Mergé | Next.js 14 + TS + Tailwind + shadcn/ui, Prisma, Clerk, CI, PR workflow |
 | Sprint 1 | ✅ Mergé | Menu 2D public, fiche plat + AR (`<model-viewer>`) + fallback 2D, i18n FR/EN |
-| Sprint 2 | 🔄 En cours (branche `feature/s2-dashboard-crud-plats`) | Dashboard restaurateur : CRUD plats, upload photo/3D, QR codes |
+| Sprint 2 | ✅ Mergé | Dashboard restaurateur : CRUD plats, upload photo/3D, QR codes |
+| Sprint 3 | 🔄 En cours (branche `feature/s3-analytics-design-system`) | Analytics par plat, système de design (palette reflect.app + Space Grotesk/Inter + toggle dark/light), landing page marketing (section 12, avancée depuis le Sprint 4) |
 
 ---
 
@@ -46,12 +47,15 @@ ci-dessous — voir section 4 pour pourquoi.
 src/
   app/
     [locale]/                    ← toutes les routes passent par next-intl
-      page.tsx                   ← accueil (placeholder Sprint 0, vraie landing = Sprint 4)
+      page.tsx                   ← landing marketing (section 12, direction reflect.app — voir section 4)
       [restaurantSlug]/          ← menu public 2D (F02)
         dishes/[dishId]/         ← fiche plat + AR (F03-F05)
       dashboard/                 ← protégé par middleware Clerk, force-dynamic
+        page.tsx                 ← vue d'ensemble (10.1)
         dishes/                  ← CRUD plats (10.2)
         qrcodes/                 ← génération QR (10.4)
+        analytics/               ← tableau global triable + export CSV (10.3)
+        analytics/[dishId]/      ← analytics par plat : tendance, heure de pointe (10.3)
     api/
       menu/[restaurantSlug]/     ← GET menu public
       dishes/                    ← GET liste (dashboard) / POST création
@@ -60,17 +64,22 @@ src/
       dishes/[id]/model3d/       ← upload .glb (+.usdz optionnel) → Cloudinary
       qrcodes/                   ← GET liste / POST création
       qrcodes/[id]/              ← DELETE
-      qrcodes/[id]/png/          ← régénère le PNG à la volée
+      qrcodes/[id]/png/          ← régénère le PNG à la volée (Content-Disposition: attachment)
       scan/                      ← POST tracking scan (rate-limited)
       allergens/                 ← GET table de référence
+      analytics/export/          ← GET export CSV (Content-Disposition: attachment)
   components/
     menu/                        ← composants du menu public
-    dashboard/                   ← composants du dashboard
+    dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart)
+    landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile)
+    theme-toggle.tsx             ← bascule dark/light (next-themes)
     ui/                          ← shadcn/ui (button, etc. — installés à la main, voir section 4)
   lib/
     prisma.ts                    ← client Prisma singleton
     auth.ts                      ← résout Clerk → Restaurant/User (voir section 6)
     scan.ts                      ← logique + rate limiting des scans
+    analytics.ts                 ← requêtes agrégées pour le dashboard (10.1, 10.3)
+    dish-locale.ts               ← localizedDishName() — résout name/nameEn selon la locale (voir section 4)
     qrcode.ts                    ← génération PNG + URL absolue
     cloudinary.ts                ← config + upload
     dish-schema.ts                ← validation zod du formulaire plat
@@ -78,7 +87,7 @@ src/
   i18n/                          ← next-intl (routing, navigation, request config)
 prisma/
   schema.prisma
-  seed.ts                        ← restaurant démo "vorae-demo" + 3 plats + 1 QR code
+  seed.ts                        ← restaurant démo "demo" + 3 plats + 1 QR code
 ```
 
 ---
@@ -120,12 +129,61 @@ concerné — cette liste est un résumé, pas la seule source.
   upgrade payant vers GitHub Team.
 - **Onboarding dashboard simplifié** — pas de flux d'invitation d'équipe
   (section 10.7, hors scope Sprint 2). Le premier compte Clerk qui visite
-  `/dashboard` est auto-provisionné "owner" du restaurant `vorae-demo`
+  `/dashboard` est auto-provisionné "owner" du restaurant `demo`
   (voir `src/lib/auth.ts`). À remplacer avant d'ouvrir à plusieurs
   restaurants/plusieurs comptes.
 - **Rate limiting en mémoire** (`src/lib/scan.ts`) — suffisant pour une
   seule instance serveur. À remplacer par un store partagé (Upstash Redis)
   avant un déploiement multi-instance.
+- **Vue de fiche plat ajoutée en Sprint 3** — le Sprint 1 n'enregistrait un
+  `ScanEvent` avec `dishId` que lors d'une activation AR ; il n'y avait
+  donc aucune donnée pour calculer un taux d'activation AR (activations ÷
+  vues). La page fiche plat enregistre maintenant aussi un scan à
+  l'ouverture (`arActivated: false`), distinct de celui déclenché par
+  l'activation AR — voir `src/lib/analytics.ts`.
+- **Palette et typographie de la section 13 remplacées par celles de
+  reflect.app — décision explicite du client, à l'encontre de la section
+  26 ("ne pas improviser de palette alternative").** Après avoir vu le
+  dashboard Sprint 3 en conditions réelles, le client a jugé le design de
+  la section 13 insuffisant pour un SaaS premium et a fourni un prompt de
+  direction créative détaillé basé sur une analyse mesurée de reflect.app
+  (couleurs hex, polices, rayons, espacement, structure de landing). Face
+  au conflit avec le cahier, le choix explicite proposé et validé était :
+  remplacer **toute** la palette (dashboard + landing), pas seulement
+  celle de la landing. Détails :
+  - `globals.css` : tokens HSL mesurés sur reflect.app en mode sombre
+    (`#030014`/`#efedfd`/`#181848`/`#f0d8f0`/`#481890`/`#484860`) ; le
+    mode clair n'a pas d'équivalent mesuré (reflect.app n'en a pas) donc
+    ses tokens sont dérivés, pas mesurés.
+  - Polices : Space Grotesk (titres) + Inter (corps) via `next/font/google`,
+    remplaçant Fraunces/Geist — AeonikPro et "Inter V" (polices d'origine
+    du prompt) sont payantes/non disponibles ; le prompt prévoyait
+    lui-même ces alternatives Google Fonts.
+  - `--radius: 7px`, `--radius-card: 24px`, boutons `h-auto` avec padding
+    explicite (12px 24px) — spec boutons reflect.app mesurée.
+  - La landing (`[locale]/page.tsx`) force `data-theme="dark"` localement
+    via un wrapper (reflect.app n'a pas de mode clair) ; le dashboard garde
+    `defaultTheme="system"` inchangé — pas de second `ThemeProvider`,
+    l'attribut `data-theme` posé sur un `<div>` suffit car tous les tokens
+    sont déjà scopés par sélecteur CSS.
+  - **Si le cahier doit un jour reprendre le dessus** (ex. revue légale/
+    marque), les valeurs originales de la section 13 (or/sarcelle) sont
+    encore dans l'historique git (`4032e9f`, `db663f6`) — il suffirait de
+    restaurer `globals.css`/`tailwind.config.ts`/`layout.tsx` à cet état.
+- **Section 13.2 ne donne pas de valeurs succès/alerte pour le mode
+  clair** — non applicable tel quel depuis le remplacement de palette
+  ci-dessus ; les tokens `--success`/`--destructive` du mode clair de
+  `globals.css` sont dérivés, pas mesurés sur reflect.app (qui n'a pas de
+  mode clair). À revoir si un contrôle de contraste WCAG AA (section
+  17.5) le juge insuffisant.
+- **Landing page (section 12) livrée en avance sur le Sprint 4** — copy FR
+  reprise textuellement du cahier quand elle existait (hero, 3 bullets
+  features), copy originale mais alignée pour les sections que le cahier
+  ne couvre pas (offre de lancement en remplacement de faux témoignages/
+  logos clients — aucun client réel à ce stade —, le trio "Scanner → Voir
+  en AR → Commander" dérivé du parcours client section 6.1). Stripe
+  Billing (section 15) reste à faire — c'est la seule pièce du Sprint 4
+  qui manque encore.
 
 ---
 
@@ -179,6 +237,18 @@ concerné — cette liste est un résumé, pas la seule source.
   comportement par défaut de next-intl sert la langue du navigateur, ce
   qui viole la Loi 96 (le français doit être prédominant à l'ouverture,
   jamais l'anglais par défaut, même sur un navigateur anglophone).
+- **Un champ bilingue en base (`x`/`xEn`) ne suffit pas : il faut aussi
+  que chaque requête serveur qui l'affiche sélectionne `xEn` et résout la
+  bonne valeur selon la locale.** Bug constaté : `src/lib/analytics.ts`
+  avait bien `Dish.nameEn` en base depuis le Sprint 1, mais ses requêtes
+  Prisma (vue d'ensemble, tableau global, page par plat) ne
+  sélectionnaient que `name` — le dashboard en anglais affichait quand
+  même les noms de plats en français. Corrigé avec un helper partagé
+  `localizedDishName()` (`src/lib/dish-locale.ts`) et une locale propagée
+  jusqu'à ces requêtes ; l'export CSV (route API hors segment `[locale]`)
+  reçoit la locale en query string. Vérifier ce même piège sur tout futur
+  champ bilingue affiché depuis une requête serveur, pas seulement dans les
+  formulaires/composants client.
 
 ---
 
@@ -214,8 +284,18 @@ créés via un script SQL équivalent collé directement dans Neon.
 
 ---
 
-## 8. Prochaines étapes (Sprint 3, section 21)
+## 8. Prochaines étapes (Sprint 4, section 21)
 
-Analytics par plat (section 10.3), système de design dark/light complet
-avec la palette de la section 13 (actuellement thème shadcn/ui neutre par
-défaut, pas encore la palette de marque Vorae).
+La landing marketing (section 12) est livrée (voir section 4 — palette
+reflect.app, thème sombre forcé localement). Il reste :
+
+- **Stripe Billing** (3 paliers, mensuel/annuel, facturation à l'usage —
+  section 15) — rien n'est encore fait, aucun compte Stripe créé.
+- Pages `/privacy` et `/terms` — les liens du footer de la landing pointent
+  vers `#` en attendant (voir commentaire dans `[locale]/page.tsx`).
+- Le CTA "Réserver une démo" / "Book a demo" de la landing ne fait encore
+  rien (pas de bouton fonctionnel, pas de formulaire/lien Calendly, etc.)
+  — à brancher avant mise en production réelle.
+- Rappel : ne plus réintroduire la palette or/sarcelle de la section 13
+  sans revalider avec le client — le remplacement par reflect.app est une
+  décision explicite et documentée (section 4), pas un oubli.

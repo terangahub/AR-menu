@@ -2,6 +2,7 @@ import { UserButton } from "@clerk/nextjs";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCurrentRestaurantUser } from "@/lib/auth";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Dashboard restaurateur (section 10) — protégé par le middleware Clerk
 // (src/middleware.ts) sur /:locale/dashboard(.*). Sprint 2 : gestion des
@@ -37,11 +38,17 @@ export default async function DashboardLayout({
             Vorae
           </Link>
           <nav className="flex gap-4 text-sm">
+            <Link href="/dashboard" className="hover:underline">
+              {t("nav.overview")}
+            </Link>
             <Link href="/dashboard/dishes" className="hover:underline">
               {t("nav.dishes")}
             </Link>
             <Link href="/dashboard/qrcodes" className="hover:underline">
               {t("nav.qrcodes")}
+            </Link>
+            <Link href="/dashboard/analytics" className="hover:underline">
+              {t("nav.analytics")}
             </Link>
           </nav>
         </div>
@@ -49,6 +56,7 @@ export default async function DashboardLayout({
           <span className="text-sm text-muted-foreground">
             {restaurantUser.restaurant.name}
           </span>
+          <ThemeToggle />
           <UserButton />
         </div>
       </header>
