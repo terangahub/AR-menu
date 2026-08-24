@@ -309,6 +309,13 @@ concerné — cette liste est un résumé, pas la seule source.
   exacts reçus ; `req.json()` puis re-sérialiser donnerait un contenu
   différent (ordre de clés, espaces) et ferait toujours échouer la
   vérification. Voir `src/app/api/webhooks/stripe/route.ts`.
+- **Le matcher du middleware (`src/middleware.ts`) doit exclure toute
+  extension de fichier statique servie depuis `public/`**, pas seulement
+  les images — sinon next-intl route la requête comme une page et la
+  redirige vers `/fr/<fichier>` (404). Repéré en ajoutant une vidéo
+  (`.mp4`) : la regex d'exclusion listait `jpe?g|webp|png|...` mais pas
+  `mp4|webm|mov|mp3`. Vérifier ce matcher à chaque nouveau type de fichier
+  statique ajouté au projet.
 
 ---
 
@@ -358,13 +365,38 @@ sont codés et buildés. Il reste :
   15.2)** — non implémentée, voir section 4 pour le détail du gap
   (`extraDishCount` existe en base mais rien ne l'alimente ni ne le
   reporte à Stripe en metered billing).
-- **Visuels réels pour la landing** — la refonte design (section 4,
-  palette reflect.app) utilise des compositions CSS pures (mockup
-  téléphone, halos, grille de points) faute de photos de plats ou de
-  rendus 3D disponibles pour ce projet. À remplacer par de vrais visuels
-  dès qu'ils existent (voir la liste envoyée à Mouhamed en session — photos
-  de plats, capture d'écran/vidéo de l'AR réelle, logo Vorae le cas
-  échéant).
+- **Visuels réels intégrés (générés par IA — Gemini/Imagen, pas de vraies
+  photos de plats ni un vrai enregistrement d'écran de l'app).** Livrés
+  par Mouhamed, stockés dans `public/` (pas Cloudinary — ce sont des
+  assets de site statiques, pas des données `Dish` éditables par un
+  restaurateur) et référencés en dur dans le code :
+  - `public/logo-icon.png` — icône du logo (monogramme "V" + réticule),
+    utilisée dans `SiteHeader` et comme favicon (`src/app/icon.png`,
+    convention Next.js App Router).
+  - `public/hero-dish.jpg` — photo plat dramatique, intégrée en visuel
+    sous le CTA du hero (`[locale]/page.tsx`).
+  - `public/hero-video.mp4` — vidéo concept (bol qui apparaît en
+    hologramme au-dessus d'un téléphone), remplace l'ancien mockup CSS
+    dans la section "aperçu produit". **Reconvertie depuis un .mov HEVC+AAC
+    d'origine** (non lisible de façon fiable sur Chrome/Firefox et avec
+    piste audio superflue pour une vidéo en boucle muette) vers H.264/
+    yuv420p sans audio via `ffmpeg` — nécessaire pour la compatibilité
+    navigateur, pas une simple copie de fichier.
+  - `public/dish-*.jpg` (signature-bowl, pasta, burger, salad) — pas
+    encore reliées aux plats du restaurant démo en base (nécessite un
+    `UPDATE` SQL collé dans Neon, voir message de session — même
+    contrainte que d'habitude, pas d'accès TCP direct depuis cet
+    environnement). `dish-burger.jpg` n'a pas de plat correspondant dans
+    `seed.ts` — disponible si un 4ᵉ plat est ajouté un jour.
+  - **Piège découvert en intégrant la vidéo** : le matcher du middleware
+    (`src/middleware.ts`) excluait bien `.png`/`.jpg`/etc. du routing
+    i18n mais pas `.mp4`/`.webm`/`.mov`/`.mp3` — next-intl redirigeait
+    donc `/hero-video.mp4` vers `/fr/hero-video.mp4` (404). Corrigé en
+    étendant la regex d'exclusion. Voir aussi section 5 (pièges connus).
+  - Ces visuels sont volontairement "concept" et non de vraies captures
+    de l'app (pas de fausse interface dans la vidéo) — voir l'échange sur
+    ce point en session. À remplacer par de vraies photos/captures dès
+    qu'elles existent.
 - Pages `/privacy` et `/terms` — les liens du footer de la landing pointent
   vers `#` en attendant (voir commentaire dans `[locale]/page.tsx`).
 - Le CTA "Réserver une démo" / "Book a demo" de la landing ne fait encore

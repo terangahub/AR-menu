@@ -35,7 +35,9 @@ export function SiteHeader() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-[890px] items-center justify-between px-4">
-        <Link href="/" className="font-heading text-lg font-medium tracking-tight">
+        <Link href="/" className="flex items-center gap-2 font-heading text-lg font-medium tracking-tight">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-icon.png" alt="" className="h-6 w-6" />
           Vorae
         </Link>
 

@@ -84,6 +84,16 @@ export default function Home() {
                 </Button>
               </div>
             </Reveal>
+            <Reveal delayMs={320}>
+              <div className="relative mx-auto mt-16 max-w-3xl overflow-hidden rounded-card border border-white/10 shadow-[0_0_80px_-20px_hsl(var(--secondary)/0.6)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/hero-dish.jpg"
+                  alt=""
+                  className="aspect-video w-full object-cover"
+                />
+              </div>
+            </Reveal>
           </div>
         </section>
 
@@ -117,31 +127,23 @@ export default function Home() {
               <p className="mx-auto mt-4 max-w-xl text-muted-foreground">{t("preview.body")}</p>
             </Reveal>
             <Reveal delayMs={120}>
-              <div className="relative mx-auto mt-12 w-full max-w-xs">
+              <div className="relative mx-auto mt-12 w-full max-w-2xl">
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-secondary/30 blur-3xl"
                 />
-                <div className="relative aspect-[9/18] w-full rounded-[2.5rem] border border-white/10 bg-gradient-to-b from-card to-background p-2 shadow-[0_0_80px_-20px_hsl(var(--secondary)/0.7)]">
-                  <div className="relative h-full w-full overflow-hidden rounded-[2rem] bg-gradient-to-br from-secondary/50 via-background to-background">
-                    <div
-                      aria-hidden
-                      className="absolute inset-x-8 top-12 aspect-square rounded-full bg-gradient-to-br from-amber-300/80 via-orange-500/60 to-transparent blur-md"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="relative h-32 w-32">
-                        <div className="absolute inset-0 rounded-full border-2 border-primary/80" />
-                        <div className="absolute -inset-2 animate-pulse rounded-full border border-primary/30" />
-                        <span className="absolute -left-1 -top-1 h-4 w-4 rounded-tl-lg border-l-2 border-t-2 border-primary" />
-                        <span className="absolute -right-1 -top-1 h-4 w-4 rounded-tr-lg border-r-2 border-t-2 border-primary" />
-                        <span className="absolute -bottom-1 -left-1 h-4 w-4 rounded-bl-lg border-b-2 border-l-2 border-primary" />
-                        <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-br-lg border-b-2 border-r-2 border-primary" />
-                      </div>
-                    </div>
-                    <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-                      <Sparkles className="h-3 w-3" />
-                      AR
-                    </div>
+                <div className="relative overflow-hidden rounded-card border border-white/10 shadow-[0_0_80px_-20px_hsl(var(--secondary)/0.7)]">
+                  <video
+                    src="/hero-video.mp4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="aspect-video w-full object-cover"
+                  />
+                  <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+                    <Sparkles className="h-3 w-3" />
+                    AR
                   </div>
                 </div>
               </div>
