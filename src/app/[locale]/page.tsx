@@ -7,6 +7,7 @@ import { TrustedMarquee } from "@/components/landing/trusted-marquee";
 import { ReviewsSection } from "@/components/landing/reviews-section";
 import { AboutSection } from "@/components/landing/about-section";
 import { BackToTop } from "@/components/landing/back-to-top";
+import { GlobeSection } from "@/components/landing/globe-section";
 import { FeatureField } from "@/components/landing/feature-field";
 import {
   ShieldCheck,
@@ -364,6 +365,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <GlobeSection />
 
         <ReviewsSection />
 

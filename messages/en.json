@@ -82,6 +82,12 @@
       "titleAccent": "the details.",
       "body": "Our mission is simple: give local restaurants a digital presence worthy of their kitchen, without the agency price tag."
     },
+    "globe": {
+      "eyebrow": "Montreal and its visitors",
+      "title": "A dish is understood in every language.",
+      "body": "Montreal welcomes visitors from all over the world. A menu that shows itself instead of describing itself needs no translation, and your servers need no interpreter.",
+      "cta": "See the guest journey"
+    },
     "pricing": {
       "eyebrow": "Pricing",
       "title": "A price that grows with your menu, never the other way around.",

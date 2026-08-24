@@ -90,7 +90,7 @@ src/
   components/
     menu/                        ← composants du menu public
     dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart, billing-panel)
-    landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile), pricing-section.tsx (tarifs, toggle mensuel/annuel), trusted-marquee.tsx, reviews-section.tsx, about-section.tsx, back-to-top.tsx
+    landing/                     ← reveal.tsx, site-header.tsx, pricing-section.tsx, trusted-marquee.tsx, reviews-section.tsx, about-section.tsx, back-to-top.tsx, feature-field.tsx (champs de mots defilants), globe-section.tsx (globe canvas)
     theme-toggle.tsx             ← bascule dark/light (next-themes)
     ui/                          ← shadcn/ui (button, etc. - installés à la main, voir section 4)
   lib/
@@ -105,6 +105,8 @@ src/
     dish-schema.ts                ← validation zod du formulaire plat
     dish-categories.ts           ← catégories existantes (pour le dropdown)
   i18n/                          ← next-intl (routing, navigation, request config)
+scripts/
+  check-contrast.mjs             ← verifie les ratios WCAG de la palette claire
 prisma/
   schema.prisma
   seed.ts                        ← restaurant démo "demo" + 3 plats + 1 QR code
@@ -454,6 +456,52 @@ Deux points de vigilance :
 Les particules de la section à propos ont des positions **figées en dur**
 et non tirées au hasard : une valeur `Math.random()` différente entre le
 rendu serveur et le rendu client provoque une erreur d'hydratation React.
+
+---
+
+## 8ter. Palette claire et animations sans dépendance
+
+**Palette claire refaite (Sprint 4.5).** Les tokens clairs d'origine
+étaient une inversion approximative du sombre. Ils sont maintenant
+construits autour du violet de marque, et chaque paire texte/fond est
+vérifiée en contraste WCAG AA (section 17.5 du cahier). Le script
+`scripts/check-contrast.mjs` recalcule tous les ratios : le relancer
+après toute modification des tokens clairs de `globals.css`.
+
+Deux inversions volontaires de rôle entre sombre et clair, documentées en
+commentaire dans `globals.css` : `--primary` passe d'un lavande clair
+(sombre) au violet profond (clair), et `--secondary` sert de fond de
+pastille en clair alors qu'il sert de violet de halo en sombre.
+
+**Limite de vérification :** le dashboard et le menu public ne peuvent pas
+être rendus dans l'environnement de développement, faute d'accès à la base
+(voir section 5). La palette claire y est donc validée par le calcul, pas
+encore à l'oeil. La validation visuelle passe par la preview Vercel.
+
+**Animations, principe retenu.** Trois effets repris de sites de
+référence sont codés à la main plutôt qu'importés :
+
+| Effet | Référence | Implémentation |
+|---|---|---|
+| Bandeaux défilants | webglow.ca | CSS pur, contenu dupliqué une fois et translation de -50%. |
+| Champs de mots des fonctionnalités | section "Hardened security" de reflect.app | Mêmes bandeaux, en rangées alternées sous masque radial. |
+| Globe en pointillés | section "dotted across the globe" de reflect.app | Canvas 2D, projection orthographique, ~60 lignes. Évite une librairie de globe (cobe, three.js) de plusieurs centaines de Ko. |
+
+Deux règles à respecter pour tout nouvel effet de ce type :
+
+- **Pas de `Math.random()` au rendu.** Une valeur différente entre serveur
+  et client provoque une erreur d'hydratation React. Les positions des
+  particules et les décalages des rangées sont figés ou dérivés de
+  l'index.
+- **Couper l'animation hors écran.** Le globe suspend sa boucle
+  `requestAnimationFrame` via un `IntersectionObserver` : une boucle qui
+  tourne en continu sur une page longue vide la batterie pour rien. Les
+  animations CSS n'ont pas ce problème, le navigateur les gère seul.
+
+Les animations d'apparition au scroll (`reveal.tsx`) se rejouent dans les
+deux sens de défilement, à la demande du client. Deux seuils plutôt qu'un
+pour éviter le clignotement au ras de la limite : apparition dès 30% de
+visibilité, réarmement seulement une fois entièrement sorti du cadre.
 
 ---
 

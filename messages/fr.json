@@ -82,6 +82,12 @@
       "titleAccent": "le détail.",
       "body": "Notre mission est simple : donner aux restaurants d'ici une présence numérique à la hauteur de leur cuisine, sans le prix d'une agence."
     },
+    "globe": {
+      "eyebrow": "Montréal et ses visiteurs",
+      "title": "Un plat se comprend dans toutes les langues.",
+      "body": "Montréal reçoit des visiteurs du monde entier. Un menu qui se montre plutôt qu'il se décrit se passe de traduction, et vos serveurs se passent d'interprète.",
+      "cta": "Voir le parcours client"
+    },
     "pricing": {
       "eyebrow": "Tarifs",
       "title": "Un prix qui grandit avec votre menu, jamais l'inverse.",

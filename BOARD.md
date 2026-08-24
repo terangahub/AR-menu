@@ -99,6 +99,8 @@ fourni), couleurs adaptées aux tokens Vorae.
 | S45-05 | Lien Avis dans la navigation | `DEV` | Ancre `#reviews`, ajoutée au menu desktop et mobile. |
 | S45-06 | Remplacer les avis de démonstration par de vrais avis | `TODO` | **Bloquant avant la mise en production.** Voir la ligne rouge éditoriale du cahier, section 12.3. |
 | S45-07 | Afficher les photos de plats sur la grille du menu public | `TODO` | Découvert en vérifiant l'`UPDATE` Neon : la grille du menu n'affiche que le texte et le prix, jamais `Dish.imageUrl`. Les photos ne sont donc visibles que sur la fiche plat. Repris dans le Sprint 4.6. |
+| S45-09 | Section globe en pointillés | `DEV` | Canvas 2D, projection orthographique, rotation lente, marqueur pulsant sur Montréal. Reprise de la section "dotted across the globe" de reflect.app, fournie en vidéo. Aucune dépendance ajoutée. |
+| S45-10 | Rejouer les animations d'apparition dans les deux sens | `DEV` | Elles ne se déclenchaient qu'une fois. Deux seuils pour éviter le clignotement au ras de la limite. |
 | S45-08 | Remplacer les photos de plats des fonctionnalités par des champs défilants | `DEV` | Les photos illustraient mal le propos : une assiette de pâtes pour parler de barrière de langue. Remplacées par un champ de mots défilants qui dit littéralement le bénéfice (questions en salle, allergènes, langues), technique de la section "Hardened security" de reflect.app. |
 
 ---
@@ -116,7 +118,7 @@ en premier.
 
 | # | Ticket | Statut | Notes |
 |---|---|---|---|
-| S46-01 | Établir une vraie palette claire | `TODO` | **À faire en premier, tout le reste en dépend.** Les tokens clairs de `globals.css` sont dérivés à la main, pas mesurés : reflect.app n'a pas de mode clair. Jamais validés en contraste (WCAG AA, section 17.5 du cahier). |
+| S46-01 | Établir une vraie palette claire | `DEV` | Fait. Palette reconstruite autour du violet de marque au lieu d'une inversion mécanique du sombre, et chaque paire texte/fond vérifiée en contraste WCAG AA via `scripts/check-contrast.mjs`. **Reste à valider visuellement sur la preview Vercel** : la base locale étant factice, le dashboard et le menu ne s'affichent pas dans cet environnement. |
 | S46-02 | Refonte du menu public et de la fiche plat | `TODO` | Écran vu par le convive, le plus critique commercialement. Absorbe S45-07 (photos sur la grille). |
 | S46-03 | Refonte de la coquille du dashboard | `TODO` | Navigation, en-tête, mise en page générale. |
 | S46-04 | Refonte des écrans du dashboard | `TODO` | Vue d'ensemble, plats, QR codes, analytics, facturation. |
