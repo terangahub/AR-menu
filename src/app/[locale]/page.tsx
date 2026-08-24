@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/landing/reveal";
 import { SiteHeader } from "@/components/landing/site-header";
+import { PricingSection } from "@/components/landing/pricing-section";
 import { Sparkles, ShieldCheck, Languages } from "lucide-react";
 
 // Landing marketing — direction reflect.app (voir CONTEXT.md pour la
@@ -231,6 +232,41 @@ export default function Home() {
           </div>
         </section>
 
+        <PricingSection />
+
+        {/* FAQ */}
+        <section className="px-4 py-24">
+          <div className="mx-auto max-w-2xl">
+            <Reveal>
+              <div className="text-center">
+                <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {t("faq.eyebrow")}
+                </span>
+                <h2 className="mt-3 font-heading text-3xl font-medium tracking-tight sm:text-4xl">
+                  {t("faq.title")}
+                </h2>
+              </div>
+            </Reveal>
+            <div className="mt-10 flex flex-col divide-y divide-border rounded-card border border-border bg-card">
+              {(["q1", "q2", "q3", "q4"] as const).map((key, i) => (
+                <Reveal key={key} delayMs={i * 60}>
+                  <details className="group px-6 py-4">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+                      {t(`faq.${key}`)}
+                      <span className="shrink-0 text-muted-foreground transition-transform group-open:rotate-45">
+                        +
+                      </span>
+                    </summary>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      {t(`faq.a${key.slice(1)}`)}
+                    </p>
+                  </details>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA */}
         <section className="px-4 py-24">
           <Reveal>
@@ -261,6 +297,9 @@ export default function Home() {
               <span className="text-muted-foreground">{t("footer.product")}</span>
               <a href="#features" className="hover:text-foreground">
                 {t("footer.features")}
+              </a>
+              <a href="#pricing" className="hover:text-foreground">
+                {t("footer.pricing")}
               </a>
             </div>
             <div className="flex flex-col gap-3">
