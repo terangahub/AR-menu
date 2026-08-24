@@ -44,6 +44,7 @@ Dernière mise à jour : Sprint 4 en revue (PR #5), Sprint 4.5 en développement
 | Sprint 3 | Analytics par plat, système de design | `DEPLOYED` | #4 |
 | Sprint 4 | Landing page complète, Stripe Billing | `REVIEW` | #5 |
 | Sprint 4.5 | Sections avis et à propos, bandeau défilant, retour en haut | `DEV` | - |
+| Sprint 4.6 | Refonte du dashboard et du menu public, clair et sombre | `TODO` | - |
 | Sprint 5 | Dashboard super admin, pilote réel Montréal | `TODO` | - |
 | Hors cahier | Génération 3D instantanée par IA (photo vers 3D) | `TODO` | - |
 
@@ -97,7 +98,29 @@ fourni), couleurs adaptées aux tokens Vorae.
 | S45-04 | Bouton fusée retour en haut | `DEV` | Apparaît après 500px, réacteur animé au décollage. |
 | S45-05 | Lien Avis dans la navigation | `DEV` | Ancre `#reviews`, ajoutée au menu desktop et mobile. |
 | S45-06 | Remplacer les avis de démonstration par de vrais avis | `TODO` | **Bloquant avant la mise en production.** Voir la ligne rouge éditoriale du cahier, section 12.3. |
-| S45-07 | Afficher les photos de plats sur la grille du menu public | `TODO` | Découvert en vérifiant l'`UPDATE` Neon : la grille du menu n'affiche que le texte et le prix, jamais `Dish.imageUrl`. Les photos ne sont donc visibles que sur la fiche plat. |
+| S45-07 | Afficher les photos de plats sur la grille du menu public | `TODO` | Découvert en vérifiant l'`UPDATE` Neon : la grille du menu n'affiche que le texte et le prix, jamais `Dish.imageUrl`. Les photos ne sont donc visibles que sur la fiche plat. Repris dans le Sprint 4.6. |
+| S45-08 | Remplacer les photos de plats des fonctionnalités par des champs défilants | `DEV` | Les photos illustraient mal le propos : une assiette de pâtes pour parler de barrière de langue. Remplacées par un champ de mots défilants qui dit littéralement le bénéfice (questions en salle, allergènes, langues), technique de la section "Hardened security" de reflect.app. |
+
+---
+
+## Sprint 4.6 - Refonte du dashboard et du menu public
+
+Rien n'est démarré. Demandé par le client : porter la qualité visuelle de
+la landing sur les écrans que voient le restaurateur et le convive.
+
+Contrainte forte qui distingue ce chantier de la landing : **la landing
+force le mode sombre**, alors que le dashboard et le menu public doivent
+fonctionner en **sombre et en clair**, dans les **deux langues**. Le mode
+clair n'a jamais été réellement éprouvé jusqu'ici, d'où le ticket S46-01
+en premier.
+
+| # | Ticket | Statut | Notes |
+|---|---|---|---|
+| S46-01 | Établir une vraie palette claire | `TODO` | **À faire en premier, tout le reste en dépend.** Les tokens clairs de `globals.css` sont dérivés à la main, pas mesurés : reflect.app n'a pas de mode clair. Jamais validés en contraste (WCAG AA, section 17.5 du cahier). |
+| S46-02 | Refonte du menu public et de la fiche plat | `TODO` | Écran vu par le convive, le plus critique commercialement. Absorbe S45-07 (photos sur la grille). |
+| S46-03 | Refonte de la coquille du dashboard | `TODO` | Navigation, en-tête, mise en page générale. |
+| S46-04 | Refonte des écrans du dashboard | `TODO` | Vue d'ensemble, plats, QR codes, analytics, facturation. |
+| S46-05 | Vérifier chaque écran en clair et en sombre, en FR et en EN | `TODO` | Quatre combinaisons par écran, à valider au rendu réel et pas seulement au build. |
 
 ---
 

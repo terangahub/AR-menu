@@ -44,7 +44,10 @@
       "feature2Body": "Chaque plat affiche clairement ce qu'il contient.",
       "feature3Eyebrow": "Accessibilité",
       "feature3Title": "Compris par tous, sans barrière de langue",
-      "feature3Body": "Le plat se montre, il n'a pas besoin d'être traduit."
+      "feature3Body": "Le plat se montre, il n'a pas besoin d'être traduit.",
+      "field1Label": "Questions en salle",
+      "field2Label": "Allergènes",
+      "field3Label": "Sans traduction"
     },
     "trusted": {
       "label": "Pensé pour tous les types de restaurants"

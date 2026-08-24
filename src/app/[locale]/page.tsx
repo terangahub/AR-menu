@@ -7,7 +7,63 @@ import { TrustedMarquee } from "@/components/landing/trusted-marquee";
 import { ReviewsSection } from "@/components/landing/reviews-section";
 import { AboutSection } from "@/components/landing/about-section";
 import { BackToTop } from "@/components/landing/back-to-top";
-import { Sparkles, ShieldCheck, Languages, ScanLine, Box, UtensilsCrossed } from "lucide-react";
+import { FeatureField } from "@/components/landing/feature-field";
+import {
+  ShieldCheck,
+  Languages,
+  ScanLine,
+  Box,
+  UtensilsCrossed,
+  MessageSquareOff,
+  Sparkles,
+} from "lucide-react";
+
+// Contenu des champs défilants illustrant chaque bénéfice. Chaque liste
+// dit littéralement de quoi parle la section : les questions que les
+// serveurs n'ont plus à répondre, les allergènes couverts, le même plat
+// écrit dans plusieurs langues.
+const FIELD_WORDS = {
+  service: [
+    "C'est servi avec quoi ?",
+    "C'est épicé ?",
+    "Quelle taille de portion ?",
+    "Il y a des noix dedans ?",
+    "C'est quoi le plat du jour ?",
+    "Ça vient avec des frites ?",
+    "C'est gros comme assiette ?",
+    "Vous avez du végé ?",
+    "C'est long à préparer ?",
+    "Ça ressemble à quoi ?",
+  ],
+  allergens: [
+    "Gluten",
+    "Arachides",
+    "Crustacés",
+    "Lait",
+    "Oeufs",
+    "Poisson",
+    "Soja",
+    "Fruits à coque",
+    "Sésame",
+    "Sulfites",
+    "Moutarde",
+    "Céleri",
+  ],
+  languages: [
+    "Bol signature",
+    "Signature bowl",
+    "Cuenco de autor",
+    "Signature-Bowl",
+    "Ciotola signature",
+    "招牌碗",
+    "시그니처 볼",
+    "シグネチャーボウル",
+    "وعاء مميز",
+    "Tigela assinatura",
+    "Фирменная чаша",
+    "Handtekening kom",
+  ],
+} as const;
 
 // Landing marketing - direction reflect.app (voir CONTEXT.md pour la
 // justification du remplacement de palette). Force le thème sombre
@@ -20,25 +76,28 @@ export default function Home() {
 
   const features = [
     {
-      icon: Sparkles,
+      icon: MessageSquareOff,
       eyebrow: t("features.feature1Eyebrow"),
       title: t("features.feature1Title"),
       body: t("features.feature1Body"),
-      image: "/dish-signature-bowl.jpg",
+      words: FIELD_WORDS.service,
+      fieldLabel: t("features.field1Label"),
     },
     {
       icon: ShieldCheck,
       eyebrow: t("features.feature2Eyebrow"),
       title: t("features.feature2Title"),
       body: t("features.feature2Body"),
-      image: "/dish-salad.jpg",
+      words: FIELD_WORDS.allergens,
+      fieldLabel: t("features.field2Label"),
     },
     {
       icon: Languages,
       eyebrow: t("features.feature3Eyebrow"),
       title: t("features.feature3Title"),
       body: t("features.feature3Body"),
-      image: "/dish-pasta.jpg",
+      words: FIELD_WORDS.languages,
+      fieldLabel: t("features.field3Label"),
     },
   ];
 
@@ -273,18 +332,11 @@ export default function Home() {
                           aria-hidden
                           className="pointer-events-none absolute -inset-6 -z-10 rounded-full bg-secondary/25 blur-3xl"
                         />
-                        <div className="border-gradient overflow-hidden rounded-card bg-card shadow-[0_20px_70px_-25px_hsl(var(--secondary))]">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={feature.image}
-                            alt=""
-                            className="aspect-[4/3] w-full object-cover"
-                          />
-                          {/* Voile sombre en bas : ancre l'image dans le
-                              fond de page au lieu d'un bord net qui flotte. */}
-                          <div
-                            aria-hidden
-                            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent"
+                        <div className="border-gradient overflow-hidden rounded-card shadow-[0_20px_70px_-25px_hsl(var(--secondary))]">
+                          <FeatureField
+                            words={[...feature.words]}
+                            icon={Icon}
+                            label={feature.fieldLabel}
                           />
                         </div>
                       </div>

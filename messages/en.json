@@ -44,7 +44,10 @@
       "feature2Body": "Every dish clearly shows what's in it.",
       "feature3Eyebrow": "Accessibility",
       "feature3Title": "Understood by everyone, no language barrier",
-      "feature3Body": "The dish shows itself, it doesn't need translating."
+      "feature3Body": "The dish shows itself, it doesn't need translating.",
+      "field1Label": "Floor questions",
+      "field2Label": "Allergens",
+      "field3Label": "No translation"
     },
     "trusted": {
       "label": "Built for every kind of restaurant"
