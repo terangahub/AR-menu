@@ -6,7 +6,7 @@ import { uploadBuffer } from "@/lib/cloudinary";
 const MAX_SIZE_BYTES = 8 * 1024 * 1024; // 8 Mo
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-// POST /api/dishes/[id]/photo — upload photo (section 10.2).
+// POST /api/dishes/[id]/photo - upload photo (section 10.2).
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

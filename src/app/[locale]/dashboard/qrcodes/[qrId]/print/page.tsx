@@ -5,7 +5,7 @@ import { getCurrentRestaurantUser } from "@/lib/auth";
 import { absoluteMenuUrl, generateQrPngDataUrl } from "@/lib/qrcode";
 import { AutoPrint } from "@/components/dashboard/auto-print";
 
-// Export imprimable en un clic (section 10.4) — utilise l'impression
+// Export imprimable en un clic (section 10.4) - utilise l'impression
 // navigateur native ("Enregistrer en PDF") plutôt qu'une librairie PDF
 // dédiée, pas de nouvelle dépendance pour un simple gabarit une page.
 export default async function PrintQrCodePage({

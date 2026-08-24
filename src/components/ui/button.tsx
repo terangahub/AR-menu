@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// Boutons — spec reflect.app mesurée (voir CONTEXT.md) :
+// Boutons - spec reflect.app mesurée (voir CONTEXT.md) :
 // primaire = solide, radius 7px (--radius), padding 12px 24px, weight 500,
 // hover = variation de luminosité ±8% sur 150ms ; secondaire = "ghost",
 // fond transparent, bordure 1px blanc 25% d'opacité.

@@ -23,7 +23,7 @@ type InvoiceInfo = {
 const KNOWN_STATUSES = ["trialing", "active", "past_due", "canceled"] as const;
 
 // Les statuts Stripe hors de cette liste (unpaid, incomplete, ...) restent
-// rares en usage normal — affichés tels quels plutôt que de bloquer sur
+// rares en usage normal - affichés tels quels plutôt que de bloquer sur
 // une clé de traduction manquante.
 function statusLabelFor(status: string, t: (key: string) => string): string {
   return (KNOWN_STATUSES as readonly string[]).includes(status)

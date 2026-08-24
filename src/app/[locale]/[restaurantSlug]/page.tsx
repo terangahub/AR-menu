@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { recordScan } from "@/lib/scan";
 import { MenuClient, type MenuDish } from "@/components/menu/menu-client";
 
-// Menu 2D public (F02) — fallback obligatoire, jamais bloqué par l'AR
+// Menu 2D public (F02) - fallback obligatoire, jamais bloqué par l'AR
 // (section 5.1, 17.1). GET /api/menu/[restaurantSlug] expose les mêmes
 // données pour d'autres clients (section 9.1).
 export default async function RestaurantMenuPage({
@@ -50,7 +50,7 @@ export default async function RestaurantMenuPage({
   }
 
   if (qr) {
-    // Best-effort — un QR code invalide ou une limite de débit atteinte ne
+    // Best-effort - un QR code invalide ou une limite de débit atteinte ne
     // doit jamais empêcher l'affichage du menu.
     await recordScan({ qrCodeId: qr }).catch(() => undefined);
   }

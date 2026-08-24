@@ -4,9 +4,9 @@ import { getGlobalDishTable } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/analytics/export — export CSV du tableau global (section 10.3).
+// GET /api/analytics/export - export CSV du tableau global (section 10.3).
 // Content-Disposition côté serveur plutôt qu'un <a download> côté client
-// — voir la note sur Safari iOS dans CONTEXT.md (même piège que le PNG
+// - voir la note sur Safari iOS dans CONTEXT.md (même piège que le PNG
 // des QR codes). Route hors du segment [locale] : la locale du dashboard
 // est passée en query string par le lien d'export (voir analytics/page.tsx).
 export async function GET(request: NextRequest) {

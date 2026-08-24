@@ -9,25 +9,25 @@
     "hero": {
       "eyebrow": "Augmented reality menu",
       "title": "Let your guests see the dish before they order.",
-      "subtitle": "Vorae turns your menu into a visual experience with a single scan — fewer questions for your servers, better-informed orders, zero app to download.",
+      "subtitle": "Vorae turns your menu into a visual experience with a single scan: fewer questions for your servers, better-informed orders, zero app to download.",
       "cta": "Book a demo",
       "secondaryCta": "See how it works"
     },
     "earlyAccess": {
-      "eyebrow": "Launch offer — Montreal",
+      "eyebrow": "Launch offer, Montreal",
       "title": "1 free AR dish, free setup",
       "body": "For the first 10 pilot restaurants in Montreal. Limited spots."
     },
     "preview": {
       "eyebrow": "The experience",
       "title": "One scan. A dish, full size, on the table.",
-      "body": "Guests rotate and zoom the dish before ordering — nothing to install."
+      "body": "Guests rotate and zoom the dish before ordering, nothing to install."
     },
     "howItWorks": {
       "eyebrow": "How it works",
       "title": "From scan to order",
       "step1Title": "Scan",
-      "step1Body": "The guest scans the table's QR code — no app, no account.",
+      "step1Body": "The guest scans the table's QR code, no app, no account.",
       "step2Title": "See it in AR",
       "step2Body": "The dish appears in 3D, full size, right on the table, before ordering.",
       "step3Title": "Order",
@@ -80,7 +80,7 @@
       "q2": "How long does setup take?",
       "a2": "The 2D menu is live as soon as your dishes are added. 3D models are produced by our capture service and go live as soon as they're ready.",
       "q3": "Does AR work on every phone?",
-      "a3": "Native AR works on recent iPhone (Safari) and Android (Chrome) devices. If AR doesn't trigger, the 2D menu displays automatically — your guests never see an error.",
+      "a3": "Native AR works on recent iPhone (Safari) and Android (Chrome) devices. If AR doesn't trigger, the 2D menu displays automatically: your guests never see an error.",
       "q4": "What happens if I go over my dish quota?",
       "a4": "Each extra dish beyond your included quota is billed monthly, with no service interruption. The Prestige tier has no limit."
     },
@@ -115,7 +115,7 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "View in AR",
     "rotateHint": "Rotate and zoom before activating AR",
-    "arUnavailable": "AR unavailable on this device — showing 2D",
+    "arUnavailable": "AR unavailable on this device: showing 2D",
     "back": "Back to menu"
   },
   "Dashboard": {

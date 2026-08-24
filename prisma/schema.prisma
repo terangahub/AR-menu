@@ -1,4 +1,4 @@
-// Vorae — schéma de données (cahier des charges v2.0, section 8)
+// Vorae - schéma de données (cahier des charges v2.0, section 8)
 // Base : Neon PostgreSQL serverless (DATABASE_URL en variable d'environnement)
 
 generator client {
@@ -36,7 +36,7 @@ model User {
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   email        String     @unique
-  // Lie l'identité Clerk (authentification) à ce profil restaurant — non
+  // Lie l'identité Clerk (authentification) à ce profil restaurant - non
   // présent dans le modèle de la section 8, nécessaire pour le dashboard
   // (section 10, 18). Nullable : un profil peut être créé avant la première
   // connexion (invitation d'équipe, section 10.7).
@@ -55,8 +55,8 @@ model Dish {
   descriptionEn   String?
   // category, ingredients, prepTimeMinutes : référencés par F02/F05
   // (catégorie, fiche plat) mais absents du modèle de données de la
-  // section 8 — ajoutés pour compléter le schéma. Variantes *En pour le
-  // bilingue FR/EN complet (F06) — description/ingrédients/catégorie
+  // section 8 - ajoutés pour compléter le schéma. Variantes *En pour le
+  // bilingue FR/EN complet (F06) - description/ingrédients/catégorie
   // n'avaient pas d'équivalent anglais, contrairement à name/nameEn.
   category        String?
   categoryEn      String?

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // Simplification Sprint 2 : il n'existe pas encore de flux d'onboarding ou
 // d'invitation d'équipe (section 10.7, hors scope du sprint). Le premier
 // compte Clerk qui visite le dashboard est donc automatiquement lié comme
-// "owner" du restaurant de démo — à remplacer par un vrai flux d'invitation
+// "owner" du restaurant de démo - à remplacer par un vrai flux d'invitation
 // avant l'ouverture à plusieurs restaurants.
 export async function getCurrentRestaurantUser() {
   const clerkUser = await currentUser();

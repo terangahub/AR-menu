@@ -32,7 +32,7 @@ export function DishList({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // La clé de filtrage reste la catégorie française (canonique) — seul le
+  // La clé de filtrage reste la catégorie française (canonique) - seul le
   // libellé affiché change selon la locale du dashboard.
   const categories = useMemo(() => {
     const labelByCategory = new Map<string, string>();
@@ -124,7 +124,7 @@ export function DishList({
           {filtered.map((dish) => {
             const name = locale === "en" && dish.nameEn ? dish.nameEn : dish.name;
             const categoryLabel =
-              (locale === "en" && dish.categoryEn ? dish.categoryEn : dish.category) ?? "—";
+              (locale === "en" && dish.categoryEn ? dish.categoryEn : dish.category) ?? "-";
 
             return (
             <div key={dish.id} className="flex items-center justify-between gap-4 p-4">

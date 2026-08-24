@@ -5,9 +5,9 @@ import { getStripe, subscriptionFieldsFrom } from "@/lib/billing";
 
 export const dynamic = "force-dynamic";
 
-// POST /api/webhooks/stripe — synchronise Subscription/Invoice (section 8,
+// POST /api/webhooks/stripe - synchronise Subscription/Invoice (section 8,
 // 9.3) avec les événements Stripe. Signature vérifiée avec le corps brut de
-// la requête (obligatoire pour Stripe — jamais passer par req.json() ici).
+// la requête (obligatoire pour Stripe - jamais passer par req.json() ici).
 export async function POST(req: NextRequest) {
   const signature = req.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;

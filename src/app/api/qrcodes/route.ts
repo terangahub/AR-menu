@@ -6,7 +6,7 @@ import { absoluteMenuUrl, generateQrPngDataUrl } from "@/lib/qrcode";
 
 export const dynamic = "force-dynamic";
 
-// GET/POST /api/qrcodes — génération par table (section 10.4, 9.2).
+// GET/POST /api/qrcodes - génération par table (section 10.4, 9.2).
 export async function GET() {
   const restaurantUser = await getCurrentRestaurantUser();
   if (!restaurantUser) {
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       restaurantId: restaurantUser.restaurantId,
       tableNumber: parsed.data.tableNumber,
       // targetUrl est finalisée après création (elle a besoin de l'id du
-      // QR code lui-même) — placeholder mis à jour juste après.
+      // QR code lui-même) - placeholder mis à jour juste après.
       targetUrl: "",
     },
   });

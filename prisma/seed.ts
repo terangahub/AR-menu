@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // Modèles 3D d'exemple hébergés publiquement par le projet model-viewer
-// (Google) — utilisés uniquement pour valider le pipeline AR pendant le
+// (Google) - utilisés uniquement pour valider le pipeline AR pendant le
 // Sprint 1. À remplacer par de vraies captures de plats (section 16).
 const SAMPLE_MODELS = {
   astronaut: {
@@ -71,8 +71,8 @@ async function main() {
       descriptionEn: "A composition that changes every week.",
       category: "Plats",
       categoryEn: "Mains",
-      ingredients: "Selon arrivage — voir avec votre serveur",
-      ingredientsEn: "Depending on availability — ask your server",
+      ingredients: "Selon arrivage - voir avec votre serveur",
+      ingredientsEn: "Depending on availability - ask your server",
       prepTimeMinutes: 20,
       price: 24.0,
       model: SAMPLE_MODELS.robot,

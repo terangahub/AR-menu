@@ -1,11 +1,11 @@
 import Stripe from "stripe";
 
-// Modèle de tarification (cahier des charges section 15.1) — 3 paliers,
+// Modèle de tarification (cahier des charges section 15.1) - 3 paliers,
 // mensuel/annuel. Les stripePriceId sont résolus depuis les variables
 // d'environnement (voir .env.example) : chaque palier/cycle correspond à
 // un Price Stripe créé manuellement dans le Dashboard Stripe (pas
 // d'accès programmatique au compte Stripe du client depuis cet
-// environnement — voir CONTEXT.md).
+// environnement - voir CONTEXT.md).
 export const TIERS = [
   {
     id: "essentiel",
@@ -51,7 +51,7 @@ export function priceIdFor(tierId: TierId, cycle: BillingCycle): string | undefi
 }
 
 // Construit les champs Subscription (schema.prisma) à partir d'un objet
-// Stripe.Subscription — utilisé par le webhook (checkout.session.completed,
+// Stripe.Subscription - utilisé par le webhook (checkout.session.completed,
 // customer.subscription.updated) pour garder la copie locale synchronisée.
 export function subscriptionFieldsFrom(sub: Stripe.Subscription) {
   const tierId = (sub.metadata?.tier as TierId | undefined) ?? "essentiel";
@@ -80,7 +80,7 @@ export function getStripe(): Stripe {
   if (!stripeClient) {
     const key = process.env.STRIPE_SECRET_KEY;
     if (!key) {
-      throw new Error("STRIPE_SECRET_KEY manquante — voir .env.example");
+      throw new Error("STRIPE_SECRET_KEY manquante - voir .env.example");
     }
     stripeClient = new Stripe(key);
   }

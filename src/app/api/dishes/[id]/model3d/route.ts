@@ -3,13 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { uploadBuffer } from "@/lib/cloudinary";
 
-const MAX_SIZE_BYTES = 15 * 1024 * 1024; // 15 Mo — au-delà du seuil cible
+const MAX_SIZE_BYTES = 15 * 1024 * 1024; // 15 Mo - au-delà du seuil cible
 // de 5 Mo max de la section 16, mais on laisse passer pour ne pas bloquer
 // un upload que le restaurateur devra de toute façon recompresser.
 
-// POST /api/dishes/[id]/model3d — upload .glb (+ .usdz optionnel, pour
+// POST /api/dishes/[id]/model3d - upload .glb (+ .usdz optionnel, pour
 // AR Quick Look iOS). Conversion .glb → .usdz automatique demandée par la
-// section 9.2, mais aucun outil fiable n'existe côté serveur Node — la
+// section 9.2, mais aucun outil fiable n'existe côté serveur Node - la
 // conversion nécessite normalement usdz_converter (Apple, macOS) ou un
 // service tiers payant. Faute de pipeline en place, on accepte le .usdz
 // en upload manuel séparé plutôt que de prétendre le générer.

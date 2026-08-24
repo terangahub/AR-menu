@@ -37,7 +37,7 @@ export function MenuClient({
     new Set()
   );
 
-  // La clé de filtrage reste toujours la catégorie française (canonique) —
+  // La clé de filtrage reste toujours la catégorie française (canonique) :
   // seul le libellé affiché change selon la locale, via categoryEn.
   const categories = useMemo(() => {
     const labelByCategory = new Map<string, string>();

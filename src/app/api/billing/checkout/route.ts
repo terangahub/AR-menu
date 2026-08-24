@@ -9,7 +9,7 @@ const checkoutSchema = z.object({
   locale: z.enum(["fr", "en"]),
 });
 
-// POST /api/billing/checkout — crée une session Stripe Checkout pour le
+// POST /api/billing/checkout - crée une session Stripe Checkout pour le
 // palier/cycle demandé (section 9.2, 10.6). Réutilise le stripeCustomerId
 // existant du restaurant s'il y en a un, sinon laisse Stripe en créer un
 // (lié après coup via le webhook checkout.session.completed).

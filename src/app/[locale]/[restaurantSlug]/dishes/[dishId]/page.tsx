@@ -36,7 +36,7 @@ export default async function DishPage({
 
   if (qr) {
     // Vue de la fiche plat, distincte de l'activation AR (voir
-    // DishArSection) — nécessaire pour calculer le taux d'activation AR
+    // DishArSection) - nécessaire pour calculer le taux d'activation AR
     // (section 10.1/10.3 : activations AR ÷ vues de fiche plat).
     await recordScan({ qrCodeId: qr, dishId: dish.id }).catch(() => undefined);
   }

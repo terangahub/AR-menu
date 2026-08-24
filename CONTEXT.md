@@ -1,15 +1,28 @@
-# Contexte projet — Vorae (AR-menu)
+# Contexte projet - Vorae (AR-menu)
 
 Ce document résume l'état réel du projet pour toute personne (humaine ou IA)
 qui reprend le travail sans avoir suivi les sessions précédentes. Il complète
-le cahier des charges (`Vorae — Cahier des charges technique v2.0`), qui reste
-la source de vérité produit — ce fichier documente l'**implémentation
+le cahier des charges (`Vorae - Cahier des charges technique v2.0`), qui reste
+la source de vérité produit - ce fichier documente l'**implémentation
 réelle**, y compris les écarts par rapport au cahier et les raisons.
 
 **Règle** : mettre à jour ce fichier à la fin de chaque sprint (nouvelle
 section "Sprint N", écarts constatés, comptes externes ajoutés, bugs connus).
-Ne jamais le laisser devenir obsolète — un contexte faux est pire qu'aucun
+Ne jamais le laisser devenir obsolète - un contexte faux est pire qu'aucun
 contexte.
+
+**Voir aussi** : [`BOARD.md`](./BOARD.md) suit l'**avancement** ticket par
+ticket (statuts TODO, READY, DEV, REVIEW, DONE, DEPLOYED, BLOCKED) et
+recense ce qui est bloqué. Répartition des rôles : `BOARD.md` répond à "où
+en est le travail", `CONTEXT.md` à "comment le projet est fait". Mettre à
+jour `BOARD.md` à chaque changement d'état d'un ticket, pas seulement en
+fin de sprint.
+
+**Convention d'écriture** : aucun tiret long (cadratin) nulle part dans le
+projet, ni dans le code, ni dans les commentaires, ni dans la
+documentation, ni dans les textes visibles par l'utilisateur. Utiliser un
+tiret court, une virgule ou un deux-points selon ce qui est le plus
+naturel. Exigence explicite du client.
 
 ---
 
@@ -21,7 +34,7 @@ contexte.
 | Sprint 1 | ✅ Mergé | Menu 2D public, fiche plat + AR (`<model-viewer>`) + fallback 2D, i18n FR/EN |
 | Sprint 2 | ✅ Mergé | Dashboard restaurateur : CRUD plats, upload photo/3D, QR codes |
 | Sprint 3 | ✅ Mergé | Analytics par plat, système de design (palette reflect.app + Space Grotesk/Inter + toggle dark/light), landing page marketing (section 12, avancée depuis le Sprint 4) |
-| Sprint 4 | 🔄 En cours (branche `feature/s4-billing-landing-polish`) | Stripe Billing (3 paliers, section 15), section tarifs + FAQ sur la landing — reste à faire : visuels réels (voir section 4), Stripe pas encore testé en conditions réelles (clés manquantes) |
+| Sprint 4 | 🔄 En cours (branche `feature/s4-billing-landing-polish`) | Stripe Billing (3 paliers, section 15), section tarifs + FAQ sur la landing - reste à faire : visuels réels (voir section 4), Stripe pas encore testé en conditions réelles (clés manquantes) |
 
 ---
 
@@ -29,12 +42,12 @@ contexte.
 
 | Service | Usage | Où sont les identifiants |
 |---|---|---|
-| **GitHub** | `terangahub/AR-menu` — repo **public** (protection de branche gratuite impossible sur un repo privé d'org sur le plan Free) | — |
+| **GitHub** | `terangahub/AR-menu` - repo **public** (protection de branche gratuite impossible sur un repo privé d'org sur le plan Free) | - |
 | **Vercel** | Hébergement, scope `terangahub's projects` | Vercel → Settings → Environment Variables |
-| **Neon** | Postgres serverless, projet `vorae` | `DATABASE_URL` dans Vercel — **utiliser la connexion POOLED** (hostname avec `-pooler`), pas la directe (voir section 5) |
+| **Neon** | Postgres serverless, projet `vorae` | `DATABASE_URL` dans Vercel - **utiliser la connexion POOLED** (hostname avec `-pooler`), pas la directe (voir section 5) |
 | **Clerk** | Authentification | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` dans Vercel |
 | **Cloudinary** | Stockage images ET modèles 3D (voir écart section 4) | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` dans Vercel |
-| **Stripe** | Facturation (section 15) — **compte pas encore créé par le client**, code écrit et buildé mais jamais exercé contre l'API réelle | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_{ESSENTIEL,CROISSANCE,PRESTIGE}_{MONTHLY,ANNUAL}` — 8 variables au total, voir section 4 pour la checklist de création |
+| **Stripe** | Facturation (section 15) - **compte pas encore créé par le client**, code écrit et buildé mais jamais exercé contre l'API réelle | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_{ESSENTIEL,CROISSANCE,PRESTIGE}_{MONTHLY,ANNUAL}` - 8 variables au total, voir section 4 pour la checklist de création |
 
 Pas encore créés : AWS (S3/CloudFront), Stripe (produits à créer, voir section 4), Resend.
 
@@ -43,13 +56,13 @@ Pas encore créés : AWS (S3/CloudFront), Stripe (produits à créer, voir secti
 ## 3. Architecture réelle
 
 Stack conforme au cahier (section 7), avec les versions **épinglées**
-ci-dessous — voir section 4 pour pourquoi.
+ci-dessous - voir section 4 pour pourquoi.
 
 ```
 src/
   app/
     [locale]/                    ← toutes les routes passent par next-intl
-      page.tsx                   ← landing marketing (section 12, direction reflect.app — voir section 4)
+      page.tsx                   ← landing marketing (section 12, direction reflect.app - voir section 4)
       [restaurantSlug]/          ← menu public 2D (F02)
         dishes/[dishId]/         ← fiche plat + AR (F03-F05)
       dashboard/                 ← protégé par middleware Clerk, force-dynamic
@@ -79,13 +92,13 @@ src/
     dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart, billing-panel)
     landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile), pricing-section.tsx (tarifs, toggle mensuel/annuel)
     theme-toggle.tsx             ← bascule dark/light (next-themes)
-    ui/                          ← shadcn/ui (button, etc. — installés à la main, voir section 4)
+    ui/                          ← shadcn/ui (button, etc. - installés à la main, voir section 4)
   lib/
     prisma.ts                    ← client Prisma singleton
     auth.ts                      ← résout Clerk → Restaurant/User (voir section 6)
     scan.ts                      ← logique + rate limiting des scans
     analytics.ts                 ← requêtes agrégées pour le dashboard (10.1, 10.3)
-    dish-locale.ts               ← localizedDishName() — résout name/nameEn selon la locale (voir section 4)
+    dish-locale.ts               ← localizedDishName() - résout name/nameEn selon la locale (voir section 4)
     billing.ts                   ← TIERS (source unique des prix, section 15.1), getStripe(), subscriptionFieldsFrom()
     qrcode.ts                    ← génération PNG + URL absolue
     cloudinary.ts                ← config + upload
@@ -102,54 +115,54 @@ prisma/
 ## 4. Écarts assumés par rapport au cahier des charges
 
 Chacun de ces écarts est documenté en commentaire dans le code source
-concerné — cette liste est un résumé, pas la seule source.
+concerné - cette liste est un résumé, pas la seule source.
 
-- **Prisma 6.19.3, pas la dernière version (7.x)** — Prisma 7 supprime
+- **Prisma 6.19.3, pas la dernière version (7.x)** - Prisma 7 supprime
   `datasource { url }` au profit de `prisma.config.ts` + adapters. Le
   schéma du cahier suppose la syntaxe classique.
-- **@clerk/nextjs 6.x, pas 7.x** — Clerk 7 exige Next.js 15+, or le cahier
+- **@clerk/nextjs 6.x, pas 7.x** - Clerk 7 exige Next.js 15+, or le cahier
   impose Next.js 14.
 - **Cloudinary au lieu d'AWS S3+CloudFront pour les modèles 3D**
-  (section 7) — aucun compte AWS configuré. Cloudinary stocke aussi les
+  (section 7) - aucun compte AWS configuré. Cloudinary stocke aussi les
   `.glb`/`.usdz` en `resource_type: "raw"`. À migrer vers S3 si le volume
   ou le coût le justifie.
 - **Pas de conversion automatique .glb → .usdz** (section 9.2 le
-  demande) — aucun outil fiable côté serveur Node (il faut `usdz_converter`
+  demande) - aucun outil fiable côté serveur Node (il faut `usdz_converter`
   d'Apple, macOS uniquement, ou un service tiers payant). Upload manuel du
   `.usdz` en attendant un vrai pipeline (section 16).
-- **shadcn/ui installé à la main** — `ui.shadcn.com` est bloqué par le
+- **shadcn/ui installé à la main** - `ui.shadcn.com` est bloqué par le
   proxy réseau de l'environnement de dev utilisé ; les fichiers standards
   (`components.json`, `lib/utils.ts`, composants) ont été recréés
   manuellement plutôt que via le CLI.
-- **Schéma de données complété** — la section 8 du cahier omet plusieurs
+- **Schéma de données complété** - la section 8 du cahier omet plusieurs
   champs référencés ailleurs dans le texte : `Dish.category`/`categoryEn`
   (F02, 10.2), `Dish.ingredients`/`ingredientsEn` (F05),
   `Dish.prepTimeMinutes` (F05), `Dish.descriptionEn` (F06 bilingue complet),
   la table `Allergen`/`DishAllergen` (référencée mais jamais définie),
   `User.clerkUserId` (lien identité Clerk ↔ profil restaurant, nécessaire
   pour le dashboard section 18).
-- **Repo GitHub public, pas privé** — la protection de branche (section
+- **Repo GitHub public, pas privé** - la protection de branche (section
   4.1, PR obligatoire + CI verte requise) n'est **appliquée** par GitHub
   que sur les repos publics pour une organisation sur le plan Free. Un
   repo privé d'org sur ce plan peut créer des règles mais elles restent
   inertes. Alternative si la confidentialité redevient prioritaire :
   upgrade payant vers GitHub Team.
-- **Onboarding dashboard simplifié** — pas de flux d'invitation d'équipe
+- **Onboarding dashboard simplifié** - pas de flux d'invitation d'équipe
   (section 10.7, hors scope Sprint 2). Le premier compte Clerk qui visite
   `/dashboard` est auto-provisionné "owner" du restaurant `demo`
   (voir `src/lib/auth.ts`). À remplacer avant d'ouvrir à plusieurs
   restaurants/plusieurs comptes.
-- **Rate limiting en mémoire** (`src/lib/scan.ts`) — suffisant pour une
+- **Rate limiting en mémoire** (`src/lib/scan.ts`) - suffisant pour une
   seule instance serveur. À remplacer par un store partagé (Upstash Redis)
   avant un déploiement multi-instance.
-- **Vue de fiche plat ajoutée en Sprint 3** — le Sprint 1 n'enregistrait un
+- **Vue de fiche plat ajoutée en Sprint 3** - le Sprint 1 n'enregistrait un
   `ScanEvent` avec `dishId` que lors d'une activation AR ; il n'y avait
   donc aucune donnée pour calculer un taux d'activation AR (activations ÷
   vues). La page fiche plat enregistre maintenant aussi un scan à
   l'ouverture (`arActivated: false`), distinct de celui déclenché par
-  l'activation AR — voir `src/lib/analytics.ts`.
+  l'activation AR - voir `src/lib/analytics.ts`.
 - **Palette et typographie de la section 13 remplacées par celles de
-  reflect.app — décision explicite du client, à l'encontre de la section
+  reflect.app - décision explicite du client, à l'encontre de la section
   26 ("ne pas improviser de palette alternative").** Après avoir vu le
   dashboard Sprint 3 en conditions réelles, le client a jugé le design de
   la section 13 insuffisant pour un SaaS premium et a fourni un prompt de
@@ -163,37 +176,37 @@ concerné — cette liste est un résumé, pas la seule source.
     mode clair n'a pas d'équivalent mesuré (reflect.app n'en a pas) donc
     ses tokens sont dérivés, pas mesurés.
   - Polices : Space Grotesk (titres) + Inter (corps) via `next/font/google`,
-    remplaçant Fraunces/Geist — AeonikPro et "Inter V" (polices d'origine
+    remplaçant Fraunces/Geist - AeonikPro et "Inter V" (polices d'origine
     du prompt) sont payantes/non disponibles ; le prompt prévoyait
     lui-même ces alternatives Google Fonts.
   - `--radius: 7px`, `--radius-card: 24px`, boutons `h-auto` avec padding
-    explicite (12px 24px) — spec boutons reflect.app mesurée.
+    explicite (12px 24px) - spec boutons reflect.app mesurée.
   - La landing (`[locale]/page.tsx`) force `data-theme="dark"` localement
     via un wrapper (reflect.app n'a pas de mode clair) ; le dashboard garde
-    `defaultTheme="system"` inchangé — pas de second `ThemeProvider`,
+    `defaultTheme="system"` inchangé - pas de second `ThemeProvider`,
     l'attribut `data-theme` posé sur un `<div>` suffit car tous les tokens
     sont déjà scopés par sélecteur CSS.
   - **Si le cahier doit un jour reprendre le dessus** (ex. revue légale/
     marque), les valeurs originales de la section 13 (or/sarcelle) sont
-    encore dans l'historique git (`4032e9f`, `db663f6`) — il suffirait de
+    encore dans l'historique git (`4032e9f`, `db663f6`) - il suffirait de
     restaurer `globals.css`/`tailwind.config.ts`/`layout.tsx` à cet état.
 - **Section 13.2 ne donne pas de valeurs succès/alerte pour le mode
-  clair** — non applicable tel quel depuis le remplacement de palette
+  clair** - non applicable tel quel depuis le remplacement de palette
   ci-dessus ; les tokens `--success`/`--destructive` du mode clair de
   `globals.css` sont dérivés, pas mesurés sur reflect.app (qui n'a pas de
   mode clair). À revoir si un contrôle de contraste WCAG AA (section
   17.5) le juge insuffisant.
-- **Landing page (section 12) livrée en avance sur le Sprint 4** — copy FR
+- **Landing page (section 12) livrée en avance sur le Sprint 4** - copy FR
   reprise textuellement du cahier quand elle existait (hero, 3 bullets
   features), copy originale mais alignée pour les sections que le cahier
   ne couvre pas (offre de lancement en remplacement de faux témoignages/
-  logos clients — aucun client réel à ce stade —, le trio "Scanner → Voir
+  logos clients - aucun client réel à ce stade -, le trio "Scanner → Voir
   en AR → Commander" dérivé du parcours client section 6.1). Section
   tarifs (12.1 #9) et FAQ (12.1 #10) ajoutées au Sprint 4, montants tirés
   tels quels de la section 15.1 via `lib/billing.ts` (source unique
   partagée avec le dashboard facturation, pour ne jamais désynchroniser
   les deux).
-- **Stripe Billing (section 15, F10) — code écrit et buildé, jamais
+- **Stripe Billing (section 15, F10) - code écrit et buildé, jamais
   exercé contre l'API réelle.** Aucun compte Stripe n'existe encore côté
   client. Checklist pour débloquer (mode Test suffit pour valider avant
   la mise en prod) :
@@ -216,7 +229,7 @@ concerné — cette liste est un résumé, pas la seule source.
      `invoice.payment_failed`. Copier le signing secret →
      `STRIPE_WEBHOOK_SECRET`.
   7. Dans Stripe → Customer Portal (Settings), autoriser les 3 Products
-     ci-dessus et activer le changement de palier — c'est ce qui permet
+     ci-dessus et activer le changement de palier - c'est ce qui permet
      à `POST /api/billing/portal` (section 9.2, 10.6) de couvrir "changement
      de palier en libre-service avec proratisation automatique" sans code
      applicatif supplémentaire : la logique de proratisation est gérée
@@ -226,17 +239,17 @@ concerné — cette liste est un résumé, pas la seule source.
     schéma `Subscription` mais rien ne l'incrémente ni ne le reporte à
     Stripe (`metered billing`, un second item de subscription par
     palier). Décision de scope Sprint 4 : livrer l'abonnement de base (3
-    paliers × 2 cycles, checkout, portail, webhook) d'abord — l'usage
+    paliers × 2 cycles, checkout, portail, webhook) d'abord - l'usage
     metered demande une automatisation (compter les plats actifs, reporter
     l'usage à Stripe) qui n'a pas pu être testée sans compte Stripe réel.
     Palier Prestige non concerné (plats illimités).
   - Palier "illimité" (Prestige) représenté par `includedDishSlots: -1`
     dans `lib/billing.ts`/`Subscription.includedDishSlots` (le champ
-    Prisma est un `Int` non nullable, donc pas de `null`) — tout code lisant
+    Prisma est un `Int` non nullable, donc pas de `null`) - tout code lisant
     ce champ doit connaître cette convention.
   - Service de capture 3D à la carte/forfaits (section 15.3,
     `DishCaptureOrder`) : modèle de données existant depuis Sprint 0, mais
-    aucun flux de commande ni paiement associé — non demandé explicitement
+    aucun flux de commande ni paiement associé - non demandé explicitement
     pour ce sprint, à faire si le client en a besoin.
 
 ---
@@ -244,21 +257,21 @@ concerné — cette liste est un résumé, pas la seule source.
 ## 5. Pièges connus / à ne pas refaire
 
 - **Neon : toujours utiliser la connexion POOLED** (`-pooler` dans le
-  hostname) pour `DATABASE_URL` sur Vercel — bonne pratique générale pour
+  hostname) pour `DATABASE_URL` sur Vercel - bonne pratique générale pour
   du serverless (la connexion directe a une limite de connexions
   simultanées très basse sur le plan gratuit). Note : ce n'était **pas**
-  la cause du bug ci-dessous malgré la ressemblance des symptômes — les
+  la cause du bug ci-dessous malgré la ressemblance des symptômes - les
   deux pièges peuvent coexister, ne pas arrêter le diagnostic au premier
   suspect plausible.
 - **Vercel peut créer une variable d'env comme chaîne VIDE plutôt qu'absente**
-  — au tout premier import du projet, Vercel avait auto-détecté les noms
+  - au tout premier import du projet, Vercel avait auto-détecté les noms
   de variables depuis `.env.example` (dont `NEXT_PUBLIC_APP_URL=`, sans
   valeur) et créé l'entrée correspondante vide plutôt que de ne rien
   créer. `process.env.NEXT_PUBLIC_APP_URL` valait donc `""`, pas
   `undefined`. Tout code utilisant `??` pour un fallback laissait passer
-  cette chaîne vide (elle n'est pas null/undefined) — `new URL(path, "")`
+  cette chaîne vide (elle n'est pas null/undefined) - `new URL(path, "")`
   plante avec `ERR_INVALID_URL`. Symptôme en prod : "Application error: a
-  server-side exception has occurred" sans plus de détail — le vrai
+  server-side exception has occurred" sans plus de détail - le vrai
   message (`TypeError: Invalid URL ... base: ''`) n'était visible que
   dans Vercel → Deployments → [déploiement] → Runtime Logs, pas dans
   l'onglet "Logs" du projet (qui est production-only). **Toujours
@@ -266,28 +279,28 @@ concerné — cette liste est un résumé, pas la seule source.
   potentiellement vide**, et vérifier les Runtime Logs du déploiement
   concerné dès qu'une erreur 500 générique apparaît, avant de deviner.
 - **Aucune connexion TCP brute (Postgres, etc.) depuis l'environnement de
-  dev sandboxé** utilisé pour ce projet — seul le HTTPS passe par le proxy
+  dev sandboxé** utilisé pour ce projet - seul le HTTPS passe par le proxy
   réseau. Toute migration/seed Prisma contre la vraie base doit être faite
   soit par SQL généré offline (`prisma migrate diff --from-empty
   --to-schema-datamodel prisma/schema.prisma --script`, qui ne nécessite
   aucune connexion) collé dans le SQL Editor de Neon, soit exécutée par
   quelqu'un ayant un accès réseau direct.
 - **`export const dynamic = "force-dynamic"`** est nécessaire sur le
-  layout `/dashboard` (et hérité par ses routes filles) — sans ça, Next.js
+  layout `/dashboard` (et hérité par ses routes filles) - sans ça, Next.js
   tente de pré-générer ces pages personnalisées par utilisateur une seule
   fois au build. Le résumé du build peut afficher "●" (statique) même
   quand `force-dynamic` fonctionne correctement : vérifier l'absence
   réelle de fichiers `.html`/`.rsc` dans `.next/server/app/...` plutôt que
   de se fier à ce symbole.
 - **Toujours vérifier `res.ok`** sur les appels fetch côté client et
-  afficher une erreur visible — plusieurs bugs signalés ("le bouton ne
+  afficher une erreur visible - plusieurs bugs signalés ("le bouton ne
   fait rien", "il faut rafraîchir pour voir le changement") venaient
   d'échecs silencieux côté client masquant une vraie erreur serveur.
 - **Toute donnée bilingue doit avoir ses deux champs dès sa création**
-  (`x` et `xEn`) — plusieurs oublis déjà corrigés (description, catégorie,
+  (`x` et `xEn`) - plusieurs oublis déjà corrigés (description, catégorie,
   ingrédients). Vérifier systématiquement qu'un nouveau champ visible par
   l'utilisateur final a son pendant anglais avant de le considérer terminé.
-- **`localeDetection: false`** est requis dans `src/i18n/routing.ts` — le
+- **`localeDetection: false`** est requis dans `src/i18n/routing.ts` - le
   comportement par défaut de next-intl sert la langue du navigateur, ce
   qui viole la Loi 96 (le français doit être prédominant à l'ouverture,
   jamais l'anglais par défaut, même sur un navigateur anglophone).
@@ -296,7 +309,7 @@ concerné — cette liste est un résumé, pas la seule source.
   bonne valeur selon la locale.** Bug constaté : `src/lib/analytics.ts`
   avait bien `Dish.nameEn` en base depuis le Sprint 1, mais ses requêtes
   Prisma (vue d'ensemble, tableau global, page par plat) ne
-  sélectionnaient que `name` — le dashboard en anglais affichait quand
+  sélectionnaient que `name` - le dashboard en anglais affichait quand
   même les noms de plats en français. Corrigé avec un helper partagé
   `localizedDishName()` (`src/lib/dish-locale.ts`) et une locale propagée
   jusqu'à ces requêtes ; l'export CSV (route API hors segment `[locale]`)
@@ -304,14 +317,14 @@ concerné — cette liste est un résumé, pas la seule source.
   champ bilingue affiché depuis une requête serveur, pas seulement dans les
   formulaires/composants client.
 - **Le webhook Stripe doit lire le corps brut de la requête** (`req.text()`)
-  et jamais `req.json()` — la vérification de signature
+  et jamais `req.json()` - la vérification de signature
   (`stripe.webhooks.constructEvent`) recalcule un HMAC sur les octets
   exacts reçus ; `req.json()` puis re-sérialiser donnerait un contenu
   différent (ordre de clés, espaces) et ferait toujours échouer la
   vérification. Voir `src/app/api/webhooks/stripe/route.ts`.
 - **Le matcher du middleware (`src/middleware.ts`) doit exclure toute
   extension de fichier statique servie depuis `public/`**, pas seulement
-  les images — sinon next-intl route la requête comme une page et la
+  les images - sinon next-intl route la requête comme une page et la
   redirige vers `/fr/<fichier>` (404). Repéré en ajoutant une vidéo
   (`.mp4`) : la regex d'exclusion listait `jpe?g|webp|png|...` mais pas
   `mp4|webm|mov|mp3`. Vérifier ce matcher à chaque nouveau type de fichier
@@ -346,7 +359,7 @@ npm run dev
 Scripts utiles : `npm run lint`, `npm run typecheck`, `npm run test -- --run`,
 `npm run build`. Le seed (`prisma/seed.ts`) nécessite une vraie connexion DB
 et n'a pas pu être exécuté depuis l'environnement de développement utilisé
-pour ce projet (voir section 5) — le restaurant démo et ses données ont été
+pour ce projet (voir section 5) - le restaurant démo et ses données ont été
 créés via un script SQL équivalent collé directement dans Neon.
 
 ---
@@ -357,64 +370,64 @@ La landing marketing (section 12, y compris tarifs + FAQ) et l'abonnement
 Stripe de base (checkout, portail, webhook, page facturation dashboard)
 sont codés et buildés. Il reste :
 
-- **Créer le compte Stripe et les 8 variables d'environnement** — voir la
-  checklist complète en section 4 ("Stripe Billing — code écrit... jamais
+- **Créer le compte Stripe et les 8 variables d'environnement** - voir la
+  checklist complète en section 4 ("Stripe Billing - code écrit... jamais
   exercé contre l'API réelle"). Rien de ce qui touche à la facturation ne
   peut être testé en conditions réelles avant ça.
 - **Facturation à l'usage (plats additionnels au-delà du quota, section
-  15.2)** — non implémentée, voir section 4 pour le détail du gap
+  15.2)** - non implémentée, voir section 4 pour le détail du gap
   (`extraDishCount` existe en base mais rien ne l'alimente ni ne le
   reporte à Stripe en metered billing).
-- **Visuels réels intégrés (générés par IA — Gemini/Imagen, pas de vraies
+- **Visuels réels intégrés (générés par IA - Gemini/Imagen, pas de vraies
   photos de plats ni un vrai enregistrement d'écran de l'app).** Livrés
-  par Mouhamed, stockés dans `public/` (pas Cloudinary — ce sont des
+  par Mouhamed, stockés dans `public/` (pas Cloudinary - ce sont des
   assets de site statiques, pas des données `Dish` éditables par un
   restaurateur) et référencés en dur dans le code :
-  - `public/logo-icon.png` — icône du logo (monogramme "V" + réticule),
+  - `public/logo-icon.png` - icône du logo (monogramme "V" + réticule),
     utilisée dans `SiteHeader` et comme favicon (`src/app/icon.png`,
     convention Next.js App Router).
-  - `public/hero-dish.jpg` — photo plat dramatique, intégrée en visuel
+  - `public/hero-dish.jpg` - photo plat dramatique, intégrée en visuel
     sous le CTA du hero (`[locale]/page.tsx`).
-  - `public/hero-video.mp4` — vidéo concept (bol qui apparaît en
+  - `public/hero-video.mp4` - vidéo concept (bol qui apparaît en
     hologramme au-dessus d'un téléphone), remplace l'ancien mockup CSS
     dans la section "aperçu produit". **Reconvertie depuis un .mov HEVC+AAC
     d'origine** (non lisible de façon fiable sur Chrome/Firefox et avec
     piste audio superflue pour une vidéo en boucle muette) vers H.264/
-    yuv420p sans audio via `ffmpeg` — nécessaire pour la compatibilité
+    yuv420p sans audio via `ffmpeg` - nécessaire pour la compatibilité
     navigateur, pas une simple copie de fichier.
-  - `public/dish-*.jpg` (signature-bowl, pasta, burger, salad) — pas
+  - `public/dish-*.jpg` (signature-bowl, pasta, burger, salad) - pas
     encore reliées aux plats du restaurant démo en base (nécessite un
-    `UPDATE` SQL collé dans Neon, voir message de session — même
+    `UPDATE` SQL collé dans Neon, voir message de session - même
     contrainte que d'habitude, pas d'accès TCP direct depuis cet
     environnement). `dish-burger.jpg` n'a pas de plat correspondant dans
-    `seed.ts` — disponible si un 4ᵉ plat est ajouté un jour.
+    `seed.ts` - disponible si un 4ᵉ plat est ajouté un jour.
   - **Piège découvert en intégrant la vidéo** : le matcher du middleware
     (`src/middleware.ts`) excluait bien `.png`/`.jpg`/etc. du routing
-    i18n mais pas `.mp4`/`.webm`/`.mov`/`.mp3` — next-intl redirigeait
+    i18n mais pas `.mp4`/`.webm`/`.mov`/`.mp3` - next-intl redirigeait
     donc `/hero-video.mp4` vers `/fr/hero-video.mp4` (404). Corrigé en
     étendant la regex d'exclusion. Voir aussi section 5 (pièges connus).
   - Ces visuels sont volontairement "concept" et non de vraies captures
-    de l'app (pas de fausse interface dans la vidéo) — voir l'échange sur
+    de l'app (pas de fausse interface dans la vidéo) - voir l'échange sur
     ce point en session. À remplacer par de vraies photos/captures dès
     qu'elles existent.
-- Pages `/privacy` et `/terms` — les liens du footer de la landing pointent
+- Pages `/privacy` et `/terms` - les liens du footer de la landing pointent
   vers `#` en attendant (voir commentaire dans `[locale]/page.tsx`).
 - Le CTA "Réserver une démo" / "Book a demo" de la landing ne fait encore
   rien (pas de bouton fonctionnel, pas de formulaire/lien Calendly, etc.)
-  — à brancher avant mise en production réelle. Les CTA de la section
+  - à brancher avant mise en production réelle. Les CTA de la section
   tarifs, eux, renvoient déjà vers `/dashboard` (sign-in Clerk → palier
   choisi dans la page facturation).
 - Rappel : ne plus réintroduire la palette or/sarcelle de la section 13
-  sans revalider avec le client — le remplacement par reflect.app est une
+  sans revalider avec le client - le remplacement par reflect.app est une
   décision explicite et documentée (section 4), pas un oubli.
 
 ---
 
-## 9. Roadmap — fonctionnalités hors cahier des charges (planifiées, pas construites)
+## 9. Roadmap - fonctionnalités hors cahier des charges (planifiées, pas construites)
 
-- **Génération de modèle 3D instantanée par IA (photo → 3D)** — voir
+- **Génération de modèle 3D instantanée par IA (photo → 3D)** - voir
   `docs/roadmap-ai-instant-3d.md`. Ajout de scope proposé par le client
   après avoir vu une vidéo marketing d'un concurrent (AR Code, déjà listé
   section 3 du cahier). Document de planification complet (architecture,
-  schéma, endpoints, garde-fous qualité, lien facturation) — **rien n'est
+  schéma, endpoints, garde-fous qualité, lien facturation) - **rien n'est
   implémenté**, à reprendre en détail avant de coder quoi que ce soit.
