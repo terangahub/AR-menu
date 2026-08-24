@@ -90,7 +90,7 @@ src/
   components/
     menu/                        ← composants du menu public
     dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart, billing-panel)
-    landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile), pricing-section.tsx (tarifs, toggle mensuel/annuel)
+    landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile), pricing-section.tsx (tarifs, toggle mensuel/annuel), trusted-marquee.tsx, reviews-section.tsx, about-section.tsx, back-to-top.tsx
     theme-toggle.tsx             ← bascule dark/light (next-themes)
     ui/                          ← shadcn/ui (button, etc. - installés à la main, voir section 4)
   lib/
@@ -420,6 +420,40 @@ sont codés et buildés. Il reste :
 - Rappel : ne plus réintroduire la palette or/sarcelle de la section 13
   sans revalider avec le client - le remplacement par reflect.app est une
   décision explicite et documentée (section 4), pas un oubli.
+
+---
+
+## 8bis. Sections de landing reprises de webglow.ca (Sprint 4.5)
+
+Le client est aussi propriétaire de l'agence WebGlow (webglow.ca) et a
+fourni le dépôt de son site pour que quatre éléments visuels soient repris
+et adaptés à Vorae. C'est du code lui appartenant, réécrit avec nos tokens
+de couleur, pas une copie d'un site tiers.
+
+| Élément Vorae | Source WebGlow | Adaptation |
+|---|---|---|
+| `trusted-marquee.tsx` | bloc de logos dans `Hero.tsx` | Rouge `#A60000` remplacé par les tokens. Contenu : types d'établissement. |
+| `reviews-section.tsx` | `Reviews.tsx` | Halo en coeur en SVG conservé, dégradés passés en `hsl(var(--primary))`. Photos de personnes remplacées par des pastilles d'initiales. |
+| `about-section.tsx` | `About.tsx` | Le composant `Particles` de Magic UI (canvas, 246 lignes, dépendance) est remplacé par des points en CSS animés : rendu équivalent à cette échelle, aucune dépendance ajoutée. |
+| `back-to-top.tsx` | `BackToTop.tsx` | Repris quasi tel quel, couleurs adaptées. |
+
+Deux points de vigilance :
+
+- **Les avis affichés sont inventés.** Aucun client réel n'existe encore.
+  Volontairement sans portrait photo : associer des photos de banque
+  d'images à de fausses citations donnerait l'illusion de vrais
+  témoignages. Les pastilles d'initiales se lisent comme un gabarit. À
+  remplacer avant toute mise en production, cf. section 12.3 du cahier
+  ("la preuve vient des chiffres et des études de cas, pas de
+  l'adjectif").
+- **Le bandeau défilant liste des types d'établissement**, pas des noms de
+  restaurants ou de marques. Afficher une enseigne réelle comme cliente
+  alors qu'elle ne l'est pas serait une fausse référence. WebGlow fait le
+  même choix sur son propre site.
+
+Les particules de la section à propos ont des positions **figées en dur**
+et non tirées au hasard : une valeur `Math.random()` différente entre le
+rendu serveur et le rendu client provoque une erreur d'hydratation React.
 
 ---
 

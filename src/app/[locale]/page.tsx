@@ -3,6 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/landing/reveal";
 import { SiteHeader } from "@/components/landing/site-header";
 import { PricingSection } from "@/components/landing/pricing-section";
+import { TrustedMarquee } from "@/components/landing/trusted-marquee";
+import { ReviewsSection } from "@/components/landing/reviews-section";
+import { AboutSection } from "@/components/landing/about-section";
+import { BackToTop } from "@/components/landing/back-to-top";
 import { Sparkles, ShieldCheck, Languages, ScanLine, Box, UtensilsCrossed } from "lucide-react";
 
 // Landing marketing - direction reflect.app (voir CONTEXT.md pour la
@@ -131,6 +135,8 @@ export default function Home() {
             </Reveal>
           </div>
         </section>
+
+        <TrustedMarquee />
 
         {/* Early access / social proof */}
         <section className="px-5">
@@ -307,6 +313,10 @@ export default function Home() {
           </div>
         </section>
 
+        <ReviewsSection />
+
+        <AboutSection />
+
         <PricingSection />
 
         {/* FAQ */}
@@ -408,6 +418,8 @@ export default function Home() {
           © {new Date().getFullYear()} Vorae. {t("footer.rights")}
         </p>
       </footer>
+
+      <BackToTop />
     </div>
   );
 }

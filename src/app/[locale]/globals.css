@@ -156,11 +156,53 @@
     box-shadow: 0 0 80px -16px hsl(var(--secondary) / 0.75);
   }
 
+  /* Défilement infini (bandeaux et mur d'avis). Le contenu doit être
+     dupliqué exactement une fois dans le JSX : la translation de -50%
+     ramène alors la copie pile à la position de l'original, la boucle est
+     invisible. Reprise de l'implémentation de webglow.ca. */
+  @keyframes infinite-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-infinite-scroll {
+    animation: infinite-scroll 60s linear infinite;
+  }
+  .group:hover .animate-infinite-scroll {
+    animation-play-state: paused;
+  }
+
+  /* Particules qui montent et s'effacent (fond de la section À propos). */
+  @keyframes float-up {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0;
+    }
+    20%,
+    80% {
+      opacity: 0.55;
+    }
+    100% {
+      transform: translateY(-120px) scale(0);
+      opacity: 0;
+    }
+  }
+  .animate-float-up {
+    animation: float-up 10s linear infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .surface-card,
     .surface-card:hover {
       transform: none;
       transition: none;
+    }
+    .animate-infinite-scroll,
+    .animate-float-up {
+      animation: none;
     }
   }
 

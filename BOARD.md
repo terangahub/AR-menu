@@ -16,7 +16,7 @@ Deux documents complémentaires, ne pas les confondre :
 changement d'état d'un ticket, pas seulement en fin de sprint. Un board
 faux est pire qu'aucun board.
 
-Dernière mise à jour : Sprint 4 en revue, en attente du compte Stripe.
+Dernière mise à jour : Sprint 4 en revue (PR #5), Sprint 4.5 en développement.
 
 ---
 
@@ -43,6 +43,7 @@ Dernière mise à jour : Sprint 4 en revue, en attente du compte Stripe.
 | Sprint 2 | Dashboard restaurateur : CRUD plats, upload photo/3D, QR codes | `DEPLOYED` | #3 |
 | Sprint 3 | Analytics par plat, système de design | `DEPLOYED` | #4 |
 | Sprint 4 | Landing page complète, Stripe Billing | `REVIEW` | #5 |
+| Sprint 4.5 | Sections avis et à propos, bandeau défilant, retour en haut | `DEV` | - |
 | Sprint 5 | Dashboard super admin, pilote réel Montréal | `TODO` | - |
 | Hors cahier | Génération 3D instantanée par IA (photo vers 3D) | `TODO` | - |
 
@@ -67,9 +68,36 @@ Branche : `feature/s4-billing-landing-polish` - PR #5
 | S4-11 | Suppression de tous les tirets longs du projet | `REVIEW` | 211 occurrences dans 49 fichiers. Exigence explicite du client. |
 | S4-12 | **Créer le compte Stripe et les 8 variables d'environnement** | `BLOCKED` | **Action Mouhamed.** Checklist complète dans `CONTEXT.md` section 4. Rien de S4-02 à S4-05 n'est testable avant. |
 | S4-13 | Facturation à l'usage, plats additionnels (section 15.2) | `TODO` | Hors périmètre décidé pour ce sprint. `extraDishCount` existe en base mais rien ne l'alimente. Voir `CONTEXT.md` section 4. |
-| S4-14 | Relier les photos de plats au restaurant démo | `BLOCKED` | **Action Mouhamed.** Nécessite un `UPDATE` SQL dans Neon (pas d'accès TCP direct depuis l'environnement de dev). |
+| S4-14 | Relier les photos de plats au restaurant démo | `DONE` | `UPDATE` SQL exécuté dans Neon par Mouhamed. Effet non visible sur la grille du menu, voir S45-07. |
 | S4-15 | Brancher le CTA "Réserver une démo" | `TODO` | Le bouton n'a aucune action. À décider : formulaire, Calendly, ou lien courriel. |
 | S4-16 | Pages `/privacy` et `/terms` | `TODO` | Liens du footer en ancre `#` en attendant. Requis par la Loi 25 (section 17.4) avant la vraie mise en production. |
+
+---
+
+## Sprint 4.5 - Sections de landing supplémentaires (en cours)
+
+Branche : `feature/s45-landing-sections`, partant de la branche du Sprint 4.
+
+Sorti du Sprint 4 volontairement : la PR #5 était déjà à 25 fichiers et
+mélangeait facturation, landing, design et nettoyage typographique.
+La section 4.3 du cahier interdit les PR fourre-tout. Ce découpage permet
+aussi de merger le Sprint 4 sans attendre ce travail.
+
+Numéroté 4.5 et non 5 ou 6 : le Sprint 5 du cahier est réservé au
+dashboard super admin, et ce travail ne dépend pas de lui.
+
+Design repris de webglow.ca (l'agence du client, dont le dépôt a été
+fourni), couleurs adaptées aux tokens Vorae.
+
+| # | Ticket | Statut | Notes |
+|---|---|---|---|
+| S45-01 | Bandeau défilant sous le hero | `DEV` | Masque en dégradé, désaturation levée au survol, pause au survol. Contenu : types d'établissement, pas de fausses marques clientes. |
+| S45-02 | Section avis, mur d'avis | `DEV` | Deux bandeaux en sens opposés, halo en coeur, pastilles d'initiales. **Avis inventés, à remplacer avant production.** |
+| S45-03 | Section à propos | `DEV` | Badge, titre en trois parties dont une en dégradé, particules flottantes en CSS pur (pas de dépendance canvas). |
+| S45-04 | Bouton fusée retour en haut | `DEV` | Apparaît après 500px, réacteur animé au décollage. |
+| S45-05 | Lien Avis dans la navigation | `DEV` | Ancre `#reviews`, ajoutée au menu desktop et mobile. |
+| S45-06 | Remplacer les avis de démonstration par de vrais avis | `TODO` | **Bloquant avant la mise en production.** Voir la ligne rouge éditoriale du cahier, section 12.3. |
+| S45-07 | Afficher les photos de plats sur la grille du menu public | `TODO` | Découvert en vérifiant l'`UPDATE` Neon : la grille du menu n'affiche que le texte et le prix, jamais `Dish.imageUrl`. Les photos ne sont donc visibles que sur la fiche plat. |
 
 ---
 
@@ -119,5 +147,5 @@ Récapitulatif de tout ce qui est bloqué et qui ne peut pas avancer sans
 une action extérieure.
 
 1. **Créer le compte Stripe** et renseigner les 8 variables d'environnement (S4-12). Checklist pas à pas dans `CONTEXT.md` section 4. C'est le seul blocage réel du Sprint 4.
-2. **Exécuter l'`UPDATE` SQL dans Neon** pour relier les photos de plats au restaurant démo (S4-14).
-3. **Tester et merger la PR #5** une fois la preview Vercel vérifiée.
+2. **Tester et merger la PR #5** une fois la preview Vercel vérifiée.
+3. L'`UPDATE` SQL dans Neon a été exécuté (S4-14). Attention, son effet n'est pas encore visible sur la grille du menu public : celle-ci n'affiche pas les photos de plats, voir S45-07.

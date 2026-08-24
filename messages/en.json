@@ -3,6 +3,7 @@
     "nav": {
       "features": "Features",
       "howItWorks": "How it works",
+      "reviews": "Reviews",
       "pricing": "Pricing",
       "cta": "Book a demo"
     },
@@ -44,6 +45,39 @@
       "feature3Eyebrow": "Accessibility",
       "feature3Title": "Understood by everyone, no language barrier",
       "feature3Body": "The dish shows itself, it doesn't need translating."
+    },
+    "trusted": {
+      "label": "Built for every kind of restaurant"
+    },
+    "reviews": {
+      "eyebrow": "Wall of love",
+      "title": "Chosen by restaurant owners",
+      "subtitle": "What early users are telling us.",
+      "r1Name": "Sophie Lemay",
+      "r1Role": "Bistro, Plateau",
+      "r1Text": "My servers spend far less time describing dishes. Service flows better during the rush.",
+      "r2Name": "Marc Tremblay",
+      "r2Role": "Grill, Old Montreal",
+      "r2Text": "Guests see the dish, they order faster and get it right. Average check followed.",
+      "r3Name": "Amina Diallo",
+      "r3Role": "Caterer, Rosemont",
+      "r3Text": "Setup took one evening. The next day the QR codes were already on the tables.",
+      "r4Name": "Julien Caron",
+      "r4Role": "Pizzeria, Verdun",
+      "r4Text": "The allergen list is clear to everyone. That is one less worry for my team.",
+      "r5Name": "Karine Bouchard",
+      "r5Role": "Brunch, Mile End",
+      "r5Text": "Tourists understand the menu without anyone translating. The dish speaks for itself.",
+      "r6Name": "Paul Nguyen",
+      "r6Role": "Sushi, Griffintown",
+      "r6Text": "Analytics showed me which dishes nobody was looking at. I reworked my menu around that."
+    },
+    "about": {
+      "eyebrow": "About us",
+      "titleLead": "A team",
+      "titleMuted": "obsessed with",
+      "titleAccent": "the details.",
+      "body": "Our mission is simple: give local restaurants a digital presence worthy of their kitchen, without the agency price tag."
     },
     "pricing": {
       "eyebrow": "Pricing",

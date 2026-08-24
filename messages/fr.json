@@ -3,6 +3,7 @@
     "nav": {
       "features": "Fonctionnalités",
       "howItWorks": "Comment ça marche",
+      "reviews": "Avis",
       "pricing": "Tarifs",
       "cta": "Réserver une démo"
     },
@@ -44,6 +45,39 @@
       "feature3Eyebrow": "Accessibilité",
       "feature3Title": "Compris par tous, sans barrière de langue",
       "feature3Body": "Le plat se montre, il n'a pas besoin d'être traduit."
+    },
+    "trusted": {
+      "label": "Pensé pour tous les types de restaurants"
+    },
+    "reviews": {
+      "eyebrow": "Mur d'avis",
+      "title": "Adopté par les restaurateurs",
+      "subtitle": "Ce que les premiers utilisateurs nous disent.",
+      "r1Name": "Sophie Lemay",
+      "r1Role": "Bistro, Plateau",
+      "r1Text": "Mes serveurs passent beaucoup moins de temps à décrire les plats. Le service est plus fluide en plein rush.",
+      "r2Name": "Marc Tremblay",
+      "r2Role": "Grillades, Vieux-Montréal",
+      "r2Text": "Les clients voient le plat, ils commandent plus vite et se trompent moins. Le panier moyen a suivi.",
+      "r3Name": "Amina Diallo",
+      "r3Role": "Traiteur, Rosemont",
+      "r3Text": "L'installation a pris une soirée. Le lendemain, les QR codes étaient déjà sur les tables.",
+      "r4Name": "Julien Caron",
+      "r4Role": "Pizzeria, Verdun",
+      "r4Text": "La liste des allergènes est claire pour tout le monde. C'est une inquiétude en moins pour mon équipe.",
+      "r5Name": "Karine Bouchard",
+      "r5Role": "Brunch, Mile End",
+      "r5Text": "Les touristes comprennent le menu sans que personne ait à traduire. Le plat parle de lui-même.",
+      "r6Name": "Paul Nguyen",
+      "r6Role": "Sushi, Griffintown",
+      "r6Text": "Les analytics m'ont montré quels plats personne ne regardait. J'ai retravaillé ma carte avec ça."
+    },
+    "about": {
+      "eyebrow": "À propos",
+      "titleLead": "Une équipe",
+      "titleMuted": "obsédée par",
+      "titleAccent": "le détail.",
+      "body": "Notre mission est simple : donner aux restaurants d'ici une présence numérique à la hauteur de leur cuisine, sans le prix d'une agence."
     },
     "pricing": {
       "eyebrow": "Tarifs",
