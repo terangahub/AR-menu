@@ -407,3 +407,14 @@ sont codés et buildés. Il reste :
 - Rappel : ne plus réintroduire la palette or/sarcelle de la section 13
   sans revalider avec le client — le remplacement par reflect.app est une
   décision explicite et documentée (section 4), pas un oubli.
+
+---
+
+## 9. Roadmap — fonctionnalités hors cahier des charges (planifiées, pas construites)
+
+- **Génération de modèle 3D instantanée par IA (photo → 3D)** — voir
+  `docs/roadmap-ai-instant-3d.md`. Ajout de scope proposé par le client
+  après avoir vu une vidéo marketing d'un concurrent (AR Code, déjà listé
+  section 3 du cahier). Document de planification complet (architecture,
+  schéma, endpoints, garde-fous qualité, lien facturation) — **rien n'est
+  implémenté**, à reprendre en détail avant de coder quoi que ce soit.
