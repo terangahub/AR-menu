@@ -287,6 +287,15 @@
       "cancel": "Cancel",
       "error": "Something went wrong. Try again."
     },
+    "dishScan": {
+      "title": "Automated 3D scan",
+      "help": "Film the dish while slowly circling it (20 to 30 seconds, even lighting). The video goes straight to storage, then the 3D model is generated automatically.",
+      "submit": "Start scan",
+      "signing": "Preparing…",
+      "uploading": "Uploading video… {progress}%",
+      "starting": "Starting scan…",
+      "started": "Scan started. Job id: {jobId}. The model will appear here once generation completes."
+    },
     "qrcodes": {
       "title": "QR codes",
       "table": "Table",

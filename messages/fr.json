@@ -287,6 +287,15 @@
       "cancel": "Annuler",
       "error": "Une erreur est survenue. Réessayez."
     },
+    "dishScan": {
+      "title": "Scan 3D automatisé",
+      "help": "Filmez le plat en tournant lentement autour (20 à 30 secondes, éclairage uniforme). La vidéo part directement vers le stockage, puis le modèle 3D est généré automatiquement.",
+      "submit": "Lancer le scan",
+      "signing": "Préparation…",
+      "uploading": "Envoi de la vidéo… {progress}%",
+      "starting": "Démarrage du scan…",
+      "started": "Scan lancé. Identifiant du job : {jobId}. Le modèle apparaîtra ici une fois la génération terminée."
+    },
     "qrcodes": {
       "title": "QR codes",
       "table": "Table",

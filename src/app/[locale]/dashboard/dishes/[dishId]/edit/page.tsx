@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { DishForm, type DishFormValues } from "@/components/dashboard/dish-form";
 import { DishMedia } from "@/components/dashboard/dish-media";
+import { DishScan } from "@/components/dashboard/dish-scan";
 import { getExistingCategories } from "@/lib/dish-categories";
 
 export default async function EditDishPage({
@@ -53,6 +54,7 @@ export default async function EditDishPage({
         model3dGlbUrl={dish.model3dGlbUrl}
         model3dUsdzUrl={dish.model3dUsdzUrl}
       />
+      <DishScan dishId={dish.id} />
       <DishForm
         mode="edit"
         dishId={dish.id}
