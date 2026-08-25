@@ -20,7 +20,11 @@ export function FeatureAllergenRing({
 }) {
   const count = tags.length;
   const radiusX = 42;
-  const radiusY = 34;
+  // Rayon vertical volontairement plus court que l'horizontal : la
+  // pastille du bas venait sinon se superposer au libellé de la carte,
+  // posé en `bottom-4`, ce qui se voyait surtout en mobile où la carte
+  // est plus petite alors que le libellé garde sa taille.
+  const radiusY = 27;
 
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-card border border-white/[0.08] bg-background">

@@ -358,6 +358,29 @@ concerné - cette liste est un résumé, pas la seule source.
   Corrigé avec `right`/`left: calc(100% + Npx)` en style inline : le
   badge part toujours du bord de son voisin vers l'extérieur, quelle que
   soit sa propre largeur.
+- **Les pourcentages d'un `@keyframes` CSS se comptent sur le cycle
+  entier, pas sur le créneau d'un élément : on ne peut donc pas faire un
+  chassé-croisé entre N éléments avec une seule animation partagée et des
+  délais négatifs décalés, sauf à écrire des pourcentages qui dépendent
+  de N** - or ils ne peuvent pas être paramétrés. Constaté sur la bascule
+  entre langues (`feature-language-flip.tsx`) : avec 12 langues et une
+  plage visible de 3 % à 88 % du cycle, une dizaine restaient à
+  `opacity: 1` en même temps et le texte s'empilait, illisible. Passer
+  l'alternance en JavaScript (un index qui avance, `transition` CSS pour
+  l'effet) reste correct quel que soit le nombre d'éléments.
+- **Un composant lucide (ou tout `forwardRef`) ne peut pas être passé en
+  prop à un Client Component depuis un Server Component** :
+  "Functions cannot be passed directly to Client Components", erreur
+  **invisible au build** (`next build` passe, les pages se génèrent) qui
+  ne sort qu'à l'exécution, en 500. Rencontrée en rendant
+  `feature-language-flip.tsx` client : il recevait `icon={Icon}` depuis
+  la page. Passer un élément déjà rendu (`icon={<Icon />}`) ne suffit pas
+  non plus ici, le `type` de l'élément restant cette même fonction et le
+  composant étant rendu dans les enfants sérialisés de `Reveal`, lui
+  aussi client. Solution retenue : importer l'icône directement dans le
+  Client Component. **Après avoir ajouté `"use client"` à un composant
+  existant, vérifier la page dans un vrai navigateur, pas seulement le
+  build.**
 
 ---
 

@@ -1,4 +1,7 @@
-import type { LucideIcon } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Languages } from "lucide-react";
 
 // Visuel de la section "Langues" : le nom du plat bascule d'une langue à
 // l'autre comme un panneau d'aéroport à palettes, plutôt qu'un champ de
@@ -6,24 +9,47 @@ import type { LucideIcon } from "lucide-react";
 // traduction que le défilement, et différencie cette carte des deux
 // autres.
 //
-// Toutes les langues partagent la même animation CSS, mais avec un
-// délai négatif décalé d'un cran chacune (`-i * SLOT_SECONDS`) : elles
-// démarrent donc déjà à des phases différentes d'un seul et même cycle
-// partagé, ce qui donne l'alternance round-robin sans JavaScript ni état
-// - et sans le "sursaut" qu'un délai positif provoquerait au chargement
-// (tout serait invisible le temps que le premier délai s'écoule).
-const SLOT_SECONDS = 3;
+// La bascule est pilotée en JavaScript (un index qui avance), pas par des
+// keyframes CSS décalées. Première tentative, qui a bugué : toutes les
+// langues partageaient une animation CSS avec un délai négatif décalé,
+// mais les pourcentages de keyframes s'expriment par rapport au cycle
+// entier, pas au créneau d'une langue - avec 12 langues, une dizaine
+// restaient à `opacity: 1` en même temps et le texte s'empilait,
+// illisible. Des pourcentages corrects dépendraient du nombre de langues,
+// or les keyframes CSS ne peuvent pas être paramétrées. Un index en JS
+// n'a pas cette limite et reste correct quel que soit le nombre.
+//
+// L'animation elle-même reste en CSS (transition sur opacity/transform) :
+// seul le choix de la langue affichée passe par React.
+//
+// L'icône est importée ici plutôt que reçue en prop, contrairement aux
+// deux autres cartes : ce fichier étant un Client Component rendu à
+// l'intérieur de `Reveal` (client lui aussi), tout ce qui lui est passé
+// en prop doit être sérialisable. Une icône lucide est un objet
+// `forwardRef`, donc une fonction, et provoquait à l'exécution
+// "Functions cannot be passed directly to Client Components" - erreur
+// invisible au build, la page renvoyait un 500. Un élément React déjà
+// rendu ne passe pas non plus, son `type` restant cette même fonction.
+// Les deux autres cartes gardent une prop `LucideIcon` sans problème :
+// elles sont restées des Server Components.
+const SLOT_MS = 2600;
 
 export function FeatureLanguageFlip({
   names,
-  icon: Icon,
   label,
 }: {
   names: readonly string[];
-  icon: LucideIcon;
   label: string;
 }) {
-  const cycleDuration = names.length * SLOT_SECONDS;
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => {
+      setIndex((current) => (current + 1) % names.length);
+    }, SLOT_MS);
+    return () => clearInterval(id);
+  }, [names.length]);
 
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-card border border-white/[0.08] bg-background">
@@ -37,22 +63,26 @@ export function FeatureLanguageFlip({
         style={{ perspective: "600px" }}
       >
         <div className="relative h-16 w-[88%] sm:h-20">
-          {names.map((name, i) => (
-            <span
-              key={name}
-              className="language-flip absolute inset-0 flex items-center justify-center text-center font-heading text-lg font-medium leading-tight text-foreground sm:text-xl"
-              style={{
-                animationDuration: `${cycleDuration}s`,
-                animationDelay: `${-i * SLOT_SECONDS}s`,
-              }}
-            >
-              {name}
-            </span>
-          ))}
+          {names.map((name, i) => {
+            const active = i === index;
+            return (
+              <span
+                key={name}
+                className="absolute inset-0 flex items-center justify-center text-balance text-center font-heading text-lg font-medium leading-tight text-foreground transition-all duration-500 ease-out sm:text-xl"
+                style={{
+                  opacity: active ? 1 : 0,
+                  transform: active ? "rotateX(0deg)" : "rotateX(-90deg)",
+                  backfaceVisibility: "hidden",
+                }}
+              >
+                {name}
+              </span>
+            );
+          })}
         </div>
 
         <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-background/70 shadow-[0_0_40px_-6px_hsl(var(--primary)/0.8)] backdrop-blur-sm">
-          <Icon className="h-6 w-6 text-primary" />
+          <Languages className="h-6 w-6 text-primary" />
         </span>
       </div>
 

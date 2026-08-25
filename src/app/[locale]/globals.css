@@ -358,31 +358,13 @@
     animation: footer-scanline 8s linear infinite;
   }
 
-  /* Trois mécaniques distinctes pour les trois cartes "Pourquoi Vorae"
-     (cf. feature-chat-cloud.tsx, feature-allergen-ring.tsx,
-     feature-language-flip.tsx) : avant, les trois utilisaient le même
-     champ de texte défilant, ce qui les faisait paraître interchangeables
-     malgré des messages différents. */
-
-  /* Bulles de question qui montent et s'effacent (section Service). */
-  @keyframes chat-bubble-rise {
-    0% {
-      transform: translateY(0);
-      opacity: 0;
-    }
-    12%,
-    82% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(-320px);
-      opacity: 0;
-    }
-  }
-  .chat-bubble {
-    bottom: 4%;
-    animation: chat-bubble-rise linear infinite;
-  }
+  /* Des mécaniques distinctes pour les cartes "Pourquoi Vorae" : avant,
+     les trois utilisaient le même champ de texte défilant, ce qui les
+     faisait paraître interchangeables malgré des messages différents.
+     Service garde ce champ défilant (cf. feature-field.tsx), Allergènes
+     et Langues ont chacune la leur (feature-allergen-ring.tsx,
+     feature-language-flip.tsx). La bascule des langues est pilotée en
+     JavaScript et non ici, cf. le commentaire en tête de ce composant. */
 
   /* Pastilles d'allergènes qui s'illuminent à tour de rôle autour de
      l'anneau (section Allergènes). */
@@ -406,29 +388,6 @@
     animation: allergen-pulse 6s ease-in-out infinite;
   }
 
-  /* Bascule façon panneau d'aéroport entre les langues (section Langues).
-     Chaque langue reçoit un délai négatif décalé, cf. le commentaire dans
-     feature-language-flip.tsx. */
-  @keyframes language-flip {
-    0% {
-      opacity: 0;
-      transform: rotateX(-90deg);
-    }
-    3%,
-    88% {
-      opacity: 1;
-      transform: rotateX(0deg);
-    }
-    92% {
-      opacity: 0;
-      transform: rotateX(90deg);
-    }
-  }
-  .language-flip {
-    animation: language-flip linear infinite;
-    backface-visibility: hidden;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .surface-card,
     .surface-card:hover {
@@ -440,21 +399,12 @@
     .shooting-star,
     .heart-trace,
     .footer-scanline,
-    .chat-bubble,
     .allergen-tag,
-    .language-flip,
     .animate-float-badge,
     .ar-scan-ring,
     .ar-float,
     .border-gradient-animated::before {
       animation: none;
-    }
-    .language-flip:not(:first-child) {
-      opacity: 0;
-    }
-    .language-flip:first-child {
-      opacity: 1;
-      transform: none;
     }
     .heart-trace {
       stroke-dasharray: none;

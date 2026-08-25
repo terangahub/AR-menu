@@ -121,6 +121,10 @@ fourni), couleurs adaptées aux tokens Vorae.
 | S45-28 | Bandeau des types de restaurants | `DEV` | Police agrandie, espace doublé avant la carte d'offre de lancement. |
 | S45-29 | Trois cartes "Pourquoi Vorae" différenciées | `DEV` | Remplace le champ de mots unique (identique sur les trois cartes) par trois mécaniques distinctes : bulles de question qui montent (Service), anneau de pastilles d'allergènes qui s'illuminent à tour de rôle (Allergènes), bascule façon panneau d'aéroport entre les langues (Langues). `feature-field.tsx` supprimé, plus utilisé. |
 | S45-30 | Refonte du footer | `DEV` | Wordmark "VORAE" géant et très pâle en fond, ligne d'accent animée en haut, troisième colonne "Entreprise" (à propos, contact), CTA répété. |
+| S45-31 | Carte Service : retour au champ défilant | `DEV` | La variante en bulles de conversation donnait un empilement illisible. Retour exact à l'ancien champ de mots, avec la vitesse uniforme et 5x plus lente demandée (325s par rangée, sens toujours alternés). |
+| S45-32 | Carte Langues : bascule réparée | `DEV` | Les 12 langues s'affichaient toutes en même temps, superposées et sans animation : les pourcentages de `@keyframes` se comptent sur le cycle entier, pas sur le créneau d'une langue, donc une dizaine restaient à `opacity: 1`. Alternance repassée en JavaScript (index qui avance, transition CSS), correcte quel que soit le nombre de langues. |
+| S45-33 | Erreur 500 en production locale, invisible au build | `DEV` | Rendre la carte Langues cliente faisait passer une icône lucide (un `forwardRef`) en prop depuis un Server Component : `next build` passait, mais la page renvoyait 500 à l'exécution. Icône importée directement dans le composant client. Documenté dans CONTEXT.md. |
+| S45-34 | Collision dans l'anneau d'allergènes | `DEV` | La pastille du bas passait sous le libellé de la carte, surtout en mobile. Rayon vertical de l'anneau resserré, design inchangé par ailleurs. |
 
 ---
 

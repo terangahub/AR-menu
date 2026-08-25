@@ -10,7 +10,7 @@ import { AboutSection } from "@/components/landing/about-section";
 import { BackToTop } from "@/components/landing/back-to-top";
 import { GlobeSection } from "@/components/landing/globe-section";
 import { ProductMockup } from "@/components/landing/product-mockup";
-import { FeatureChatCloud } from "@/components/landing/feature-chat-cloud";
+import { FeatureField } from "@/components/landing/feature-field";
 import { FeatureAllergenRing } from "@/components/landing/feature-allergen-ring";
 import { FeatureLanguageFlip } from "@/components/landing/feature-language-flip";
 import {
@@ -328,12 +328,15 @@ export default function Home() {
                         />
                         <div className="border-gradient overflow-hidden rounded-card shadow-[0_20px_70px_-25px_hsl(var(--secondary))]">
                           {/* Une mécanique visuelle différente par carte
-                              (bulles, anneau, bascule) plutôt que le même
-                              champ de texte répété trois fois - cf.
-                              CONTEXT.md pour la justification. */}
+                              (champ défilant, anneau, bascule) plutôt que
+                              le même champ de texte répété trois fois.
+                              Le champ défilant est conservé pour Service,
+                              à la demande du client : la variante en
+                              bulles de conversation essayée à sa place
+                              donnait un empilement illisible. */}
                           {i === 0 && (
-                            <FeatureChatCloud
-                              questions={feature.words}
+                            <FeatureField
+                              words={[...feature.words]}
                               icon={Icon}
                               label={feature.fieldLabel}
                             />
@@ -348,7 +351,6 @@ export default function Home() {
                           {i === 2 && (
                             <FeatureLanguageFlip
                               names={feature.words}
-                              icon={Icon}
                               label={feature.fieldLabel}
                             />
                           )}
