@@ -160,6 +160,37 @@ en premier.
 
 ---
 
+## Sprint 4.7 - Capture 3D automatisée des plats
+
+Rien n'est démarré. Fait suite à l'arbitrage documenté dans
+`docs/roadmap-ai-instant-3d.md` (section 0) et `docs/scan-3d-plats-vorae.pdf` :
+photogrammétrie managée via l'API KIRI Engine, en remplacement de l'upload
+manuel de `.glb` par le restaurateur.
+
+**Self-service, dans le dashboard du restaurant, pas dans le super admin** :
+c'est le restaurateur qui filme son propre plat, il n'y a pas
+d'intermédiaire Vorae dans ce flux (contrairement au service de capture
+professionnel de la section 15.3, qui lui resterait piloté par Vorae s'il
+est construit un jour).
+
+Le backend (S47-02 à S47-06) ne dépend d'aucun design et peut démarrer
+immédiatement, en parallèle du Sprint 4.6. L'interface (S47-07) attend
+volontairement `S46-04` (refonte des écrans du dashboard) pour n'être
+stylée qu'une seule fois.
+
+| # | Ticket | Statut | Notes |
+|---|---|---|---|
+| S47-01 | Compte KIRI Engine et clé API | `BLOQUÉ` | Action Mouhamed. 20 crédits offerts à l'inscription, suffisants pour tester sur de vrais plats avant tout engagement financier. Bloque tout le reste du sprint. |
+| S47-02 | Modèle Prisma `ScanJob` | `TODO` | Statut, fournisseur, média source, coût, message d'erreur. Sur le principe de `DishCaptureOrder`, pour le flux automatisé plutôt qu'humain. |
+| S47-03 | Adaptateur `lib/scan3d.ts` | `TODO` | Interface `Scan3dProvider` sur le modèle de `lib/billing.ts`. Implémentation KIRI en premier ; RealityScan 2.1 en plan B si besoin de changer sans réécrire les routes. |
+| S47-04 | `POST /api/dishes/[id]/scan` | `TODO` | Reçoit la vidéo (30 s) ou les photos (20 à 300), appelle l'API KIRI, crée le `ScanJob`. |
+| S47-05 | `POST /api/webhooks/kiri` | `TODO` | Réception du callback, `getModelZip`, extraction GLB et USDZ, upload Cloudinary, mise à jour de `Dish.model3dGlbUrl`/`model3dUsdzUrl`. Fait disparaître la dette D-03 (conversion glb vers usdz) au passage. |
+| S47-06 | Garde-fous d'usage | `TODO` | Chaque scan coûte de l'argent réel côté KIRI. Compteur et limite par restaurant obligatoires dès la première version, jamais d'accès illimité non facturé. |
+| S47-07 | Interface dans le dashboard restaurant | `TODO` | Bouton "Scanner ce plat" sur la fiche plat, enregistrement ou upload vidéo, statut du job en direct. **Séquencé après S46-04** pour n'être stylé qu'une fois. Coexiste avec l'upload manuel, ne le supprime pas. |
+| S47-08 | Test réel sur le restaurant pilote | `TODO` | Avec les crédits gratuits de S47-01, sur de vrais plats, pas des photos de stock. Condition de passage à l'échelle. |
+
+---
+
 ## Sprint 5 - Dashboard super admin et pilote réel
 
 Rien n'est démarré. Périmètre issu des sections 11 et 21 du cahier.
@@ -181,7 +212,7 @@ Rien n'est démarré. Périmètre issu des sections 11 et 21 du cahier.
 
 | # | Ticket | Statut | Notes |
 |---|---|---|---|
-| X-01 | Capture 3D automatisée des plats depuis le dashboard | `TODO` | **Fournisseur arbitré : KIRI Engine API** (photogrammétrie managée, REST et webhooks, sorties GLB et USDZ). La génération IA à partir d'une photo unique (Meshy, Tripo3D) est écartée : elle invente le plat au lieu de le capturer, confirmé par un test sur photo de burger. RealityScan 2.1 gardé en plan B (gratuit sous 1 M$ de revenu, mais machine GPU à héberger). Décision et schéma de flux dans `docs/scan-3d-plats-vorae.pdf`, détail technique en section 0 de `docs/roadmap-ai-instant-3d.md`. **Bloqué sur une action Mouhamed :** créer le compte KIRI et transmettre la clé API (20 crédits offerts pour le test). |
+| X-01 | Capture 3D automatisée des plats | `DÉPLACÉ` | N'est plus hors cahier des charges : arbitré et planifié en détail dans le **Sprint 4.7**, ci-dessus. Décision et schéma de flux dans `docs/scan-3d-plats-vorae.pdf`. |
 
 ---
 
@@ -208,4 +239,4 @@ une action extérieure.
 1. **Créer le compte Stripe** et renseigner les 8 variables d'environnement (S4-12). Checklist pas à pas dans `CONTEXT.md` section 4. C'est le seul blocage réel du Sprint 4.
 2. **Tester et merger la PR #5** une fois la preview Vercel vérifiée.
 3. L'`UPDATE` SQL dans Neon a été exécuté (S4-14). Attention, son effet n'est pas encore visible sur la grille du menu public : celle-ci n'affiche pas les photos de plats, voir S45-07.
-4. **Créer le compte KIRI Engine** et transmettre la clé API (X-01). 20 crédits offerts à l'inscription, de quoi tester la qualité sur de vrais plats sans rien payer. Sans cette clé, le flux de capture 3D ne peut pas être testé.
+4. **Créer le compte KIRI Engine** et transmettre la clé API (S47-01). 20 crédits offerts à l'inscription, de quoi tester la qualité sur de vrais plats sans rien payer. Bloque tout le Sprint 4.7.
