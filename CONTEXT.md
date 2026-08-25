@@ -78,6 +78,8 @@ src/
       dishes/[id]/               ← GET public / PUT / DELETE
       dishes/[id]/photo/         ← upload image → Cloudinary
       dishes/[id]/model3d/       ← upload .glb (+.usdz optionnel) → Cloudinary
+      dishes/[id]/scan/          ← POST déclenche une capture 3D via KIRI Engine (Sprint 4.7)
+      webhooks/kiri/             ← POST callback KIRI (statut de scan), voir lib/scan3d.ts
       qrcodes/                   ← GET liste / POST création
       qrcodes/[id]/              ← DELETE
       qrcodes/[id]/png/          ← régénère le PNG à la volée (Content-Disposition: attachment)
@@ -100,6 +102,7 @@ src/
     analytics.ts                 ← requêtes agrégées pour le dashboard (10.1, 10.3)
     dish-locale.ts               ← localizedDishName() - résout name/nameEn selon la locale (voir section 4)
     billing.ts                   ← TIERS (source unique des prix, section 15.1), getStripe(), subscriptionFieldsFrom()
+    scan3d.ts                    ← Scan3dProvider (Sprint 4.7) : adaptateur KIRI Engine, sur le même principe que billing.ts
     qrcode.ts                    ← génération PNG + URL absolue
     cloudinary.ts                ← config + upload
     dish-schema.ts                ← validation zod du formulaire plat
@@ -430,6 +433,19 @@ concerné - cette liste est un résumé, pas la seule source.
   que deux horloges différentes (event timestamp vs `now` de rAF)
   produisent un delta positif ; borner toute valeur dérivée d'un delta de
   temps avant de l'utiliser comme rayon.**
+- **`Buffer` de Node n'est pas assignable à `BlobPart` sous TypeScript
+  strict.** Rencontré dans `lib/scan3d.ts` en construisant un `FormData`
+  pour l'upload multipart vers KIRI : `new Blob([buffer])` échoue à la
+  compilation (`Buffer<ArrayBufferLike>` vs `ArrayBufferView<ArrayBuffer>`,
+  une incompatibilité de types liée à `SharedArrayBuffer`). Corrigé en
+  enveloppant explicitement : `new Blob([new Uint8Array(buffer)])`.
+- **Le champ `code` d'une API tierce n'est pas forcément un indicateur de
+  succès fiable, même documenté comme tel.** La doc KIRI montre `code: 0`
+  sur ses exemples de réponse réussie, mais un appel réel testé en
+  direct a renvoyé `code: 200` pour le même succès. `lib/scan3d.ts` se
+  fie au champ `ok` (booléen), jamais à `code`. **Vérifier le comportement
+  réel d'une API avant de coder une condition sur un champ de statut
+  documenté par des exemples plutôt que par une spec stricte.**
 
 ---
 
