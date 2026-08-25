@@ -180,7 +180,7 @@ stylée qu'une seule fois.
 
 | # | Ticket | Statut | Notes |
 |---|---|---|---|
-| S47-01 | Compte KIRI Engine et clé API | `BLOQUÉ` | Action Mouhamed. 20 crédits offerts à l'inscription, suffisants pour tester sur de vrais plats avant tout engagement financier. Bloque tout le reste du sprint. |
+| S47-01 | Compte KIRI Engine et clé API | `BLOQUÉ` | Action Mouhamed. Tarif API confirmé : 1 appel = 1 crédit = 1 $ US, quel que soit le type de scan. 10 crédits offerts à l'inscription, suffisants pour tester sur de vrais plats. Recharge minimale de 500 crédits (500 $) au-delà du gratuit : décision de budget à prendre avant de dépasser 10 plats, pas au moment de créer le compte. Bloque tout le reste du sprint. |
 | S47-02 | Modèle Prisma `ScanJob` | `TODO` | Statut, fournisseur, média source, coût, message d'erreur. Sur le principe de `DishCaptureOrder`, pour le flux automatisé plutôt qu'humain. |
 | S47-03 | Adaptateur `lib/scan3d.ts` | `TODO` | Interface `Scan3dProvider` sur le modèle de `lib/billing.ts`. Implémentation KIRI en premier ; RealityScan 2.1 en plan B si besoin de changer sans réécrire les routes. |
 | S47-04 | `POST /api/dishes/[id]/scan` | `TODO` | Reçoit la vidéo (30 s) ou les photos (20 à 300), appelle l'API KIRI, crée le `ScanJob`. |
@@ -239,4 +239,4 @@ une action extérieure.
 1. **Créer le compte Stripe** et renseigner les 8 variables d'environnement (S4-12). Checklist pas à pas dans `CONTEXT.md` section 4. C'est le seul blocage réel du Sprint 4.
 2. **Tester et merger la PR #5** une fois la preview Vercel vérifiée.
 3. L'`UPDATE` SQL dans Neon a été exécuté (S4-14). Attention, son effet n'est pas encore visible sur la grille du menu public : celle-ci n'affiche pas les photos de plats, voir S45-07.
-4. **Créer le compte KIRI Engine** et transmettre la clé API (S47-01). 20 crédits offerts à l'inscription, de quoi tester la qualité sur de vrais plats sans rien payer. Bloque tout le Sprint 4.7.
+4. **Créer le compte KIRI Engine** et transmettre la clé API (S47-01). 10 crédits offerts à l'inscription (1 crédit = 1 scan = 1 $), de quoi tester la qualité sur de vrais plats sans rien payer. Au-delà, la recharge minimale est de 500 crédits (500 $) : à budgéter avant de dépasser 10 plats, pas maintenant. Bloque tout le Sprint 4.7.

@@ -68,7 +68,9 @@ sur le dépôt officiel `Kiri-Innovation/KIRI-ENGINE-SDK-API` :
 | Webhooks | POST JSON au changement de statut, 3 tentatives, backoff exponentiel |
 | Suivi | `getStatus`, `getModelZip` (lien 60 min), `balance` |
 | Limites | 3 Go par envoi |
-| Essai | 20 crédits offerts à l'inscription |
+| Tarif | 1 appel API = 1 crédit = 1 $ US, quel que soit le type de scan (Photo Scan, Featureless, 3DGS) |
+| Essai | 10 crédits offerts à l'inscription |
+| Recharge | Minimum 500 crédits (500 $) au-delà du gratuit |
 
 Trois points décisifs pour notre cas :
 
@@ -100,8 +102,15 @@ changer sans réécrire le flux.
 
 ### Reste à trancher avant de coder
 
-- **Le prix par crédit KIRI n'est pas publié.** Créer un compte, récupérer
-  la clé et les 20 crédits offerts, mesurer le coût réel par plat.
+- **Le prix par crédit est confirmé, la décision de budget ne l'est pas.**
+  1 $/scan est raisonnable à l'usage, mais la recharge minimale de 500 $
+  est un vrai engagement à planifier avant de dépasser les 10 plats
+  gratuits, pas un détail technique. Si ce montant est prématuré pour le
+  stade pilote, solution de repli manuelle : l'abonnement web KIRI à
+  17,99 $/mois en scan illimité, utilisé à la main (upload sur
+  kiriengine.app, export, puis transfert dans Vorae) le temps de valider
+  avec plus de plats, avant de basculer sur l'API à 500 $ quand le volume
+  le justifie.
 - **Juger la qualité sur de vrais plats du restaurant pilote**, pas sur
   des photos de stock.
 
