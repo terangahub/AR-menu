@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { ShootingStars } from "@/components/landing/shooting-stars";
 
 // Section À propos (cahier section 12.1), design repris de webglow.ca :
 // badge à pastille, très grand titre dont une partie passe en dégradé,
@@ -11,6 +12,14 @@ import { useTranslations } from "next-intl";
 // continu. Positions figées en dur plutôt que Math.random() : une valeur
 // aléatoire différente entre le rendu serveur et le rendu client
 // provoquerait une erreur d'hydratation React.
+//
+// `isolate` sur la section : sans lui, ces calques `-z-10` (et les
+// étoiles filantes ci-dessous) se peignaient sous le fond opaque du
+// wrapper racine de la page au lieu de se peindre juste derrière le
+// texte de la section - invisibles à l'écran bien que présents dans le
+// DOM. `isolate` force la section à former son propre contexte
+// d'empilement, ce qui contient ses enfants `-z-10` localement au lieu
+// de les laisser remonter jusqu'à la racine. Cf. CONTEXT.md.
 const PARTICLES = [
   { left: "8%", top: "62%", delay: "0s", duration: "11s", size: 2 },
   { left: "17%", top: "38%", delay: "2.4s", duration: "13s", size: 1 },
@@ -30,7 +39,8 @@ export function AboutSection() {
   const t = useTranslations("Landing.about");
 
   return (
-    <section id="about" className="relative w-full overflow-hidden py-28 sm:py-36">
+    <section id="about" className="relative isolate w-full overflow-hidden py-28 sm:py-36">
+      <ShootingStars />
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         {PARTICLES.map((p, i) => (
           <span

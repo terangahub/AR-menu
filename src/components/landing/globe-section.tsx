@@ -59,6 +59,12 @@ export function GlobeSection() {
     const styles = getComputedStyle(canvas);
     const fg = styles.getPropertyValue("--foreground").trim();
     const primary = styles.getPropertyValue("--primary").trim();
+    const secondary = styles.getPropertyValue("--secondary").trim();
+
+    // `createConicGradient` fait le balayage electrique ci-dessous ;
+    // navigateur ancien sans support, on saute juste ce dessin, le globe
+    // reste utilisable sans lui.
+    const supportsConicGradient = typeof ctx.createConicGradient === "function";
 
     function resize() {
       if (!canvas) return;
@@ -112,18 +118,69 @@ export function GlobeSection() {
         ctx.fill();
       }
 
-      // Marqueur Montréal, avec un halo qui pulse.
+      // Balayage electrique : un secteur lumineux qui tourne bien plus
+      // vite que le globe (un tour toutes les 4s contre 60s), pour
+      // rappeler ce que fait le produit - un scan - plutot que de
+      // decorer le globe au hasard. Independant de `rotation`, qui
+      // pilote la sphere elle-meme.
+      const sweepAngle = ((now / 1000) * ((Math.PI * 2) / 4)) % (Math.PI * 2);
+      if (supportsConicGradient && !reduced) {
+        const sweepGradient = ctx.createConicGradient(sweepAngle, cx, cy);
+        sweepGradient.addColorStop(0, `hsl(${primary} / 0.55)`);
+        sweepGradient.addColorStop(0.03, `hsl(${secondary} / 0.35)`);
+        sweepGradient.addColorStop(0.09, "transparent");
+        sweepGradient.addColorStop(1, "transparent");
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.fillStyle = sweepGradient;
+        ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+        ctx.restore();
+
+        // Trait net qui suit le meme angle, le long du bord de la
+        // sphere : le degrade conique seul reste diffus sur une zone
+        // aussi grande que le globe, ce trait donne le "coup de laser"
+        // qui se voit vraiment au passage.
+        ctx.save();
+        ctx.strokeStyle = `hsl(${primary} / 0.9)`;
+        ctx.lineWidth = 2;
+        ctx.shadowColor = `hsl(${primary})`;
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, sweepAngle - 0.05, sweepAngle + 0.05);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Marqueur Montréal : halo qui pulse en continu, et qui "reagit"
+      // quand le balayage le traverse, comme un point detecte par un
+      // scan plutot qu'une simple pastille decorative.
       const m = project(MONTREAL.lat, MONTREAL.lon, cx, cy, r);
       if (m.z > 0) {
         const pulse = 0.5 + 0.5 * Math.sin(now / 700);
-        ctx.fillStyle = `hsl(${primary} / ${0.12 + pulse * 0.18})`;
+        let flash = 0;
+        if (supportsConicGradient && !reduced) {
+          const montrealAngle = Math.atan2(m.y - cy, m.x - cx);
+          let diff = Math.abs(montrealAngle - sweepAngle) % (Math.PI * 2);
+          if (diff > Math.PI) diff = Math.PI * 2 - diff;
+          flash = Math.max(0, 1 - diff / 0.35);
+        }
+        ctx.fillStyle = `hsl(${primary} / ${0.12 + pulse * 0.18 + flash * 0.35})`;
         ctx.beginPath();
-        ctx.arc(m.x, m.y, 9 + pulse * 7, 0, Math.PI * 2);
+        ctx.arc(m.x, m.y, 9 + pulse * 7 + flash * 10, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = `hsl(${primary} / 0.95)`;
         ctx.beginPath();
-        ctx.arc(m.x, m.y, 3, 0, Math.PI * 2);
+        ctx.arc(m.x, m.y, 3 + flash * 2, 0, Math.PI * 2);
         ctx.fill();
+        if (flash > 0.3) {
+          ctx.strokeStyle = `hsl(${primary} / ${flash * 0.6})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, 14 + (1 - flash) * 10, 0, Math.PI * 2);
+          ctx.stroke();
+        }
       }
 
       if (running) raf = requestAnimationFrame(draw);
@@ -160,7 +217,7 @@ export function GlobeSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden px-5 pt-28 sm:pt-36">
+    <section className="relative isolate overflow-hidden px-5 pt-28 sm:pt-36">
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/3 -z-10 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--secondary)/0.3),transparent)] blur-2xl"

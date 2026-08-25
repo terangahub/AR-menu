@@ -291,5 +291,50 @@
         "canceled": "Annulé"
       }
     }
+  },
+  "Legal": {
+    "disclaimer": "Document provisoire, en attente de validation par un juriste avant la mise en production de Vorae.",
+    "backHome": "Retour à l'accueil",
+    "updated": "Dernière mise à jour : {date}",
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "intro": "Cette politique explique quelles données Vorae recueille auprès des restaurants qui utilisent le service et de leurs clients qui consultent un menu, pourquoi, et comment les faire retirer.",
+      "s1Title": "Données recueillies",
+      "s1Body": "Pour les restaurants : nom, courriel et mot de passe (gérés par notre fournisseur d'authentification, Clerk), informations de facturation (traitées par Stripe, jamais stockées par Vorae), et le contenu du menu (noms, descriptions, prix, photos et modèles 3D des plats). Pour les clients d'un restaurant qui consultent un menu : aucune information personnelle n'est demandée. Un scan de QR code ou l'ouverture d'une fiche plat déclenche un compteur anonyme (nombre de vues, taux d'ouverture de la réalité augmentée), sans adresse IP ni identifiant conservé au-delà de cette agrégation.",
+      "s2Title": "Utilisation des données",
+      "s2Body": "Les données du restaurant servent à faire fonctionner le compte (afficher le menu, générer les codes QR, produire les statistiques de consultation) et à traiter la facturation de l'abonnement. Vorae ne vend ni ne loue aucune donnée à des tiers, et ne les utilise pas à des fins publicitaires.",
+      "s3Title": "Sous-traitants et hébergement",
+      "s3Body": "Vorae fait appel à des fournisseurs pour opérer le service : Clerk (authentification), Neon (base de données Postgres), Cloudinary (hébergement des photos et modèles 3D), Stripe (paiement et facturation), Vercel (hébergement de l'application). Chacun agit comme sous-traitant de Vorae dans le cadre de son propre contrat et de sa propre politique de confidentialité.",
+      "s4Title": "Conservation et droits",
+      "s4Body": "Les données d'un compte sont conservées tant que le compte est actif, puis supprimées dans un délai raisonnable après sa fermeture. Conformément à la Loi 25 (Québec) et à la LPRPDE (Canada), tout restaurant peut demander l'accès, la rectification ou la suppression de ses données en écrivant à l'adresse ci-dessous, et peut porter plainte auprès de la Commission d'accès à l'information du Québec s'il estime que sa demande n'est pas traitée correctement.",
+      "s5Title": "Témoins de connexion (cookies)",
+      "s5Body": "Vorae utilise uniquement des témoins fonctionnels : la session de connexion (Clerk) et la préférence d'affichage clair ou sombre. Aucun témoin publicitaire ou de suivi entre sites n'est déposé.",
+      "s6Title": "Sécurité",
+      "s6Body": "Les mots de passe ne sont jamais stockés par Vorae : l'authentification est déléguée à Clerk. Les communications avec l'application sont chiffrées (HTTPS). Aucun système n'étant infaillible, un incident de sécurité serait communiqué aux comptes concernés dans les meilleurs délais, comme l'exige la Loi 25.",
+      "s7Title": "Contact",
+      "s7Body": "Pour toute question ou demande relative à vos données, écrivez à privacy@vorae.app."
+    },
+    "terms": {
+      "title": "Conditions d'utilisation",
+      "intro": "En créant un compte ou en utilisant Vorae, un restaurant accepte les conditions ci-dessous. Merci de les lire avant de s'abonner.",
+      "s1Title": "Description du service",
+      "s1Body": "Vorae est un service qui permet à un restaurant de publier son menu en ligne, avec des fiches plats consultables en réalité augmentée via un code QR affiché en salle, ainsi qu'un tableau de bord de gestion du menu et de consultation des statistiques.",
+      "s2Title": "Compte et abonnement",
+      "s2Body": "L'accès au tableau de bord nécessite un compte, avec un essai gratuit de 14 jours sans carte requise. Passé l'essai, l'abonnement est facturé selon le forfait choisi et reconduit automatiquement à chaque période, sauf annulation depuis le portail de facturation. Les paiements sont traités par Stripe ; Vorae ne conserve aucune information de carte.",
+      "s3Title": "Responsabilités du restaurant",
+      "s3Body": "Le restaurant reste seul responsable de l'exactitude des informations publiées sur son menu (prix, allergènes, description des plats) et des photos ou modèles 3D qu'il met en ligne. Vorae fournit l'outil de publication, pas le contenu.",
+      "s4Title": "Utilisation acceptable",
+      "s4Body": "Le compte ne peut pas servir à publier un contenu illicite, trompeur ou portant atteinte aux droits d'un tiers. Vorae se réserve le droit de suspendre un compte en cas de manquement manifeste, après tentative de contact préalable sauf urgence.",
+      "s5Title": "Propriété intellectuelle",
+      "s5Body": "Le restaurant conserve tous les droits sur le contenu de son menu. Vorae conserve tous les droits sur le logiciel, l'interface et la marque Vorae. Aucune licence n'est accordée à l'un sur les droits de l'autre au-delà de ce qui est nécessaire au fonctionnement du service.",
+      "s6Title": "Disponibilité et limitation de responsabilité",
+      "s6Body": "Vorae met des efforts raisonnables à maintenir le service disponible, sans garantir une disponibilité continue. Dans la mesure permise par la loi, Vorae ne peut être tenu responsable des pertes indirectes (perte de ventes, de clientèle) liées à une interruption du service.",
+      "s7Title": "Résiliation",
+      "s7Body": "Le restaurant peut résilier son abonnement à tout moment depuis le portail de facturation ; l'accès reste actif jusqu'à la fin de la période déjà payée. Vorae peut résilier un compte en cas de manquement grave et répété aux présentes conditions.",
+      "s8Title": "Droit applicable",
+      "s8Body": "Les présentes conditions sont régies par le droit applicable au Québec et au Canada. Tout litige relève des tribunaux compétents de la province de Québec.",
+      "s9Title": "Modifications",
+      "s9Body": "Ces conditions peuvent être mises à jour ; en cas de changement important, les restaurants abonnés en seront informés par courriel avant l'entrée en vigueur."
+    }
   }
 }

@@ -331,6 +331,23 @@ concerné - cette liste est un résumé, pas la seule source.
   (`.mp4`) : la regex d'exclusion listait `jpe?g|webp|png|...` mais pas
   `mp4|webm|mov|mp3`. Vérifier ce matcher à chaque nouveau type de fichier
   statique ajouté au projet.
+- **Un calque décoratif en `-z-10` (halo, particules) peut être invisible
+  à l'écran tout en étant bien présent dans le DOM, si la section qui le
+  contient ne forme pas son propre contexte d'empilement CSS.** `position:
+  relative` seul, sans `z-index`, ne suffit pas : l'élément `-z-10` remonte
+  alors jusqu'au premier ancêtre qui en forme un (souvent la racine de la
+  page), et se retrouve peint **sous** le fond opaque de cet ancêtre au
+  lieu de juste derrière le texte de sa propre section. Repéré en ajoutant
+  les étoiles filantes des sections À propos et Avis (Sprint 4.5, S45-13) :
+  invisibles malgré un `opacity` et une `animation` corrects en
+  `getComputedStyle`, confirmé en écrivant un carré rouge de test au même
+  endroit et en vérifiant sa couleur de pixel réelle plutôt que de se fier
+  aux styles calculés. Corrigé en ajoutant `isolate` (utilitaire Tailwind
+  pour `isolation: isolate`) sur chaque `<section>` contenant un calque
+  `-z-10` : hero, "Comment ça marche", Fonctionnalités, Avis, À propos,
+  Tarifs, Globe. **Tout nouveau calque `-z-10` doit vivre dans une section
+  qui a `isolate`, sinon vérifier son rendu par une capture d'écran, pas
+  seulement par la lecture du code.**
 
 ---
 

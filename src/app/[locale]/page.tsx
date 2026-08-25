@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/landing/reveal";
 import { SiteHeader } from "@/components/landing/site-header";
@@ -70,9 +71,7 @@ const FIELD_WORDS = {
 // Landing marketing - direction reflect.app (voir CONTEXT.md pour la
 // justification du remplacement de palette). Force le thème sombre
 // localement : reflect.app n'a pas de mode clair, le dashboard garde sa
-// préférence système par défaut (voir [locale]/layout.tsx). Les pages
-// /privacy et /terms n'existent pas encore (hors périmètre Sprint 3/4),
-// les liens du footer restent des ancres # en attendant.
+// préférence système par défaut (voir [locale]/layout.tsx).
 export default function Home() {
   const t = useTranslations("Landing");
 
@@ -115,7 +114,7 @@ export default function Home() {
 
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden px-5 pb-28 pt-36 sm:pt-44">
+        <section className="relative isolate overflow-hidden px-5 pb-28 pt-36 sm:pt-44">
           {/* Aurore de fond : dégradé radial large + orbe centrale floue.
               Deux couches distinctes pour éviter un halo trop uniforme. */}
           <div
@@ -202,7 +201,7 @@ export default function Home() {
         </section>
 
         {/* Product preview */}
-        <section className="relative px-5 py-28 sm:py-36">
+        <section className="relative isolate px-5 py-28 sm:py-36">
           <div className="mx-auto max-w-[1100px] text-center">
             <Reveal>
               <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground">
@@ -256,8 +255,16 @@ export default function Home() {
             </Reveal>
 
             <div className="relative mt-16">
-              {/* Ligne de liaison entre les 3 étapes (desktop seulement) :
-                  matérialise la progression scan vers AR vers commande. */}
+              {/* Ligne de liaison entre les 3 étapes : matérialise la
+                  progression scan vers AR vers commande. Horizontale au
+                  centre des icônes en desktop (grille en 3 colonnes),
+                  verticale sur la même colonne d'icônes en mobile (cartes
+                  empilées) : même idée, orientation adaptée à la mise en
+                  page. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 top-15 hidden h-[calc(100%-7.5rem)] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/30 to-transparent max-sm:block"
+              />
               <div
                 aria-hidden
                 className="pointer-events-none absolute left-0 right-0 top-[3.25rem] hidden h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent sm:block"
@@ -288,13 +295,13 @@ export default function Home() {
         </section>
 
         {/* Features - 3 rangées alternées */}
-        <section id="features" className="relative px-5 py-28 sm:py-36">
+        <section id="features" className="relative isolate px-5 py-28 sm:py-36">
           <div
             aria-hidden
             className="pointer-events-none absolute right-0 top-1/3 -z-10 h-[500px] w-[500px] rounded-full bg-[radial-gradient(closest-side,hsl(var(--secondary)/0.22),transparent)] blur-2xl"
           />
           <div className="mx-auto max-w-[1100px]">
-            <Reveal>
+            <Reveal durationMs={500}>
               <div className="text-center">
                 <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground">
                   {t("features.eyebrow")}
@@ -306,7 +313,7 @@ export default function Home() {
                 const Icon = feature.icon;
                 const reversed = i % 2 === 1;
                 return (
-                  <Reveal key={feature.title}>
+                  <Reveal key={feature.title} durationMs={500}>
                     <div
                       className={`flex flex-col items-center gap-10 sm:flex-row sm:gap-16 ${
                         reversed ? "sm:flex-row-reverse" : ""
@@ -350,13 +357,13 @@ export default function Home() {
           </div>
         </section>
 
-        <GlobeSection />
-
         <ReviewsSection />
 
         <AboutSection />
 
         <PricingSection />
+
+        <GlobeSection />
 
         {/* FAQ */}
         <section className="px-5 py-28 sm:py-36">
@@ -443,12 +450,12 @@ export default function Home() {
               <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 {t("footer.legal")}
               </span>
-              <a href="#" className="text-foreground/80 transition-colors hover:text-foreground">
+              <Link href="/privacy" className="text-foreground/80 transition-colors hover:text-foreground">
                 {t("footer.privacy")}
-              </a>
-              <a href="#" className="text-foreground/80 transition-colors hover:text-foreground">
+              </Link>
+              <Link href="/terms" className="text-foreground/80 transition-colors hover:text-foreground">
                 {t("footer.terms")}
-              </a>
+              </Link>
             </div>
           </div>
         </div>

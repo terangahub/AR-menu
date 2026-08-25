@@ -2,10 +2,35 @@
 
 import { useEffect, useState } from "react";
 import { Rocket } from "lucide-react";
+import { suppressReveal } from "@/lib/reveal-suppress";
 
 // Bouton "retour en haut" en forme de fusée, repris de webglow.ca :
 // apparaît après 500px de scroll, réacteur qui s'allume au survol et
 // pendant le décollage. Couleurs adaptées aux tokens Vorae.
+//
+// Défilement fait à la main plutôt que `scrollTo({ behavior: "smooth" })` :
+// la durée native du navigateur dépend de la distance et peut être très
+// courte sur une page longue, ce qui fait défiler toutes les sections à
+// toute vitesse - une expérience que le client a décrite comme "on dirait
+// qu'on recommence à relire la page". Une durée fixe et un easing doux
+// donnent un mouvement plus posé, quelle que soit la distance.
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function smoothScrollToTop(durationMs: number) {
+  const start = window.scrollY;
+  if (start === 0) return;
+  const startTime = performance.now();
+
+  function step(now: number) {
+    const progress = Math.min(1, (now - startTime) / durationMs);
+    window.scrollTo(0, start * (1 - easeOutCubic(progress)));
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
   const [launching, setLaunching] = useState(false);
@@ -19,10 +44,12 @@ export function BackToTop() {
 
   function scrollToTop() {
     setLaunching(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const duration = 1100;
+    suppressReveal(duration + 150);
+    smoothScrollToTop(duration);
     // Le décollage est purement décoratif : on le coupe après une durée
-    // fixe, il n'y a pas d'évènement fiable de "fin de scroll smooth".
-    setTimeout(() => setLaunching(false), 1000);
+    // fixe, alignée sur celle du défilement.
+    setTimeout(() => setLaunching(false), duration);
   }
 
   return (

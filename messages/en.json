@@ -291,5 +291,50 @@
         "canceled": "Canceled"
       }
     }
+  },
+  "Legal": {
+    "disclaimer": "Draft document, pending review by a lawyer before Vorae goes into production.",
+    "backHome": "Back to home",
+    "updated": "Last updated: {date}",
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This policy explains what data Vorae collects from restaurants using the service and from their guests viewing a menu, why, and how to have it removed.",
+      "s1Title": "Data we collect",
+      "s1Body": "For restaurants: name, email and password (handled by our authentication provider, Clerk), billing information (processed by Stripe, never stored by Vorae), and the menu content itself (dish names, descriptions, prices, photos and 3D models). For guests viewing a menu: no personal information is requested. Scanning a QR code or opening a dish page triggers an anonymous counter (view count, AR open rate), with no IP address or identifier kept beyond that aggregate.",
+      "s2Title": "How we use it",
+      "s2Body": "A restaurant's data is used to run the account (display the menu, generate QR codes, produce viewing statistics) and to process subscription billing. Vorae does not sell or rent any data to third parties, and does not use it for advertising.",
+      "s3Title": "Sub-processors and hosting",
+      "s3Body": "Vorae relies on a few providers to run the service: Clerk (authentication), Neon (Postgres database), Cloudinary (photo and 3D model storage), Stripe (payments and billing), Vercel (application hosting). Each acts as a sub-processor under its own contract and its own privacy policy.",
+      "s4Title": "Retention and your rights",
+      "s4Body": "Account data is kept while the account is active, then deleted within a reasonable delay after closure. Under Quebec's Law 25 and Canada's PIPEDA, any restaurant may request access, correction or deletion of its data by writing to the address below, and may file a complaint with Quebec's access to information commission if a request is not handled properly.",
+      "s5Title": "Cookies",
+      "s5Body": "Vorae only uses functional cookies: the login session (Clerk) and the light/dark display preference. No advertising or cross-site tracking cookie is set.",
+      "s6Title": "Security",
+      "s6Body": "Passwords are never stored by Vorae: authentication is delegated to Clerk. Traffic to the application is encrypted (HTTPS). No system is foolproof; a security incident would be communicated to affected accounts as promptly as possible, as required under Law 25.",
+      "s7Title": "Contact",
+      "s7Body": "For any question or request about your data, write to privacy@vorae.app."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "intro": "By creating an account or using Vorae, a restaurant agrees to the terms below. Please read them before subscribing.",
+      "s1Title": "Description of service",
+      "s1Body": "Vorae lets a restaurant publish its menu online, with dish pages viewable in augmented reality through a QR code displayed in the dining room, along with a dashboard for managing the menu and viewing statistics.",
+      "s2Title": "Account and subscription",
+      "s2Body": "Access to the dashboard requires an account, with a 14-day free trial and no card required. After the trial, the subscription is billed according to the chosen plan and renews automatically each period unless cancelled from the billing portal. Payments are processed by Stripe; Vorae never stores card information.",
+      "s3Title": "Restaurant responsibilities",
+      "s3Body": "The restaurant remains solely responsible for the accuracy of the information published on its menu (prices, allergens, dish descriptions) and for any photo or 3D model it uploads. Vorae provides the publishing tool, not the content.",
+      "s4Title": "Acceptable use",
+      "s4Body": "The account may not be used to publish unlawful or misleading content, or content infringing a third party's rights. Vorae reserves the right to suspend an account in case of a clear breach, after attempting to make contact first except in urgent cases.",
+      "s5Title": "Intellectual property",
+      "s5Body": "The restaurant keeps all rights to its menu content. Vorae keeps all rights to the software, interface and Vorae brand. Neither party grants the other any license beyond what is needed to operate the service.",
+      "s6Title": "Availability and limitation of liability",
+      "s6Body": "Vorae makes reasonable efforts to keep the service available, without guaranteeing continuous uptime. To the extent permitted by law, Vorae is not liable for indirect losses (lost sales, lost customers) resulting from a service interruption.",
+      "s7Title": "Termination",
+      "s7Body": "A restaurant may cancel its subscription at any time from the billing portal; access remains active until the end of the period already paid for. Vorae may terminate an account in case of a serious, repeated breach of these terms.",
+      "s8Title": "Governing law",
+      "s8Body": "These terms are governed by the laws applicable in Quebec and Canada. Any dispute falls under the competent courts of the province of Quebec.",
+      "s9Title": "Changes",
+      "s9Body": "These terms may be updated; in case of a material change, subscribed restaurants will be notified by email before it takes effect."
+    }
   }
 }

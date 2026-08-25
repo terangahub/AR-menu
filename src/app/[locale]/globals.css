@@ -200,6 +200,99 @@
     animation: float-up 10s linear infinite;
   }
 
+  /* Étoile filante : un point dont la traînée (::before, dégradé qui
+     s'éteint vers l'arrière) glisse en diagonale et s'efface. L'élément
+     est pré-tourné en JSX (transform: rotate) selon l'angle de chaque
+     étoile ; l'animation ne translate qu'en X, dans le repère déjà
+     tourné, ce qui donne un mouvement diagonal sans recalculer de
+     vecteur par étoile. */
+  .shooting-star {
+    position: relative;
+    animation: shooting-star linear infinite;
+    box-shadow: 0 0 6px 1px hsl(var(--primary) / 0.8);
+  }
+  .shooting-star::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    width: 64px;
+    height: 1px;
+    background: linear-gradient(to left, hsl(var(--primary) / 0.7), transparent);
+    transform: translateY(-50%);
+  }
+  @keyframes shooting-star {
+    0% {
+      transform: translateX(-40px);
+      opacity: 0;
+    }
+    10%,
+    75% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(220px);
+      opacity: 0;
+    }
+  }
+
+  /* Trait lumineux qui parcourt le contour du coeur de la section Avis
+     en boucle (cf. reviews-section.tsx, l'attribut `pathLength="1"` sur
+     le path concerné normalise dasharray/dashoffset en fraction du
+     tracé : la boucle reste exacte quelle que soit la longueur réelle
+     de la courbe). */
+  @keyframes heart-trace {
+    to {
+      stroke-dashoffset: -1;
+    }
+  }
+  .heart-trace {
+    animation: heart-trace 5s linear infinite;
+  }
+
+  /* Bordure animée : même idée que `.border-gradient`, un pseudo-élément
+     peint le dégradé et le masque n'en garde que l'épaisseur, mais le
+     dégradé est conique et tourne en continu (via la propriété
+     enregistrée `--border-angle`, qui rend l'angle animable en CSS pur).
+     Lit comme une lumière qui parcourt le contour de la carte en boucle,
+     demandé pour la carte "Croissance" du tarif. */
+  @property --border-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .border-gradient-animated {
+    position: relative;
+  }
+  .border-gradient-animated::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 0%,
+      hsl(var(--secondary) / 0.4) 6%,
+      hsl(var(--primary)) 12%,
+      hsl(var(--secondary) / 0.4) 18%,
+      transparent 30%,
+      transparent 100%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: border-spin 3.5s linear infinite;
+  }
+  @keyframes border-spin {
+    to {
+      --border-angle: 360deg;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .surface-card,
     .surface-card:hover {
@@ -207,8 +300,14 @@
       transition: none;
     }
     .animate-infinite-scroll,
-    .animate-float-up {
+    .animate-float-up,
+    .shooting-star,
+    .heart-trace,
+    .border-gradient-animated::before {
       animation: none;
+    }
+    .heart-trace {
+      stroke-dasharray: none;
     }
   }
 

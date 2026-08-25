@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { isRevealSuppressed } from "@/lib/reveal-suppress";
 
 // Scroll-reveal : fade-in + translateY(8px) sur 350ms, déclenché à 30% de
 // visibilité, respecte prefers-reduced-motion (visible immédiatement).
@@ -12,14 +13,22 @@ import { cn } from "@/lib/utils";
 // réarme que lorsqu'il est entièrement sorti du cadre (ratio 0). Avec un
 // seuil unique, un micro-scroll autour de la limite ferait clignoter
 // l'élément.
+//
+// Pendant un défilement programmatique long (le bouton retour en haut),
+// ce rejeu dans les deux sens fait clignoter toutes les sections
+// traversées d'un coup, comme si la page se relisait. `isRevealSuppressed`
+// ignore alors les changements d'intersection le temps du défilement, cf.
+// `lib/reveal-suppress.ts`.
 export function Reveal({
   children,
   className,
   delayMs = 0,
+  durationMs = 350,
 }: {
   children: React.ReactNode;
   className?: string;
   delayMs?: number;
+  durationMs?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -35,6 +44,7 @@ export function Reveal({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        if (isRevealSuppressed()) return;
         if (entry.intersectionRatio >= 0.3) {
           setVisible(true);
         } else if (entry.intersectionRatio === 0) {
@@ -56,7 +66,7 @@ export function Reveal({
         className
       )}
       style={{
-        transitionDuration: "350ms",
+        transitionDuration: `${durationMs}ms`,
         transitionDelay: visible ? `${delayMs}ms` : "0ms",
       }}
     >
