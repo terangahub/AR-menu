@@ -348,6 +348,16 @@ concerné - cette liste est un résumé, pas la seule source.
   Tarifs, Globe. **Tout nouveau calque `-z-10` doit vivre dans une section
   qui a `isolate`, sinon vérifier son rendu par une capture d'écran, pas
   seulement par la lecture du code.**
+- **Un badge positionné en dehors d'un élément avec un simple décalage
+  négatif fixe (`-left-10`, `-right-12`) chevauche cet élément si son
+  propre contenu est plus large que le décalage** - constaté sur les
+  badges flottants du hero (`product-mockup.tsx`) : corrects en anglais,
+  ils chevauchaient l'écran du téléphone en français, le texte y étant
+  plus long. Un décalage fixe suffit pour un élément de taille connue à
+  l'avance, pas pour un texte dont la longueur dépend de la langue.
+  Corrigé avec `right`/`left: calc(100% + Npx)` en style inline : le
+  badge part toujours du bord de son voisin vers l'extérieur, quelle que
+  soit sa propre largeur.
 
 ---
 

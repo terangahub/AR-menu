@@ -22,8 +22,15 @@
       "catMains": "Mains",
       "catStarters": "Starters",
       "d1": "Signature bowl",
-      "d2": "Grilled salmon",
-      "d3": "Creamy tagliatelle"
+      "d2": "Fresh salad",
+      "d3": "Creamy tagliatelle",
+      "d4": "Signature burger",
+      "badgeAr": "Augmented reality view",
+      "badgeLanguages": "12 languages",
+      "badgeNoApp": "Zero app",
+      "arBack": "Back to menu",
+      "arLive": "AR preview",
+      "arHint": "The guest sees the dish full size, right on their table."
     },
     "earlyAccess": {
       "eyebrow": "Launch offer, Montreal",
@@ -97,7 +104,7 @@
       "eyebrow": "Montreal and its visitors",
       "title": "A dish is understood in every language.",
       "body": "Montreal welcomes visitors from all over the world. A menu that shows itself instead of describing itself needs no translation, and your servers need no interpreter.",
-      "cta": "See the guest journey"
+      "cta": "Get started"
     },
     "pricing": {
       "eyebrow": "Pricing",
@@ -144,10 +151,17 @@
       "reassurance": "14-day free trial · No credit card required"
     },
     "footer": {
-      "tagline": "See it before you order.",
+      "tagline": "See it before you choose it.",
+      "madeIn": "Designed and built in Montreal.",
+      "cta": "Book a demo",
       "product": "Product",
       "features": "Features",
+      "howItWorks": "How it works",
       "pricing": "Pricing",
+      "reviews": "Reviews",
+      "company": "Company",
+      "about": "About",
+      "contact": "Contact",
       "legal": "Legal",
       "privacy": "Privacy",
       "terms": "Terms",

@@ -22,8 +22,15 @@
       "catMains": "Plats",
       "catStarters": "Entrées",
       "d1": "Bol signature",
-      "d2": "Saumon grillé",
-      "d3": "Tagliatelles crémeuses"
+      "d2": "Salade fraîcheur",
+      "d3": "Tagliatelles crémeuses",
+      "d4": "Burger signature",
+      "badgeAr": "Vue en réalité augmentée",
+      "badgeLanguages": "12 langues",
+      "badgeNoApp": "Zéro application",
+      "arBack": "Retour au menu",
+      "arLive": "Aperçu AR",
+      "arHint": "Le client voit le plat en vraie grandeur, sur sa table."
     },
     "earlyAccess": {
       "eyebrow": "Offre de lancement, Montréal",
@@ -97,7 +104,7 @@
       "eyebrow": "Montréal et ses visiteurs",
       "title": "Un plat se comprend dans toutes les langues.",
       "body": "Montréal reçoit des visiteurs du monde entier. Un menu qui se montre plutôt qu'il se décrit se passe de traduction, et vos serveurs se passent d'interprète.",
-      "cta": "Voir le parcours client"
+      "cta": "Commencer"
     },
     "pricing": {
       "eyebrow": "Tarifs",
@@ -145,9 +152,16 @@
     },
     "footer": {
       "tagline": "Voyez avant de choisir.",
+      "madeIn": "Conçu et codé à Montréal.",
+      "cta": "Réserver une démo",
       "product": "Produit",
       "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
       "pricing": "Tarifs",
+      "reviews": "Avis",
+      "company": "Entreprise",
+      "about": "À propos",
+      "contact": "Contact",
       "legal": "Légal",
       "privacy": "Confidentialité",
       "terms": "Conditions",

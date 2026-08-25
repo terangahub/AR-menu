@@ -10,7 +10,9 @@ import { AboutSection } from "@/components/landing/about-section";
 import { BackToTop } from "@/components/landing/back-to-top";
 import { GlobeSection } from "@/components/landing/globe-section";
 import { ProductMockup } from "@/components/landing/product-mockup";
-import { FeatureField } from "@/components/landing/feature-field";
+import { FeatureChatCloud } from "@/components/landing/feature-chat-cloud";
+import { FeatureAllergenRing } from "@/components/landing/feature-allergen-ring";
+import { FeatureLanguageFlip } from "@/components/landing/feature-language-flip";
 import {
   ShieldCheck,
   Languages,
@@ -325,11 +327,31 @@ export default function Home() {
                           className="pointer-events-none absolute -inset-6 -z-10 rounded-full bg-secondary/25 blur-3xl"
                         />
                         <div className="border-gradient overflow-hidden rounded-card shadow-[0_20px_70px_-25px_hsl(var(--secondary))]">
-                          <FeatureField
-                            words={[...feature.words]}
-                            icon={Icon}
-                            label={feature.fieldLabel}
-                          />
+                          {/* Une mécanique visuelle différente par carte
+                              (bulles, anneau, bascule) plutôt que le même
+                              champ de texte répété trois fois - cf.
+                              CONTEXT.md pour la justification. */}
+                          {i === 0 && (
+                            <FeatureChatCloud
+                              questions={feature.words}
+                              icon={Icon}
+                              label={feature.fieldLabel}
+                            />
+                          )}
+                          {i === 1 && (
+                            <FeatureAllergenRing
+                              tags={feature.words}
+                              icon={Icon}
+                              label={feature.fieldLabel}
+                            />
+                          )}
+                          {i === 2 && (
+                            <FeatureLanguageFlip
+                              names={feature.words}
+                              icon={Icon}
+                              label={feature.fieldLabel}
+                            />
+                          )}
                         </div>
                       </div>
 
@@ -422,46 +444,99 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="relative border-t border-white/10 px-5 py-16">
-        <div className="mx-auto flex max-w-[1100px] flex-col gap-12 sm:flex-row sm:justify-between">
-          <div>
-            <span className="flex items-center gap-2.5 font-heading text-lg font-medium tracking-tight">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/25 to-secondary/40 ring-1 ring-white/10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-icon.png" alt="" className="h-5 w-5" />
-              </span>
-              Vorae
-            </span>
-            <p className="mt-4 max-w-xs text-sm text-muted-foreground">{t("footer.tagline")}</p>
-          </div>
-          <div className="flex gap-16 text-sm">
-            <div className="flex flex-col gap-3">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                {t("footer.product")}
-              </span>
-              <a href="#features" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.features")}
-              </a>
-              <a href="#pricing" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.pricing")}
-              </a>
-            </div>
-            <div className="flex flex-col gap-3">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                {t("footer.legal")}
-              </span>
-              <Link href="/privacy" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.privacy")}
-              </Link>
-              <Link href="/terms" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.terms")}
-              </Link>
-            </div>
-          </div>
+      {/* Footer : la carte de marque repose sur trois choses, aucune
+          n'invente de contenu. Un trait qui defile en haut (meme famille
+          visuelle que le balayage du globe et le trait du coeur des avis,
+          plutot qu'un motif isole). Le mot "VORAE" en tres grand et tres
+          pale en fond, coupe par le cadre - technique courante des sites
+          de produit premium (Linear, Vercel), qui donne du poids a la
+          marque sans rien ajouter de factice. Et une troisieme colonne de
+          liens ("Entreprise") qui n'existait pas, pour ne plus avoir deux
+          maigres colonnes cote a cote. `isolate` : sans lui le fond -z-10
+          se peint sous l'aplat du wrapper racine au lieu de derriere le
+          texte, cf. CONTEXT.md. */}
+      <footer className="relative isolate overflow-hidden border-t border-white/10 px-5 pb-10 pt-20">
+        <div aria-hidden className="footer-scanline pointer-events-none absolute inset-x-0 top-0 h-px" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 flex justify-center overflow-hidden"
+        >
+          <span className="translate-y-[22%] select-none whitespace-nowrap font-heading text-[26vw] font-medium leading-none tracking-tighter text-foreground/[0.05] sm:text-[15vw]">
+            VORAE
+          </span>
         </div>
-        <p className="mx-auto mt-12 max-w-[1100px] border-t border-white/[0.06] pt-8 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Vorae. {t("footer.rights")}
-        </p>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 left-1/2 -z-10 h-72 w-[70%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--secondary)/0.2),transparent)] blur-3xl"
+        />
+
+        <div className="relative mx-auto max-w-[1100px]">
+          <div className="flex flex-col gap-14 sm:flex-row sm:justify-between">
+            <div className="max-w-xs">
+              <span className="flex items-center gap-2.5 font-heading text-lg font-medium tracking-tight">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/25 to-secondary/40 ring-1 ring-white/10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/logo-icon.png" alt="" className="h-5 w-5" />
+                </span>
+                Vorae
+              </span>
+              <p className="mt-4 text-sm text-muted-foreground">{t("footer.tagline")}</p>
+              <p className="mt-2 text-xs text-muted-foreground/70">{t("footer.madeIn")}</p>
+              <Button size="sm" className="mt-6" asChild>
+                <Link href="/dashboard">{t("footer.cta")}</Link>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-10 gap-y-10 text-sm sm:grid-cols-3 sm:gap-x-16">
+              <div className="flex flex-col gap-3">
+                <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("footer.product")}
+                </span>
+                <a href="#features" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.features")}
+                </a>
+                <a href="#how-it-works" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.howItWorks")}
+                </a>
+                <a href="#pricing" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.pricing")}
+                </a>
+                <a href="#reviews" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.reviews")}
+                </a>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("footer.company")}
+                </span>
+                <a href="#about" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.about")}
+                </a>
+                <a
+                  href="mailto:bonjour@vorae.app"
+                  className="text-foreground/80 transition-colors hover:text-foreground"
+                >
+                  {t("footer.contact")}
+                </a>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("footer.legal")}
+                </span>
+                <Link href="/privacy" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.privacy")}
+                </Link>
+                <Link href="/terms" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.terms")}
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-16 border-t border-white/[0.06] pt-8 text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Vorae. {t("footer.rights")}
+          </p>
+        </div>
       </footer>
 
       <BackToTop />

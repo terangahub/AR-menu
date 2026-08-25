@@ -26,7 +26,7 @@ export function TrustedMarquee() {
   const t = useTranslations("Landing.trusted");
 
   return (
-    <section className="relative z-10 w-full pb-4">
+    <section className="relative z-10 w-full pb-8">
       <p className="mb-8 text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         {t("label")}
       </p>
@@ -38,7 +38,7 @@ export function TrustedMarquee() {
           {[...SEGMENTS, ...SEGMENTS].map((segment, i) => (
             <span
               key={`${segment}-${i}`}
-              className="mx-8 whitespace-nowrap font-heading text-xl font-medium text-foreground"
+              className="mx-8 whitespace-nowrap font-heading text-2xl font-medium text-foreground sm:text-3xl"
             >
               {segment}
             </span>
