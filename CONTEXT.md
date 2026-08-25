@@ -381,6 +381,30 @@ concerné - cette liste est un résumé, pas la seule source.
   Client Component. **Après avoir ajouté `"use client"` à un composant
   existant, vérifier la page dans un vrai navigateur, pas seulement le
   build.**
+- **`transformStyle: preserve-3d` casse le test de collision des
+  descendants : des boutons deviennent incliquables à la souris alors
+  qu'ils répondent encore à un clic déclenché en JavaScript.** Constaté
+  sur la maquette de téléphone du hero, dont le châssis porte une légère
+  rotation 3D qui suit la souris : `mousedown` était attribué au
+  conteneur, `mouseup` au bouton, et le navigateur déclenchait donc le
+  `click` sur leur ancêtre commun, si bien que le bouton ne réagissait
+  jamais. Piège vicieux à diagnostiquer : `document.elementFromPoint`
+  renvoyait bien le bouton, et un `element.click()` en JS fonctionnait.
+  La méthode qui a tranché : écouter `pointerdown`/`mousedown`/`mouseup`/
+  `click` au niveau du document et comparer leurs cibles. `preserve-3d`
+  n'était pas nécessaire ici (aucun enfant n'a sa propre transformation
+  3D), le retirer garde la rotation identique à l'oeil. **Ne pas mettre
+  `preserve-3d` sur un conteneur qui contient des éléments cliquables, et
+  tester les clics à la souris, pas seulement en JavaScript.**
+- **Un élément statique remonté sous un élément positionné passe
+  derrière lui, quel que soit l'ordre du DOM.** Sur la fiche plat de la
+  maquette, le bloc texte était remonté par `-mt-6` pour chevaucher le
+  bas de la photo ; le conteneur de la photo étant `relative` et le bloc
+  texte statique, le nom du plat et le prix étaient invisibles, cachés
+  derrière l'image. Corrigé en donnant `relative` au bloc texte. Aucun
+  test automatique ne l'aurait vu (le texte est bien dans le DOM et
+  `innerText` le renvoie) : c'est la relecture des captures d'écran qui
+  l'a révélé.
 
 ---
 

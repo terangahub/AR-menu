@@ -22,15 +22,31 @@
       "catMains": "Mains",
       "catStarters": "Starters",
       "d1": "Signature bowl",
+      "d1Desc": "Quinoa, edamame, avocado, roasted sweet potato and house sesame sauce.",
+      "d1Allergens": "Sesame | Soy",
       "d2": "Fresh salad",
+      "d2Desc": "Baby greens, cherry tomatoes, feta, toasted walnuts, dill vinaigrette.",
+      "d2Allergens": "Milk | Tree nuts | Mustard",
       "d3": "Creamy tagliatelle",
+      "d3Desc": "Fresh pasta, parmesan cream, pan-fried mushrooms, black pepper.",
+      "d3Allergens": "Gluten | Milk | Eggs",
       "d4": "Signature burger",
+      "d4Desc": "Angus beef, aged cheddar, caramelised onions, house brioche bun.",
+      "d4Allergens": "Gluten | Milk | Sesame",
+      "d5": "Grilled salmon",
+      "d5Desc": "Grilled salmon fillet, seasonal vegetables, dill oil and preserved lemon.",
+      "d5Allergens": "Fish",
       "badgeAr": "Augmented reality view",
       "badgeLanguages": "12 languages",
       "badgeNoApp": "Zero app",
+      "back": "Back",
+      "allergensLabel": "Allergens",
+      "viewAr": "View in augmented reality",
+      "noAr": "AR view coming soon",
       "arBack": "Back to menu",
       "arLive": "AR preview",
-      "arHint": "The guest sees the dish full size, right on their table."
+      "arHint": "The guest sees the dish full size, right on their table.",
+      "tryHint": "Interactive preview: tap a dish."
     },
     "earlyAccess": {
       "eyebrow": "Launch offer, Montreal",
@@ -166,6 +182,10 @@
       "privacy": "Privacy",
       "terms": "Terms",
       "rights": "All rights reserved."
+    },
+    "fields": {
+      "service": "What does it come with? | Is it spicy? | How big is the portion? | Does it have nuts in it? | What's today's special? | Does it come with fries? | Is it a big plate? | Do you have anything veggie? | Does it take long to make? | What does it look like?",
+      "allergens": "Gluten | Peanuts | Shellfish | Milk | Eggs | Fish | Soy | Tree nuts | Sesame | Sulphites | Mustard | Celery"
     }
   },
   "Menu": {

@@ -11,6 +11,7 @@ import { BackToTop } from "@/components/landing/back-to-top";
 import { GlobeSection } from "@/components/landing/globe-section";
 import { ProductMockup } from "@/components/landing/product-mockup";
 import { FeatureField } from "@/components/landing/feature-field";
+import { LoopingVideo } from "@/components/landing/looping-video";
 import { FeatureAllergenRing } from "@/components/landing/feature-allergen-ring";
 import { FeatureLanguageFlip } from "@/components/landing/feature-language-flip";
 import {
@@ -23,37 +24,17 @@ import {
   Sparkles,
 } from "lucide-react";
 
-// Contenu des champs défilants illustrant chaque bénéfice. Chaque liste
-// dit littéralement de quoi parle la section : les questions que les
-// serveurs n'ont plus à répondre, les allergènes couverts, le même plat
-// écrit dans plusieurs langues.
-const FIELD_WORDS = {
-  service: [
-    "C'est servi avec quoi ?",
-    "C'est épicé ?",
-    "Quelle taille de portion ?",
-    "Il y a des noix dedans ?",
-    "C'est quoi le plat du jour ?",
-    "Ça vient avec des frites ?",
-    "C'est gros comme assiette ?",
-    "Vous avez du végé ?",
-    "C'est long à préparer ?",
-    "Ça ressemble à quoi ?",
-  ],
-  allergens: [
-    "Gluten",
-    "Arachides",
-    "Crustacés",
-    "Lait",
-    "Oeufs",
-    "Poisson",
-    "Soja",
-    "Fruits à coque",
-    "Sésame",
-    "Sulfites",
-    "Moutarde",
-    "Céleri",
-  ],
+// Le contenu des champs "Service" et "Allergènes" vit dans les fichiers
+// de traduction (`Landing.fields`) : ce sont des phrases et des mots de
+// vocabulaire, ils doivent suivre la langue de la page. next-intl ne
+// gérant pas les tableaux dans ses messages, chaque liste y est stockée
+// en une seule chaîne, séparée par ce caractère.
+const FIELD_SEPARATOR = " | ";
+
+// Les langues, elles, restent ici : la liste EST le contenu (le même plat
+// écrit dans douze langues). La traduire n'aurait aucun sens, c'est
+// justement le fait qu'elle ne change pas qui illustre le propos.
+const LANGUAGE_WORDS = {
   languages: [
     "Bol signature",
     "Signature bowl",
@@ -83,7 +64,7 @@ export default function Home() {
       eyebrow: t("features.feature1Eyebrow"),
       title: t("features.feature1Title"),
       body: t("features.feature1Body"),
-      words: FIELD_WORDS.service,
+      words: t("fields.service").split(FIELD_SEPARATOR),
       fieldLabel: t("features.field1Label"),
     },
     {
@@ -91,7 +72,7 @@ export default function Home() {
       eyebrow: t("features.feature2Eyebrow"),
       title: t("features.feature2Title"),
       body: t("features.feature2Body"),
-      words: FIELD_WORDS.allergens,
+      words: t("fields.allergens").split(FIELD_SEPARATOR),
       fieldLabel: t("features.field2Label"),
     },
     {
@@ -99,7 +80,7 @@ export default function Home() {
       eyebrow: t("features.feature3Eyebrow"),
       title: t("features.feature3Title"),
       body: t("features.feature3Body"),
-      words: FIELD_WORDS.languages,
+      words: LANGUAGE_WORDS.languages,
       fieldLabel: t("features.field3Label"),
     },
   ];
@@ -223,13 +204,9 @@ export default function Home() {
                   className="pointer-events-none absolute -inset-8 -z-10 rounded-full bg-secondary/30 blur-3xl"
                 />
                 <div className="border-gradient relative overflow-hidden rounded-card bg-card shadow-[0_30px_120px_-30px_hsl(var(--secondary))]">
-                  <video
+                  <LoopingVideo
                     src="/hero-video.mp4"
                     poster="/hero-dish.jpg"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
                     className="aspect-video w-full object-cover"
                   />
                   <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md">

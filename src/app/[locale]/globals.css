@@ -97,6 +97,18 @@
     @apply rounded-md border border-input bg-background px-3 py-1.5 text-sm;
   }
 
+  /* Zone qui défile sans montrer sa barre de défilement : utilisé à
+     l'intérieur de la maquette de téléphone du hero, où une barre
+     grise de navigateur trahirait tout de suite que ce n'est pas un
+     vrai écran de téléphone. Le contenu reste bien défilable, seule
+     la barre est masquée. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   /* --- Utilitaires visuels de la landing ---
      Regroupés ici plutôt que répétés en classes Tailwind inline : ces
      effets (bordure en dégradé, halo, texte dégradé) demandent des

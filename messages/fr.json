@@ -22,15 +22,31 @@
       "catMains": "Plats",
       "catStarters": "Entrées",
       "d1": "Bol signature",
+      "d1Desc": "Quinoa, edamame, avocat, patate douce rôtie et sauce sésame maison.",
+      "d1Allergens": "Sésame | Soja",
       "d2": "Salade fraîcheur",
+      "d2Desc": "Jeunes pousses, tomates cerises, feta, noix grillées, vinaigrette à l'aneth.",
+      "d2Allergens": "Lait | Fruits à coque | Moutarde",
       "d3": "Tagliatelles crémeuses",
+      "d3Desc": "Pâtes fraîches, crème au parmesan, champignons poêlés, poivre noir.",
+      "d3Allergens": "Gluten | Lait | Oeufs",
       "d4": "Burger signature",
+      "d4Desc": "Boeuf Angus, cheddar vieilli, oignons confits, pain brioché maison.",
+      "d4Allergens": "Gluten | Lait | Sésame",
+      "d5": "Saumon grillé",
+      "d5Desc": "Filet de saumon grillé, légumes de saison, huile d'aneth et citron confit.",
+      "d5Allergens": "Poisson",
       "badgeAr": "Vue en réalité augmentée",
       "badgeLanguages": "12 langues",
       "badgeNoApp": "Zéro application",
+      "back": "Retour",
+      "allergensLabel": "Allergènes",
+      "viewAr": "Voir en réalité augmentée",
+      "noAr": "Vue AR bientôt disponible",
       "arBack": "Retour au menu",
       "arLive": "Aperçu AR",
-      "arHint": "Le client voit le plat en vraie grandeur, sur sa table."
+      "arHint": "Le client voit le plat en vraie grandeur, sur sa table.",
+      "tryHint": "Aperçu interactif : touchez un plat."
     },
     "earlyAccess": {
       "eyebrow": "Offre de lancement, Montréal",
@@ -166,6 +182,10 @@
       "privacy": "Confidentialité",
       "terms": "Conditions",
       "rights": "Tous droits réservés."
+    },
+    "fields": {
+      "service": "C'est servi avec quoi ? | C'est épicé ? | Quelle taille de portion ? | Il y a des noix dedans ? | C'est quoi le plat du jour ? | Ça vient avec des frites ? | C'est gros comme assiette ? | Vous avez du végé ? | C'est long à préparer ? | Ça ressemble à quoi ?",
+      "allergens": "Gluten | Arachides | Crustacés | Lait | Oeufs | Poisson | Soja | Fruits à coque | Sésame | Sulfites | Moutarde | Céleri"
     }
   },
   "Menu": {

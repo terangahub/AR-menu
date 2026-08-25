@@ -63,9 +63,43 @@ export function GlobeSection() {
     let dragStartX = 0;
     let dragStartOffset = 0;
     // Point de pression ("presser l'eponge") : une force qui monte vite a
-    // l'appui et redescend lentement au relachement, cf. son usage dans
-    // draw() plus bas.
-    const press = { x: 0, y: 0, strength: 0, active: false };
+    // l'appui, puis revient lentement en oscillant au relachement, cf.
+    // son usage dans draw() plus bas. `releaseStrength` et `releasedAt`
+    // figent l'etat au moment du relachement pour que le retour se calcule
+    // sur une horloge, et non par decroissance image par image : la duree
+    // du retour est ainsi la meme quel que soit le nombre d'images par
+    // seconde de l'appareil.
+    const press = {
+      x: 0,
+      y: 0,
+      strength: 0,
+      active: false,
+      releaseStrength: 0,
+      releasedAt: 0,
+    };
+    // Retour volontairement long : plus court, l'oeil ne voyait pas la
+    // surface reprendre sa forme, l'effet passait inapercu.
+    const PRESS_RECOVER_MS = 3000;
+    // Amortissement volontairement faible : avec une decroissance rapide,
+    // tout etait fini en moins d'une seconde et le rebond passait
+    // inapercu. A cette valeur, le mouvement reste lisible sur pres de
+    // deux secondes.
+    const PRESS_DAMPING = 1.8;
+
+    // Ondes de choc emises a l'appui et au relachement. Chacune est un
+    // front circulaire qui s'eloigne du point touche, visible a la fois
+    // comme un anneau et comme une bosse qui souleve les points au
+    // passage. Limitees en nombre : chaque onde coute un calcul de
+    // distance par point de la sphere.
+    const ripples: { x: number; y: number; start: number }[] = [];
+    const RIPPLE_MS = 1600;
+    const MAX_RIPPLES = 3;
+
+    function addRipple(x: number, y: number) {
+      if (reduced) return;
+      ripples.push({ x, y, start: performance.now() });
+      if (ripples.length > MAX_RIPPLES) ripples.shift();
+    }
     let raf = 0;
     let running = true;
     let lastTime = performance.now();
@@ -122,14 +156,26 @@ export function GlobeSection() {
         rotation += (delta / 60000) * 360;
       }
 
-      // Force de pression : monte vite a l'appui, redescend lentement au
-      // relachement ("comme une eponge qu'on relache").
+      // Force de pression : monte vite a l'appui, puis revient lentement
+      // en oscillant au relachement. L'oscillation amortie (exponentielle
+      // qui decroit, multipliee par un cosinus) donne le rebond d'une
+      // eponge : la surface repasse legerement au-dela de sa forme au
+      // repos avant de se stabiliser, au lieu de revenir platement.
       if (press.active) {
         press.strength += (1 - press.strength) * 0.35;
-      } else if (press.strength > 0.001) {
-        press.strength *= 0.94;
-      } else {
-        press.strength = 0;
+      } else if (press.releasedAt > 0) {
+        const t = (now - press.releasedAt) / PRESS_RECOVER_MS;
+        if (t >= 1) {
+          press.strength = 0;
+          press.releasedAt = 0;
+        } else {
+          // Le cosinus s'annule exactement a t = 1 : la force revient a
+          // zero sans saut, sans avoir a la forcer.
+          press.strength =
+            press.releaseStrength *
+            Math.exp(-PRESS_DAMPING * t) *
+            Math.cos(t * Math.PI * 1.5);
+        }
       }
 
       const rect = canvas.getBoundingClientRect();
@@ -142,7 +188,28 @@ export function GlobeSection() {
       const r = Math.min(w * 0.42, 460);
       const cx = w / 2;
       const cy = h * 0.16 + r;
-      const dentRadius = r * 0.22;
+      // Creux large : l'empreinte doit mordre bien au-dela du point touche
+      // pour qu'on voie la surface entiere ceder, pas juste quelques
+      // points sous le doigt.
+      const dentRadius = r * 0.5;
+      // Les ondes trop vieilles sont retirees ici, une fois par image,
+      // plutot qu'a chaque point.
+      const pressing = Math.abs(press.strength) > 0.01;
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        if (now - ripples[i].start > RIPPLE_MS) ripples.splice(i, 1);
+      }
+      const rippleFronts = ripples.map((ripple) => {
+        const age = (now - ripple.start) / RIPPLE_MS;
+        return {
+          x: ripple.x,
+          y: ripple.y,
+          // Le front ralentit en s'eloignant, comme une vraie onde qui
+          // se dissipe.
+          radius: (1 - Math.pow(1 - age, 2)) * dentRadius * 2.2,
+          fade: 1 - age,
+        };
+      });
+      const rippleBand = r * 0.1;
 
       for (const dot of dots) {
         const p = project(dot.lat, dot.lon, cx, cy, r);
@@ -156,22 +223,54 @@ export function GlobeSection() {
 
         // Empreinte de pression : les points proches du doigt/curseur sont
         // tires vers le point d'appui et s'assombrissent legerement, comme
-        // une surface qui s'enfonce puis reprend sa forme.
-        if (press.strength > 0.01) {
+        // une surface qui s'enfonce puis reprend sa forme. La force peut
+        // devenir negative pendant le rebond, les points sont alors
+        // repousses vers l'exterieur : c'est la bosse de l'eponge qui
+        // repasse au-dela de sa forme au repos.
+        if (pressing) {
           const dist = Math.hypot(p.x - press.x, p.y - press.y);
           if (dist < dentRadius) {
-            const fall = (1 - dist / dentRadius) * press.strength;
-            px = p.x + (press.x - p.x) * fall * 0.4;
-            py = p.y + (press.y - p.y) * fall * 0.4;
+            // Chute en cosinus plutot que lineaire : le bord du creux se
+            // raccorde en douceur au reste de la sphere, sans cassure
+            // visible sur le cercle du rayon.
+            const fall =
+              (0.5 + 0.5 * Math.cos((dist / dentRadius) * Math.PI)) * press.strength;
+            px = p.x + (press.x - p.x) * fall * 0.55;
+            py = p.y + (press.y - p.y) * fall * 0.55;
             alpha *= 1 - fall * 0.5;
             size *= 1 - fall * 0.35;
           }
         }
 
-        ctx.fillStyle = `hsl(${fg} / ${alpha})`;
+        // Onde de choc : au passage du front, les points sont souleves et
+        // brillent brievement.
+        for (const front of rippleFronts) {
+          const dist = Math.hypot(p.x - front.x, p.y - front.y);
+          const band = Math.abs(dist - front.radius);
+          if (band > rippleBand) continue;
+          const lift = (1 - band / rippleBand) * front.fade;
+          const angle = Math.atan2(p.y - front.y, p.x - front.x);
+          px += Math.cos(angle) * lift * 7;
+          py += Math.sin(angle) * lift * 7;
+          alpha += lift * 0.5;
+          size += lift * 0.9;
+        }
+
+        // Les deux effets peuvent pousser alpha et size hors de leurs
+        // bornes utiles, notamment quand une onde traverse un creux.
+        ctx.fillStyle = `hsl(${fg} / ${Math.max(0, Math.min(1, alpha))})`;
         ctx.beginPath();
-        ctx.arc(px, py, size, 0, Math.PI * 2);
+        ctx.arc(px, py, Math.max(0.3, size), 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // Anneaux des ondes, par-dessus les points.
+      for (const front of rippleFronts) {
+        ctx.strokeStyle = `hsl(${primary} / ${front.fade * 0.45})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(front.x, front.y, front.radius, 0, Math.PI * 2);
+        ctx.stroke();
       }
 
       // Balayage electrique : un secteur lumineux qui tourne, bien plus
@@ -276,6 +375,7 @@ export function GlobeSection() {
       press.active = true;
       press.x = pt.x;
       press.y = pt.y;
+      addRipple(pt.x, pt.y);
       canvas!.setPointerCapture(e.pointerId);
       canvas!.style.cursor = "grabbing";
     }
@@ -294,6 +394,13 @@ export function GlobeSection() {
 
     function onPointerUp(e: PointerEvent) {
       dragging = false;
+      if (press.active) {
+        // Fige l'etat au relachement : le retour a la forme au repos se
+        // calcule ensuite sur une horloge, cf. PRESS_RECOVER_MS.
+        press.releaseStrength = press.strength;
+        press.releasedAt = performance.now();
+        addRipple(press.x, press.y);
+      }
       press.active = false;
       canvas!.releasePointerCapture(e.pointerId);
       canvas!.style.cursor = "grab";
