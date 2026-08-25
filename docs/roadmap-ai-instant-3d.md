@@ -16,6 +16,113 @@ concurrence, à traiter comme les autres écarts déjà documentés dans
 
 ---
 
+## 0. Décision arbitrée (août 2026) : photogrammétrie, pas génération IA
+
+**Ce document a été écrit avant l'arbitrage. La section 0 le corrige ; les
+sections suivantes restent valables pour tout ce qui touche à
+l'architecture, mais leur hypothèse de départ (génération IA à partir
+d'une seule photo) est abandonnée.** Version illustrée sur trois pages
+dans `docs/scan-3d-plats-vorae.pdf`.
+
+### Ce qui a été écarté et pourquoi
+
+La **génération IA à partir d'une photo unique** (Meshy, Tripo3D, Stable
+Fast 3D) est écartée. Elle ne capture pas le plat, elle en invente une
+interprétation. Les analyses techniques 2026 situent explicitement ces
+moteurs sur le contenu stylisé de jeu vidéo, avec des arêtes au rendu
+"pâte à modeler" de près. Sur un menu où le convive doit reconnaître ce
+qu'il va commander, l'écart entre le plat servi et le modèle affiché est
+un risque commercial, pas un détail esthétique. Test mené sur une photo
+de burger avec Meshy : géométrie approximative et export bloqué derrière
+l'abonnement. Le doute soulevé en section 5 de ce document (« la
+nourriture est un cas difficile ») s'est confirmé en pratique.
+
+Écartés également :
+- **Luma AI** : leur outil de capture (Genie) a été arrêté au 1er janvier
+  2026, l'offre a pivoté vers le Gaussian Splatting de scènes et la
+  vidéo. La mention "Polycam/Luma AI" de la section 15.3 du cahier est
+  donc périmée sur la moitié Luma.
+- **Polycam** : le palier gratuit n'exporte qu'en GLTF, ni GLB ni USDZ.
+  Sans USDZ, pas d'AR Quick Look sur iPhone. Reste une option payante de
+  secours.
+- **Rig multi-caméras** (proposé en session par un collaborateur) : bonne
+  intuition sur le multi-vues, mais construire une station physique est
+  disproportionné pour un pilote à un seul restaurant. À reconsidérer si
+  le passage à l'échelle le justifie.
+
+### Ce qui est retenu : KIRI Engine API
+
+Photogrammétrie **managée** : capture réelle du plat, pas de génération,
+et aucune infrastructure à héberger de notre côté. Spécification vérifiée
+sur le dépôt officiel `Kiri-Innovation/KIRI-ENGINE-SDK-API` :
+
+| Élément | Valeur |
+|---|---|
+| Base URL | `https://api.kiriengine.app/api/` |
+| Authentification | Bearer, clé au format `kiri-<random>` |
+| Entrée vidéo | 3 min max, 1920x1080 |
+| Entrée photos | 20 à 300 images |
+| Sorties | OBJ, FBX, STL, PLY, **GLB**, glTF, **USDZ**, XYZ |
+| Algorithmes | Photo Scan, Featureless Object, 3DGS (avec conversion mesh) |
+| Qualité | `modelQuality` 0=High à 3=Ultra, `textureQuality` 0=4K à 3=8K |
+| Webhooks | POST JSON au changement de statut, 3 tentatives, backoff exponentiel |
+| Suivi | `getStatus`, `getModelZip` (lien 60 min), `balance` |
+| Limites | 3 Go par envoi |
+| Essai | 20 crédits offerts à l'inscription |
+
+Trois points décisifs pour notre cas :
+
+1. **`Featureless Object`** vise les surfaces brillantes et sans texture,
+   exactement le cas des assiettes blanches et des sauces réfléchissantes
+   où la photogrammétrie classique échoue.
+2. **L'entrée vidéo** rend le geste réaliste pour un restaurateur : filmer
+   30 secondes le tour de l'assiette, au lieu de cadrer 20 à 300 photos.
+3. **Les webhooks** résolvent la contrainte Vercel décrite en section 6 de
+   ce document : plus besoin d'inventer un mécanisme de reprise, KIRI
+   rappelle Vorae quand le modèle est prêt.
+
+**Effet de bord favorable** : KIRI livre GLB et USDZ dans le même export.
+La dette **D-03** du `BOARD.md` (pas de conversion `.glb` vers `.usdz`,
+faute d'outil fiable côté Node) disparaît sans travail supplémentaire.
+
+### Plan B conservé : RealityScan 2.1 (Epic)
+
+Le moteur de photogrammétrie le plus qualitatif du marché. Depuis
+novembre 2025 il expose un **Remote Command Plugin REST et gRPC**,
+utilisable en service headless, avec support Linux complet. Licence
+**gratuite même en usage commercial sous 1 M$ de revenu annuel**, ce qui
+couvre largement Vorae aujourd'hui (au-delà : 1 250 $/siège/an).
+
+Non retenu en premier choix parce qu'il faut héberger et maintenir notre
+propre machine GPU. C'est le repli si la qualité ou le coût de KIRI ne
+tiennent pas à l'échelle. L'adaptateur de la section 4.1 permet d'en
+changer sans réécrire le flux.
+
+### Reste à trancher avant de coder
+
+- **Le prix par crédit KIRI n'est pas publié.** Créer un compte, récupérer
+  la clé et les 20 crédits offerts, mesurer le coût réel par plat.
+- **Juger la qualité sur de vrais plats du restaurant pilote**, pas sur
+  des photos de stock.
+
+### Corrections à apporter au reste du document
+
+- Section 4.1 : l'interface s'appelle désormais `Scan3dProvider`
+  (`src/lib/scan3d.ts`), et prend des médias de capture, pas une photo
+  unique. Le fournisseur par défaut est KIRI.
+- Section 4.2 : le modèle Prisma devient `ScanJob` plutôt que
+  `Ai3dGenerationJob`, avec `sourceMediaUrls` (pluriel) au lieu de
+  `sourceImageUrl`.
+- Section 6 (contrainte Vercel) : résolue par les webhooks KIRI.
+- Le positionnement de la section 2 reste valable tel quel : ce flux
+  complète le service de capture professionnel à 45 $/plat de la section
+  15.3 du cahier, il ne le remplace pas.
+- Les garde-fous de la section 5 restent obligatoires : chaque scan coûte
+  de l'argent réel, donc compteur et limite par restaurant dès la première
+  version, jamais d'accès illimité non facturé.
+
+---
+
 ## 1. Ce que fait réellement le concurrent (et ce qui est vérifié vs approximatif)
 
 | Affirmation de l'analyse d'origine | Vérification |

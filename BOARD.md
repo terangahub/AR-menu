@@ -10,7 +10,8 @@ Deux documents complémentaires, ne pas les confondre :
 |---|---|
 | `BOARD.md` (ce fichier) | **Où en est chaque ticket.** Statut, blocages, prochaine action. |
 | `CONTEXT.md` | **Comment le projet est fait.** Architecture, écarts au cahier, pièges connus. |
-| `docs/roadmap-ai-instant-3d.md` | Planification détaillée d'un chantier futur non démarré. |
+| `docs/roadmap-ai-instant-3d.md` | Planification détaillée d'un chantier futur non démarré. La section 0 porte l'arbitrage du fournisseur de capture 3D. |
+| `docs/scan-3d-plats-vorae.pdf` | Note de décision en trois pages sur le scan 3D des plats, avec schéma de flux. Document à partager. |
 
 **Règle de mise à jour :** ce fichier doit être mis à jour à chaque
 changement d'état d'un ticket, pas seulement en fin de sprint. Un board
@@ -180,7 +181,7 @@ Rien n'est démarré. Périmètre issu des sections 11 et 21 du cahier.
 
 | # | Ticket | Statut | Notes |
 |---|---|---|---|
-| X-01 | Génération de modèle 3D instantanée par IA | `TODO` | Planification complète dans `docs/roadmap-ai-instant-3d.md`. Demande un comparatif de fournisseurs avant tout code. |
+| X-01 | Capture 3D automatisée des plats depuis le dashboard | `TODO` | **Fournisseur arbitré : KIRI Engine API** (photogrammétrie managée, REST et webhooks, sorties GLB et USDZ). La génération IA à partir d'une photo unique (Meshy, Tripo3D) est écartée : elle invente le plat au lieu de le capturer, confirmé par un test sur photo de burger. RealityScan 2.1 gardé en plan B (gratuit sous 1 M$ de revenu, mais machine GPU à héberger). Décision et schéma de flux dans `docs/scan-3d-plats-vorae.pdf`, détail technique en section 0 de `docs/roadmap-ai-instant-3d.md`. **Bloqué sur une action Mouhamed :** créer le compte KIRI et transmettre la clé API (20 crédits offerts pour le test). |
 
 ---
 
@@ -207,3 +208,4 @@ une action extérieure.
 1. **Créer le compte Stripe** et renseigner les 8 variables d'environnement (S4-12). Checklist pas à pas dans `CONTEXT.md` section 4. C'est le seul blocage réel du Sprint 4.
 2. **Tester et merger la PR #5** une fois la preview Vercel vérifiée.
 3. L'`UPDATE` SQL dans Neon a été exécuté (S4-14). Attention, son effet n'est pas encore visible sur la grille du menu public : celle-ci n'affiche pas les photos de plats, voir S45-07.
+4. **Créer le compte KIRI Engine** et transmettre la clé API (X-01). 20 crédits offerts à l'inscription, de quoi tester la qualité sur de vrais plats sans rien payer. Sans cette clé, le flux de capture 3D ne peut pas être testé.
