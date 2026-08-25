@@ -169,6 +169,11 @@ model ScanJob {
   status          String // uploading | processing | queuing | successful | failed | expired
   externalJobId   String? // "serialize" cote KIRI, absent si l'appel initial a echoue
   sourceMediaType String // "video" | "image"
+  // URL Cloudinary temporaire du média source (upload direct client, ne
+  // transite jamais par la Function - voir CONTEXT.md section 5). Pour
+  // un scan photo, seule la première URL est gardée ici, à titre de
+  // traçabilité, pas la liste complète.
+  sourceMediaUrl  String?
   // Format demande a l'appel : fileFormat de l'API KIRI n'accepte qu'une
   // seule valeur par appel (pas une liste) - voir la mise en garde en
   // section 0 du document de roadmap sur le doute glb+usdz en un seul

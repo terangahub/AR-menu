@@ -32,3 +32,36 @@ export async function uploadBuffer(
     stream.end(buffer);
   });
 }
+
+// Signature pour un upload direct depuis le client vers Cloudinary (Sprint
+// 4.7, capture 3D). Les Vercel Functions refusent tout corps de requête
+// au-dela d'environ 4,5 Mo (FUNCTION_PAYLOAD_TOO_LARGE) - une video de
+// scan de 20-30s depasse toujours ce seuil. La video ne doit donc jamais
+// transiter par notre route, seulement l'URL du resultat une fois
+// televerse directement chez Cloudinary. Voir CONTEXT.md section 5.
+export function signUpload(params: {
+  folder: string;
+  publicId: string;
+  resourceType: "video" | "image";
+}) {
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  if (!apiSecret || !apiKey || !cloudName) {
+    throw new Error("Configuration Cloudinary manquante - voir .env.example");
+  }
+
+  const timestamp = Math.round(Date.now() / 1000);
+  const paramsToSign = { folder: params.folder, public_id: params.publicId, timestamp };
+  const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
+
+  return {
+    cloudName,
+    apiKey,
+    timestamp,
+    folder: params.folder,
+    publicId: params.publicId,
+    signature,
+    uploadUrl: `https://api.cloudinary.com/v1_1/${cloudName}/${params.resourceType}/upload`,
+  };
+}

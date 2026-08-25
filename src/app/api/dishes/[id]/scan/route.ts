@@ -17,9 +17,28 @@ const MAX_IMAGES = 300;
 const ALGORITHMS: ScanAlgorithm[] = ["photo", "featureless", "3dgs"];
 const FORMATS: ScanFileFormat[] = ["glb", "usdz", "obj", "fbx", "stl", "ply", "gltf", "xyz"];
 
+async function fetchAsFile(url: string, maxSizeBytes: number) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Téléchargement du média échoué (${res.status})`);
+  }
+  const buffer = Buffer.from(await res.arrayBuffer());
+  if (buffer.byteLength > maxSizeBytes) {
+    throw new Error("Média trop volumineux");
+  }
+  const filename = new URL(url).pathname.split("/").pop() || "media";
+  return { buffer, filename };
+}
+
 // POST /api/dishes/[id]/scan - déclenche une capture 3D automatisée via
-// KIRI Engine (Sprint 4.7). Reçoit soit une vidéo (champ "video"), soit
-// un lot de photos (champ "images", répété), jamais les deux à la fois.
+// KIRI Engine (Sprint 4.7). Reçoit un JSON { videoUrl } ou
+// { imageUrls: string[] }, jamais le fichier lui-même : les Vercel
+// Functions refusent tout corps de requête au-delà d'environ 4,5 Mo
+// (FUNCTION_PAYLOAD_TOO_LARGE), bien en-deçà de ce que pèse une vidéo de
+// scan utilisable. Le média doit d'abord être téléversé directement chez
+// Cloudinary via POST /api/dishes/[id]/scan/upload-url, qui ne fait
+// jamais transiter les octets par notre Function. Voir CONTEXT.md
+// section 5.
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -35,56 +54,43 @@ export async function POST(
     return NextResponse.json({ error: "Dish not found" }, { status: 404 });
   }
 
-  const formData = await req.formData().catch(() => null);
-  if (!formData) {
-    return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+  const body = await req.json().catch(() => null);
+  if (!body) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const algorithmRaw = formData.get("algorithm");
-  // Featureless Object par défaut : conçu pour les surfaces brillantes et
-  // sans texture, exactement le cas des assiettes blanches et des sauces
-  // (voir docs/roadmap-ai-instant-3d.md section 0).
-  const algorithm: ScanAlgorithm = ALGORITHMS.includes(algorithmRaw as ScanAlgorithm)
-    ? (algorithmRaw as ScanAlgorithm)
+  const algorithm: ScanAlgorithm = ALGORITHMS.includes(body.algorithm)
+    ? body.algorithm
     : "featureless";
+  const fileFormat: ScanFileFormat = FORMATS.includes(body.format) ? body.format : "glb";
 
-  const formatRaw = formData.get("format");
-  const fileFormat: ScanFileFormat = FORMATS.includes(formatRaw as ScanFileFormat)
-    ? (formatRaw as ScanFileFormat)
-    : "glb";
-
-  const videoFile = formData.get("video");
-  const imageEntries = formData.getAll("images");
+  const videoUrl: string | undefined = typeof body.videoUrl === "string" ? body.videoUrl : undefined;
+  const imageUrls: string[] | undefined = Array.isArray(body.imageUrls) ? body.imageUrls : undefined;
 
   let mediaType: "video" | "image";
   let video: { buffer: Buffer; filename: string } | undefined;
   let images: { buffer: Buffer; filename: string }[] | undefined;
 
-  if (videoFile instanceof File) {
-    if (videoFile.size > MAX_VIDEO_SIZE_BYTES) {
-      return NextResponse.json({ error: "Video too large" }, { status: 400 });
-    }
-    mediaType = "video";
-    video = { buffer: Buffer.from(await videoFile.arrayBuffer()), filename: videoFile.name };
-  } else {
-    const imageFiles = imageEntries.filter((entry): entry is File => entry instanceof File);
-    if (imageFiles.length < MIN_IMAGES || imageFiles.length > MAX_IMAGES) {
-      return NextResponse.json(
-        { error: `Entre ${MIN_IMAGES} et ${MAX_IMAGES} photos sont requises` },
-        { status: 400 }
-      );
-    }
-    for (const image of imageFiles) {
-      if (image.size > MAX_IMAGE_SIZE_BYTES) {
-        return NextResponse.json({ error: "Image too large" }, { status: 400 });
+  try {
+    if (videoUrl) {
+      mediaType = "video";
+      video = await fetchAsFile(videoUrl, MAX_VIDEO_SIZE_BYTES);
+    } else if (imageUrls?.length) {
+      if (imageUrls.length < MIN_IMAGES || imageUrls.length > MAX_IMAGES) {
+        return NextResponse.json(
+          { error: `Entre ${MIN_IMAGES} et ${MAX_IMAGES} photos sont requises` },
+          { status: 400 }
+        );
       }
+      mediaType = "image";
+      images = await Promise.all(imageUrls.map((url) => fetchAsFile(url, MAX_IMAGE_SIZE_BYTES)));
+    } else {
+      return NextResponse.json({ error: "Missing videoUrl or imageUrls" }, { status: 400 });
     }
-    mediaType = "image";
-    images = await Promise.all(
-      imageFiles.map(async (image) => ({
-        buffer: Buffer.from(await image.arrayBuffer()),
-        filename: image.name,
-      }))
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Échec de récupération du média" },
+      { status: 400 }
     );
   }
 
@@ -98,6 +104,7 @@ export async function POST(
       algorithm,
       status: "uploading",
       sourceMediaType: mediaType,
+      sourceMediaUrl: videoUrl ?? imageUrls?.[0],
       requestedFormat: fileFormat,
     },
   });

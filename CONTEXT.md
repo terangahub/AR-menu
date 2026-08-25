@@ -78,7 +78,8 @@ src/
       dishes/[id]/               ← GET public / PUT / DELETE
       dishes/[id]/photo/         ← upload image → Cloudinary
       dishes/[id]/model3d/       ← upload .glb (+.usdz optionnel) → Cloudinary
-      dishes/[id]/scan/          ← POST déclenche une capture 3D via KIRI Engine (Sprint 4.7)
+      dishes/[id]/scan/upload-url/ ← POST signature d'upload direct vers Cloudinary (jamais le fichier lui-même, voir section 5)
+      dishes/[id]/scan/          ← POST { videoUrl | imageUrls } déclenche une capture 3D via KIRI Engine (Sprint 4.7)
       webhooks/kiri/             ← POST callback KIRI (statut de scan), voir lib/scan3d.ts
       qrcodes/                   ← GET liste / POST création
       qrcodes/[id]/              ← DELETE
@@ -446,6 +447,24 @@ concerné - cette liste est un résumé, pas la seule source.
   fie au champ `ok` (booléen), jamais à `code`. **Vérifier le comportement
   réel d'une API avant de coder une condition sur un champ de statut
   documenté par des exemples plutôt que par une spec stricte.**
+- **Les Vercel Functions (Node.js) refusent tout corps de requête entrant
+  au-delà d'environ 4,5 Mo, avec l'erreur `FUNCTION_PAYLOAD_TOO_LARGE`
+  (HTTP 413) - avant même que le code de la route s'exécute.** Découvert
+  en testant `POST /api/dishes/[id]/scan` avec une vraie vidéo de 13,6 Mo,
+  pourtant conforme aux critères KIRI (1080p, moins de 3 minutes). Aucune
+  vidéo de scan utilisable ne tient sous ce seuil. Corrigé en faisant
+  transiter le média par un upload direct client → Cloudinary (signature
+  générée par `POST /api/dishes/[id]/scan/upload-url`, jamais les octets
+  eux-mêmes) : la route `/scan` ne reçoit plus qu'une URL en JSON, et va
+  chercher le fichier elle-même côté serveur (un appel sortant depuis une
+  Function n'est pas soumis à cette limite, seul le corps entrant l'est).
+  **Cette limite s'applique à toute route qui reçoit un fichier en
+  multipart directement.** `POST /api/dishes/[id]/model3d` (upload manuel
+  de `.glb`/`.usdz`, section 9.2) accepte actuellement jusqu'à 15 Mo dans
+  son propre code, largement au-dessus du seuil réel de Vercel - tout
+  fichier entre 4,5 et 15 Mo y échoue donc probablement déjà en
+  production avec le même 413, non corrigé pour l'instant (hors
+  périmètre du Sprint 4.7, à traiter séparément).
 
 ---
 
