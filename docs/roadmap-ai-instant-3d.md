@@ -54,7 +54,9 @@ nourriture est un cas difficile ») s'est confirmé en pratique.
 
 Photogrammétrie **managée** : capture réelle du plat, pas de génération,
 et aucune infrastructure à héberger de notre côté. Spécification vérifiée
-sur le dépôt officiel `Kiri-Innovation/KIRI-ENGINE-SDK-API` :
+sur la documentation officielle complète (`docs.kiriengine.app`, PDF fourni
+par Mouhamed le 25 août 2026, plus fiable que le dépôt GitHub utilisé pour
+la première version de ce document) :
 
 | Élément | Valeur |
 |---|---|
@@ -62,30 +64,118 @@ sur le dépôt officiel `Kiri-Innovation/KIRI-ENGINE-SDK-API` :
 | Authentification | Bearer, clé au format `kiri-<random>` |
 | Entrée vidéo | 3 min max, 1920x1080 |
 | Entrée photos | 20 à 300 images |
-| Sorties | OBJ, FBX, STL, PLY, **GLB**, glTF, **USDZ**, XYZ |
-| Algorithmes | Photo Scan, Featureless Object, 3DGS (avec conversion mesh) |
+| Sorties | OBJ, FBX, STL, PLY, GLB, glTF, USDZ, XYZ - **une seule valeur par appel** (voir mise en garde ci-dessous) |
 | Qualité | `modelQuality` 0=High à 3=Ultra, `textureQuality` 0=4K à 3=8K |
-| Webhooks | POST JSON au changement de statut, 3 tentatives, backoff exponentiel |
 | Suivi | `getStatus`, `getModelZip` (lien 60 min), `balance` |
 | Limites | 3 Go par envoi |
 | Tarif | 1 appel API = 1 crédit = 1 $ US, quel que soit le type de scan (Photo Scan, Featureless, 3DGS) |
-| Essai | 10 crédits offerts à l'inscription |
+| Essai | 10 crédits offerts à l'inscription (confirmé en direct : `balance: 10`) |
 | Recharge | Minimum 500 crédits (500 $) au-delà du gratuit |
+| Rétention | **3 jours seulement**, suppression automatique ensuite |
 
-Trois points décisifs pour notre cas :
+**Endpoints réels, un par algorithme et par type de média** (pas un
+endpoint générique comme supposé dans la première version de ce
+document) :
+
+| Algorithme | Vidéo | Photos |
+|---|---|---|
+| Photo Scan | `POST /v1/open/photo/video` | `POST /v1/open/photo/image` |
+| Featureless Object | `POST /v1/open/featureless/video` | `POST /v1/open/featureless/image` |
+| 3DGS | `POST /v1/open/3dgs/video` | `POST /v1/open/3dgs/image` |
+
+Chaque appel renvoie `{ code, msg, data: { serialize, calculateType }, ok }`.
+**`serialize` est l'identifiant du job à stocker dans `ScanJob.externalJobId`.**
+Le champ `code` n'est pas fiable comme indicateur de succès (un appel
+réussi a renvoyé `code: 200` en test réel, alors que les exemples de la
+doc montrent `code: 0`) - **se fier au champ `ok`**, pas à `code`.
+
+Deux points décisifs pour notre cas :
 
 1. **`Featureless Object`** vise les surfaces brillantes et sans texture,
    exactement le cas des assiettes blanches et des sauces réfléchissantes
    où la photogrammétrie classique échoue.
 2. **L'entrée vidéo** rend le geste réaliste pour un restaurateur : filmer
    30 secondes le tour de l'assiette, au lieu de cadrer 20 à 300 photos.
-3. **Les webhooks** résolvent la contrainte Vercel décrite en section 6 de
-   ce document : plus besoin d'inventer un mécanisme de reprise, KIRI
-   rappelle Vorae quand le modèle est prêt.
 
-**Effet de bord favorable** : KIRI livre GLB et USDZ dans le même export.
-La dette **D-03** du `BOARD.md` (pas de conversion `.glb` vers `.usdz`,
-faute d'outil fiable côté Node) disparaît sans travail supplémentaire.
+**Mise en garde sur les formats GLB et USDZ (corrige une affirmation
+erronée de la première version de ce document) :** `fileFormat` est une
+**valeur unique** par appel selon la doc officielle, pas une liste. Rien
+ne garantit qu'un seul appel produise à la fois le `.glb` et le `.usdz`
+dont `Dish` a besoin. Deux scénarios possibles, à trancher **par un test
+réel avant d'écrire la route d'upload** :
+- Le zip contient plusieurs formats malgré un seul `fileFormat` demandé
+  (auquel cas rien ne change au plan).
+- Il faut deux appels (deux crédits) par plat pour obtenir les deux
+  formats, ce qui double le coût réel par plat et change le calcul de
+  S47-06 (garde-fous d'usage).
+Ne pas annoncer la dette **D-03** résolue tant que ce point n'est pas
+vérifié.
+
+### Webhooks : configurés dans le dashboard, pas par appel
+
+Correction importante par rapport à la première version de ce document :
+**les webhooks ne se passent pas en paramètre à chaque appel de scan**.
+Ils se configurent une fois, dans *Settings » Webhooks* du dashboard
+KIRI (ou via une API dédiée, pas encore explorée). Trois éléments :
+
+1. **Callback URL** - où KIRI envoie un `POST` JSON `{ status, serialize }`
+   à chaque changement de statut de n'importe quel job du compte. C'est
+   `serialize` qui permet de retrouver le bon `ScanJob` côté Vorae, pas
+   l'URL elle-même (une seule URL pour tous les jobs).
+2. **Signing secret** - chaîne de 6 à 40 caractères à valider sur chaque
+   requête entrante pour confirmer qu'elle vient bien de KIRI. Le
+   mécanisme exact de signature (quel header, quel algorithme) n'est pas
+   détaillé dans la doc fournie - **à observer sur la première requête
+   réelle reçue**, ne pas le deviner à l'avance.
+3. Répondre **HTTP 200** à la notification, sinon KIRI la considère non
+   délivrée.
+
+Statuts renvoyés par `getStatus` et par le webhook (`status`) :
+
+| Code | Sens |
+|---|---|
+| -1 | Uploading |
+| 0 | Processing |
+| 1 | Failed |
+| 2 | Successful |
+| 3 | Queuing |
+| 4 | **Expired** (rétention de 3 jours dépassée - corrige "Exported" annoncé par erreur dans la première version de ce document) |
+
+### Erreurs
+
+| Code | Sens |
+|---|---|
+| 400 | Paramètre manquant ou mal formé |
+| 401 | Clé API absente ou invalide |
+| 403 | **Crédit insuffisant** (pas 402 comme on pourrait s'y attendre) |
+| 404 | Ressource introuvable |
+| 5xx | Erreur serveur KIRI, rare |
+
+Notre route doit distinguer explicitement le 403 ("recharger des
+crédits") du 401 ("clé invalide, vérifier la config") plutôt que les
+traiter comme une erreur générique.
+
+**Codes détaillés (`code` dans le corps de la réponse, notamment sur les
+5xx)** :
+
+| Code | Sens | Action côté Vorae |
+|---|---|---|
+| 2000 | Modèle en cours de traitement | Normal, continuer à sonder `getStatus` |
+| 2001 | Échec de génération, lien de téléchargement impossible | Marquer le `ScanJob` `failed`, informer le restaurateur |
+| 2002 | Modèle expiré | Correspond au statut 4 - le plat doit être re-scanné, un crédit est reperdu |
+| 2003 | Statut du modèle impossible à récupérer | Retenter, puis marquer en erreur si ça persiste |
+| 2004 | Photoset vide | Erreur de validation - à intercepter **avant** l'appel API pour ne pas gaspiller un crédit |
+| 2005 | Trop de photos envoyées (max 300) | Idem, validation côté client dans S47-07 |
+| 2006 | Modèle introuvable, mauvais numéro de série | Bug côté Vorae si ça arrive, à logger sérieusement |
+| 2007 | Pas assez d'images (min 20) | Idem 2004/2005, validation avant envoi |
+| 2008 | Modèle en file d'attente | Normal, continuer à sonder |
+| 2009 | Vidéo non conforme (durée, résolution) | Validation côté client : max 3 min, 1920x1080 |
+| 2010 | Format de fichier non conforme | Vérifier `fileFormat` avant l'appel |
+
+Les codes 2004, 2005, 2007, 2009 et 2010 sont tous évitables par une
+validation côté client **avant** d'appeler l'API - à construire dans
+l'interface du dashboard (S47-07), pour ne jamais dépenser un crédit sur
+une requête vouée à échouer.
 
 ### Plan B conservé : RealityScan 2.1 (Epic)
 
