@@ -55,13 +55,6 @@ export function GlobeSection() {
     const blipDots = dots.filter((_, i) => i % 53 === 0);
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let rotation = 0;
-    // Rotation manuelle ajoutee par le glisser : persiste apres le
-    // relachement, la rotation automatique repart de la ou l'utilisateur
-    // a laisse le globe plutot que de sauter en arriere.
-    let dragOffset = 0;
-    let dragging = false;
-    let dragStartX = 0;
-    let dragStartOffset = 0;
     // Point de pression ("presser l'eponge") : une force qui monte vite a
     // l'appui, puis revient lentement en oscillant au relachement, cf.
     // son usage dans draw() plus bas. `releaseStrength` et `releasedAt`
@@ -128,7 +121,7 @@ export function GlobeSection() {
 
     function project(lat: number, lon: number, cx: number, cy: number, r: number) {
       const latRad = (lat * Math.PI) / 180;
-      const lonRad = ((lon + rotation + dragOffset) * Math.PI) / 180;
+      const lonRad = ((lon + rotation) * Math.PI) / 180;
       const x = Math.cos(latRad) * Math.sin(lonRad);
       const y = Math.sin(latRad);
       const z = Math.cos(latRad) * Math.cos(lonRad);
@@ -148,11 +141,9 @@ export function GlobeSection() {
       if (!canvas || !ctx) return;
       const delta = now - lastTime;
       lastTime = now;
-      if (!reduced && !dragging) {
+      if (!reduced) {
         // Un tour complet en environ 60 secondes, indépendamment du
-        // nombre d'images par seconde de l'appareil. Suspendu pendant le
-        // glisser pour ne pas cumuler avec le geste de l'utilisateur ;
-        // reprend ensuite exactement d'où il l'a laissé.
+        // nombre d'images par seconde de l'appareil.
         rotation += (delta / 60000) * 360;
       }
 
@@ -199,7 +190,14 @@ export function GlobeSection() {
         if (now - ripples[i].start > RIPPLE_MS) ripples.splice(i, 1);
       }
       const rippleFronts = ripples.map((ripple) => {
-        const age = (now - ripple.start) / RIPPLE_MS;
+        // `now` vient du timestamp de requestAnimationFrame, `ripple.start`
+        // de performance.now() pris dans le gestionnaire d'evenement : les
+        // deux horloges sont censees concorder, mais un appui juste avant
+        // le prochain frame peut renvoyer un `age` legerement negatif. Sans
+        // le clamp, (1 - Math.pow(1 - age, 2)) passe sous zero et
+        // `ctx.arc` plante avec un rayon negatif - reproduit en testant un
+        // glisser rapide sur le globe.
+        const age = Math.max(0, Math.min(1, (now - ripple.start) / RIPPLE_MS));
         return {
           x: ripple.x,
           y: ripple.y,
@@ -359,32 +357,28 @@ export function GlobeSection() {
       if (running) raf = requestAnimationFrame(draw);
     }
 
-    // Glisser pour tourner le globe soi-meme, en plus de la rotation
-    // automatique. `setPointerCapture` garde les evenements meme si le
-    // doigt/curseur sort du canvas pendant le geste.
+    // Presser le globe (eponge + ondes), sans pouvoir le faire tourner au
+    // glisser : une premiere version ajoutait une rotation manuelle au
+    // glisser, mais bouger le doigt/curseur pendant l'appui deplacait le
+    // point de pression en meme temps que la sphere tournait sous lui,
+    // ce qui perturbait visiblement les ondes, et tourner vite provoquait
+    // des sauts visibles. `setPointerCapture` garde les evenements meme
+    // si le doigt/curseur sort du canvas pendant le geste.
     function toCanvasPoint(e: PointerEvent) {
       const rect = canvas!.getBoundingClientRect();
       return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
     function onPointerDown(e: PointerEvent) {
-      dragging = true;
-      dragStartX = e.clientX;
-      dragStartOffset = dragOffset;
       const pt = toCanvasPoint(e);
       press.active = true;
       press.x = pt.x;
       press.y = pt.y;
       addRipple(pt.x, pt.y);
       canvas!.setPointerCapture(e.pointerId);
-      canvas!.style.cursor = "grabbing";
     }
 
     function onPointerMove(e: PointerEvent) {
-      if (dragging) {
-        const deltaX = e.clientX - dragStartX;
-        dragOffset = dragStartOffset + deltaX * 0.25;
-      }
       if (press.active) {
         const pt = toCanvasPoint(e);
         press.x = pt.x;
@@ -393,7 +387,6 @@ export function GlobeSection() {
     }
 
     function onPointerUp(e: PointerEvent) {
-      dragging = false;
       if (press.active) {
         // Fige l'etat au relachement : le retour a la forme au repos se
         // calcule ensuite sur une horloge, cf. PRESS_RECOVER_MS.
@@ -403,10 +396,8 @@ export function GlobeSection() {
       }
       press.active = false;
       canvas!.releasePointerCapture(e.pointerId);
-      canvas!.style.cursor = "grab";
     }
 
-    canvas.style.cursor = "grab";
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerup", onPointerUp);
@@ -476,10 +467,10 @@ export function GlobeSection() {
 
       {/* Le globe est masqué en bas pour se fondre dans la section
           suivante plutôt que de s'arrêter sur une ligne nette. Manipulable
-          à la souris/au doigt (glisser pour tourner, appuyer pour
-          l'enfoncer), cf. le useEffect ci-dessus. */}
+          à la souris/au doigt (appuyer pour l'enfoncer), cf. le useEffect
+          ci-dessus. */}
       <div className="relative mx-auto mt-2 h-[300px] w-full max-w-[1100px] [mask-image:linear-gradient(to_bottom,#000_55%,transparent)] sm:h-[380px]">
-        <canvas ref={canvasRef} className="h-full w-full touch-pan-y" aria-hidden />
+        <canvas ref={canvasRef} className="h-full w-full" aria-hidden />
       </div>
     </section>
   );

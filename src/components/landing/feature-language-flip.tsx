@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Languages } from "lucide-react";
 
 // Visuel de la section "Langues" : le nom du plat bascule d'une langue à
@@ -50,6 +50,7 @@ export function FeatureLanguageFlip({
   label: string;
 }) {
   const [step, setStep] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const flashSteps = names.length * FLASH_SWEEPS;
   const totalSteps = flashSteps + names.length;
@@ -68,8 +69,35 @@ export function FeatureLanguageFlip({
     return () => clearTimeout(id);
   }, [step, flashSteps, totalSteps]);
 
+  // La carte tourne en boucle dès le montage : sans ça, un visiteur qui
+  // scrolle jusqu'ici arrive au hasard dans le cycle et rate souvent le
+  // flash-back (2 balayages rapides sur ~2s, contre ~2.2s par langue en
+  // lecture posée - la fenêtre pour voir le flash-back est courte). On
+  // relance donc `step` à 0 à chaque fois que la carte entre dans le
+  // cadre, pour que le flash-back se (re)joue systématiquement au moment
+  // où le user la découvre.
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStep(0);
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-card border border-white/[0.08] bg-background">
+    <div
+      ref={containerRef}
+      className="relative aspect-[4/3] w-full overflow-hidden rounded-card border border-white/[0.08] bg-background"
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/2 h-[130%] w-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--secondary)/0.5),transparent)]"

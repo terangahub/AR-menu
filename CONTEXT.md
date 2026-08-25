@@ -405,6 +405,31 @@ concerné - cette liste est un résumé, pas la seule source.
   test automatique ne l'aurait vu (le texte est bien dans le DOM et
   `innerText` le renvoie) : c'est la relecture des captures d'écran qui
   l'a révélé.
+- **Une animation en boucle continue depuis le montage rate son propre
+  effet dès qu'elle est censée être vue au scroll.** La carte
+  Accessibilité tournait en boucle dès le chargement de la page : le
+  flash-back rapide (~2,3s) n'occupe qu'une petite fraction d'un cycle
+  total de ~24s, donc un visiteur qui scrolle jusqu'à la carte arrive le
+  plus souvent en pleine phase lente et ne voit jamais le flash-back.
+  Corrigé avec le même idiome que `Reveal` (`IntersectionObserver` sur le
+  conteneur de la carte), qui remet l'étape à 0 à chaque entrée dans le
+  cadre. **Toute animation en boucle dont le début compte doit se
+  déclencher/relancer à l'entrée dans le viewport, pas au montage.**
+- **`ctx.arc()` plante avec `IndexSizeError` si le rayon calculé est
+  négatif, même de très peu.** Sur le globe, l'anneau d'une onde de choc
+  se calcule à partir de `age = (now - ripple.start) / RIPPLE_MS`, où
+  `now` vient du timestamp de `requestAnimationFrame` et `ripple.start`
+  de `performance.now()` pris dans le gestionnaire `pointerdown`/
+  `pointerup`. Les deux horloges sont censées concorder, mais un appui
+  juste avant le prochain frame peut renvoyer un `age` légèrement négatif
+  (quelques millisecondes), ce qui rend `(1 - Math.pow(1 - age, 2))`
+  négatif et donc le rayon de l'anneau aussi. Reproduit de façon fiable
+  avec un glisser rapide et répété sur le globe (confirmé avec un
+  `CanvasRenderingContext2D.prototype.arc` instrumenté en Playwright).
+  Corrigé en bornant `age` à `[0, 1]`. **Ne jamais faire confiance à ce
+  que deux horloges différentes (event timestamp vs `now` de rAF)
+  produisent un delta positif ; borner toute valeur dérivée d'un delta de
+  temps avant de l'utiliser comme rayon.**
 
 ---
 
