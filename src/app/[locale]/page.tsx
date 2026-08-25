@@ -1,40 +1,87 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/landing/reveal";
 import { SiteHeader } from "@/components/landing/site-header";
 import { PricingSection } from "@/components/landing/pricing-section";
-import { Sparkles, ShieldCheck, Languages, ScanLine, Box, UtensilsCrossed } from "lucide-react";
+import { TrustedMarquee } from "@/components/landing/trusted-marquee";
+import { ReviewsSection } from "@/components/landing/reviews-section";
+import { AboutSection } from "@/components/landing/about-section";
+import { BackToTop } from "@/components/landing/back-to-top";
+import { GlobeSection } from "@/components/landing/globe-section";
+import { ProductMockup } from "@/components/landing/product-mockup";
+import { FeatureField } from "@/components/landing/feature-field";
+import { LoopingVideo } from "@/components/landing/looping-video";
+import { FeatureAllergenRing } from "@/components/landing/feature-allergen-ring";
+import { FeatureLanguageFlip } from "@/components/landing/feature-language-flip";
+import {
+  ShieldCheck,
+  Languages,
+  ScanLine,
+  Box,
+  UtensilsCrossed,
+  MessageSquareOff,
+  Sparkles,
+} from "lucide-react";
+
+// Le contenu des champs "Service" et "Allergènes" vit dans les fichiers
+// de traduction (`Landing.fields`) : ce sont des phrases et des mots de
+// vocabulaire, ils doivent suivre la langue de la page. next-intl ne
+// gérant pas les tableaux dans ses messages, chaque liste y est stockée
+// en une seule chaîne, séparée par ce caractère.
+const FIELD_SEPARATOR = " | ";
+
+// Les langues, elles, restent ici : la liste EST le contenu (le même plat
+// écrit dans douze langues). La traduire n'aurait aucun sens, c'est
+// justement le fait qu'elle ne change pas qui illustre le propos.
+const LANGUAGE_WORDS = {
+  languages: [
+    "Bol signature",
+    "Signature bowl",
+    "Cuenco de autor",
+    "Signature-Bowl",
+    "Ciotola signature",
+    "招牌碗",
+    "시그니처 볼",
+    "シグネチャーボウル",
+    "وعاء مميز",
+    "Tigela assinatura",
+    "Фирменная чаша",
+    "Handtekening kom",
+  ],
+} as const;
 
 // Landing marketing - direction reflect.app (voir CONTEXT.md pour la
 // justification du remplacement de palette). Force le thème sombre
 // localement : reflect.app n'a pas de mode clair, le dashboard garde sa
-// préférence système par défaut (voir [locale]/layout.tsx). Les pages
-// /privacy et /terms n'existent pas encore (hors périmètre Sprint 3/4),
-// les liens du footer restent des ancres # en attendant.
+// préférence système par défaut (voir [locale]/layout.tsx).
 export default function Home() {
   const t = useTranslations("Landing");
 
   const features = [
     {
-      icon: Sparkles,
+      icon: MessageSquareOff,
       eyebrow: t("features.feature1Eyebrow"),
       title: t("features.feature1Title"),
       body: t("features.feature1Body"),
-      image: "/dish-signature-bowl.jpg",
+      words: t("fields.service").split(FIELD_SEPARATOR),
+      fieldLabel: t("features.field1Label"),
     },
     {
       icon: ShieldCheck,
       eyebrow: t("features.feature2Eyebrow"),
       title: t("features.feature2Title"),
       body: t("features.feature2Body"),
-      image: "/dish-salad.jpg",
+      words: t("fields.allergens").split(FIELD_SEPARATOR),
+      fieldLabel: t("features.field2Label"),
     },
     {
       icon: Languages,
       eyebrow: t("features.feature3Eyebrow"),
       title: t("features.feature3Title"),
       body: t("features.feature3Body"),
-      image: "/dish-pasta.jpg",
+      words: LANGUAGE_WORDS.languages,
+      fieldLabel: t("features.field3Label"),
     },
   ];
 
@@ -50,7 +97,7 @@ export default function Home() {
 
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden px-5 pb-28 pt-36 sm:pt-44">
+        <section className="relative isolate overflow-hidden px-5 pb-28 pt-36 sm:pt-44">
           {/* Aurore de fond : dégradé radial large + orbe centrale floue.
               Deux couches distinctes pour éviter un halo trop uniforme. */}
           <div
@@ -104,33 +151,18 @@ export default function Home() {
               </div>
             </Reveal>
 
+            {/* Le hero montre l'interface du produit. Une photo de plat
+                achetee y figurait avant : jolie, mais elle ne disait pas
+                ce que fait Vorae. */}
             <Reveal delayMs={340}>
-              <div className="relative mx-auto mt-20 max-w-4xl">
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -inset-x-10 -top-10 bottom-10 -z-10 rounded-full bg-secondary/25 blur-3xl"
-                />
-                <div className="border-gradient overflow-hidden rounded-card bg-card shadow-[0_30px_120px_-30px_hsl(var(--secondary))]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/hero-dish.jpg"
-                    alt=""
-                    className="aspect-[16/10] w-full object-cover"
-                  />
-                </div>
-                {/* Reflet sous l'image - l'illusion d'une surface polie,
-                    masqué en dégradé pour s'éteindre progressivement. */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none mx-auto h-24 w-[85%] scale-y-[-1] overflow-hidden rounded-card opacity-25 [mask-image:linear-gradient(to_top,#000,transparent)]"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/hero-dish.jpg" alt="" className="w-full object-cover" />
-                </div>
+              <div className="relative mx-auto mt-24 max-w-4xl">
+                <ProductMockup />
               </div>
             </Reveal>
           </div>
         </section>
+
+        <TrustedMarquee />
 
         {/* Early access / social proof */}
         <section className="px-5">
@@ -152,7 +184,7 @@ export default function Home() {
         </section>
 
         {/* Product preview */}
-        <section className="relative px-5 py-28 sm:py-36">
+        <section className="relative isolate px-5 py-28 sm:py-36">
           <div className="mx-auto max-w-[1100px] text-center">
             <Reveal>
               <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground">
@@ -172,13 +204,9 @@ export default function Home() {
                   className="pointer-events-none absolute -inset-8 -z-10 rounded-full bg-secondary/30 blur-3xl"
                 />
                 <div className="border-gradient relative overflow-hidden rounded-card bg-card shadow-[0_30px_120px_-30px_hsl(var(--secondary))]">
-                  <video
+                  <LoopingVideo
                     src="/hero-video.mp4"
                     poster="/hero-dish.jpg"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
                     className="aspect-video w-full object-cover"
                   />
                   <div className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full border border-white/15 bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md">
@@ -206,8 +234,16 @@ export default function Home() {
             </Reveal>
 
             <div className="relative mt-16">
-              {/* Ligne de liaison entre les 3 étapes (desktop seulement) :
-                  matérialise la progression scan vers AR vers commande. */}
+              {/* Ligne de liaison entre les 3 étapes : matérialise la
+                  progression scan vers AR vers commande. Horizontale au
+                  centre des icônes en desktop (grille en 3 colonnes),
+                  verticale sur la même colonne d'icônes en mobile (cartes
+                  empilées) : même idée, orientation adaptée à la mise en
+                  page. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 top-15 hidden h-[calc(100%-7.5rem)] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/30 to-transparent max-sm:block"
+              />
               <div
                 aria-hidden
                 className="pointer-events-none absolute left-0 right-0 top-[3.25rem] hidden h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent sm:block"
@@ -238,13 +274,13 @@ export default function Home() {
         </section>
 
         {/* Features - 3 rangées alternées */}
-        <section id="features" className="relative px-5 py-28 sm:py-36">
+        <section id="features" className="relative isolate px-5 py-28 sm:py-36">
           <div
             aria-hidden
             className="pointer-events-none absolute right-0 top-1/3 -z-10 h-[500px] w-[500px] rounded-full bg-[radial-gradient(closest-side,hsl(var(--secondary)/0.22),transparent)] blur-2xl"
           />
           <div className="mx-auto max-w-[1100px]">
-            <Reveal>
+            <Reveal durationMs={500}>
               <div className="text-center">
                 <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs uppercase tracking-[0.14em] text-muted-foreground">
                   {t("features.eyebrow")}
@@ -256,7 +292,7 @@ export default function Home() {
                 const Icon = feature.icon;
                 const reversed = i % 2 === 1;
                 return (
-                  <Reveal key={feature.title}>
+                  <Reveal key={feature.title} durationMs={500}>
                     <div
                       className={`flex flex-col items-center gap-10 sm:flex-row sm:gap-16 ${
                         reversed ? "sm:flex-row-reverse" : ""
@@ -267,19 +303,34 @@ export default function Home() {
                           aria-hidden
                           className="pointer-events-none absolute -inset-6 -z-10 rounded-full bg-secondary/25 blur-3xl"
                         />
-                        <div className="border-gradient overflow-hidden rounded-card bg-card shadow-[0_20px_70px_-25px_hsl(var(--secondary))]">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={feature.image}
-                            alt=""
-                            className="aspect-[4/3] w-full object-cover"
-                          />
-                          {/* Voile sombre en bas : ancre l'image dans le
-                              fond de page au lieu d'un bord net qui flotte. */}
-                          <div
-                            aria-hidden
-                            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/70 to-transparent"
-                          />
+                        <div className="border-gradient overflow-hidden rounded-card shadow-[0_20px_70px_-25px_hsl(var(--secondary))]">
+                          {/* Une mécanique visuelle différente par carte
+                              (champ défilant, anneau, bascule) plutôt que
+                              le même champ de texte répété trois fois.
+                              Le champ défilant est conservé pour Service,
+                              à la demande du client : la variante en
+                              bulles de conversation essayée à sa place
+                              donnait un empilement illisible. */}
+                          {i === 0 && (
+                            <FeatureField
+                              words={[...feature.words]}
+                              icon={Icon}
+                              label={feature.fieldLabel}
+                            />
+                          )}
+                          {i === 1 && (
+                            <FeatureAllergenRing
+                              tags={feature.words}
+                              icon={Icon}
+                              label={feature.fieldLabel}
+                            />
+                          )}
+                          {i === 2 && (
+                            <FeatureLanguageFlip
+                              names={feature.words}
+                              label={feature.fieldLabel}
+                            />
+                          )}
                         </div>
                       </div>
 
@@ -307,7 +358,13 @@ export default function Home() {
           </div>
         </section>
 
+        <ReviewsSection />
+
+        <AboutSection />
+
         <PricingSection />
+
+        <GlobeSection />
 
         {/* FAQ */}
         <section className="px-5 py-28 sm:py-36">
@@ -366,48 +423,102 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 px-5 py-16">
-        <div className="mx-auto flex max-w-[1100px] flex-col gap-12 sm:flex-row sm:justify-between">
-          <div>
-            <span className="flex items-center gap-2.5 font-heading text-lg font-medium tracking-tight">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/25 to-secondary/40 ring-1 ring-white/10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-icon.png" alt="" className="h-5 w-5" />
-              </span>
-              Vorae
-            </span>
-            <p className="mt-4 max-w-xs text-sm text-muted-foreground">{t("footer.tagline")}</p>
-          </div>
-          <div className="flex gap-16 text-sm">
-            <div className="flex flex-col gap-3">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                {t("footer.product")}
-              </span>
-              <a href="#features" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.features")}
-              </a>
-              <a href="#pricing" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.pricing")}
-              </a>
-            </div>
-            <div className="flex flex-col gap-3">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                {t("footer.legal")}
-              </span>
-              <a href="#" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.privacy")}
-              </a>
-              <a href="#" className="text-foreground/80 transition-colors hover:text-foreground">
-                {t("footer.terms")}
-              </a>
-            </div>
-          </div>
+      {/* Footer : la carte de marque repose sur trois choses, aucune
+          n'invente de contenu. Un trait qui defile en haut (meme famille
+          visuelle que le balayage du globe et le trait du coeur des avis,
+          plutot qu'un motif isole). Le mot "VORAE" en tres grand et tres
+          pale en fond, coupe par le cadre - technique courante des sites
+          de produit premium (Linear, Vercel), qui donne du poids a la
+          marque sans rien ajouter de factice. Et une troisieme colonne de
+          liens ("Entreprise") qui n'existait pas, pour ne plus avoir deux
+          maigres colonnes cote a cote. `isolate` : sans lui le fond -z-10
+          se peint sous l'aplat du wrapper racine au lieu de derriere le
+          texte, cf. CONTEXT.md. */}
+      <footer className="relative isolate overflow-hidden border-t border-white/10 px-5 pb-10 pt-20">
+        <div aria-hidden className="footer-scanline pointer-events-none absolute inset-x-0 top-0 h-px" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 flex justify-center overflow-hidden"
+        >
+          <span className="translate-y-[22%] select-none whitespace-nowrap font-heading text-[26vw] font-medium leading-none tracking-tighter text-foreground/[0.05] sm:text-[15vw]">
+            VORAE
+          </span>
         </div>
-        <p className="mx-auto mt-12 max-w-[1100px] border-t border-white/[0.06] pt-8 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Vorae. {t("footer.rights")}
-        </p>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 left-1/2 -z-10 h-72 w-[70%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--secondary)/0.2),transparent)] blur-3xl"
+        />
+
+        <div className="relative mx-auto max-w-[1100px]">
+          <div className="flex flex-col gap-14 sm:flex-row sm:justify-between">
+            <div className="max-w-xs">
+              <span className="flex items-center gap-2.5 font-heading text-lg font-medium tracking-tight">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/25 to-secondary/40 ring-1 ring-white/10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/logo-icon.png" alt="" className="h-5 w-5" />
+                </span>
+                Vorae
+              </span>
+              <p className="mt-4 text-sm text-muted-foreground">{t("footer.tagline")}</p>
+              <p className="mt-2 text-xs text-muted-foreground/70">{t("footer.madeIn")}</p>
+              <Button size="sm" className="mt-6" asChild>
+                <Link href="/dashboard">{t("footer.cta")}</Link>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-10 gap-y-10 text-sm sm:grid-cols-3 sm:gap-x-16">
+              <div className="flex flex-col gap-3">
+                <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("footer.product")}
+                </span>
+                <a href="#features" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.features")}
+                </a>
+                <a href="#how-it-works" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.howItWorks")}
+                </a>
+                <a href="#pricing" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.pricing")}
+                </a>
+                <a href="#reviews" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.reviews")}
+                </a>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("footer.company")}
+                </span>
+                <a href="#about" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.about")}
+                </a>
+                <a
+                  href="mailto:bonjour@vorae.app"
+                  className="text-foreground/80 transition-colors hover:text-foreground"
+                >
+                  {t("footer.contact")}
+                </a>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("footer.legal")}
+                </span>
+                <Link href="/privacy" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.privacy")}
+                </Link>
+                <Link href="/terms" className="text-foreground/80 transition-colors hover:text-foreground">
+                  {t("footer.terms")}
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-16 border-t border-white/[0.06] pt-8 text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Vorae. {t("footer.rights")}
+          </p>
+        </div>
       </footer>
+
+      <BackToTop />
     </div>
   );
 }

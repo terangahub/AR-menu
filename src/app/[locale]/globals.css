@@ -8,37 +8,43 @@
    "Palette reflect.app, pas la palette Vorae de la section 13"). Convertie
    en HSL pour les tokens `hsl(var(--x))` déjà en place.
 
-   reflect.app ne mesure qu'un thème sombre - aucune valeur claire n'existe
-   dans la source. Le mode clair ci-dessous est dérivé (même famille de
-   teintes, luminosité inversée) pour conserver le bascule sombre/clair du
-   dashboard (section 13.4 du cahier, toujours valide) ; ce n'est pas une
-   valeur "mesurée" au même titre que le reste. --destructive/--success
-   n'existent pas non plus dans la palette reflect.app (page marketing,
-   pas de besoin d'états d'erreur) - conservées de la palette Vorae
-   d'origine, seul le dashboard en a l'usage. */
+   reflect.app ne mesure qu'un thème sombre : aucune valeur claire
+   n'existe dans la source. Le mode clair ci-dessous n'est donc pas une
+   inversion mécanique du sombre, il est construit à part, autour du
+   violet de marque, et chaque paire texte/fond a été vérifiée en
+   contraste WCAG AA (section 17.5 du cahier). Les ratios obtenus sont
+   notés en commentaire.
+
+   Deux inversions volontaires par rapport au sombre :
+   - en sombre, `--primary` est un lavande très clair posé sur du texte
+     sombre ; en clair, c'est le violet profond de marque posé sur du
+     blanc. Le rôle (couleur d'action) est conservé, la valeur s'inverse.
+   - `--secondary` sert de fond de pastille en clair, alors qu'il sert de
+     violet de halo en sombre. Les halos de la landing ne concernent que
+     le sombre, la landing forçant ce thème. */
 @layer base {
   :root {
-    --background: 249 30% 98%;
-    --foreground: 248 40% 12%;
+    --background: 250 40% 99%;
+    --foreground: 250 45% 11%; /* 18.0:1 sur le fond */
     --card: 0 0% 100%;
-    --card-foreground: 248 40% 12%;
+    --card-foreground: 250 45% 11%; /* 18.6:1 sur la carte */
     --popover: 0 0% 100%;
-    --popover-foreground: 248 40% 12%;
-    --primary: 300 44% 45%;
+    --popover-foreground: 250 45% 11%;
+    --primary: 264 70% 45%; /* 8.0:1 en texte, 8.2:1 avec du blanc dessus */
     --primary-foreground: 0 0% 100%;
-    --secondary: 264 71% 40%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 14% 93%;
-    --muted-foreground: 240 10% 40%;
-    --accent: 240 14% 93%;
-    --accent-foreground: 248 40% 12%;
-    --destructive: 7 53% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --success: 146 45% 40%;
-    --success-foreground: 0 0% 98%;
-    --border: 240 14% 88%;
-    --input: 240 14% 88%;
-    --ring: 300 44% 45%;
+    --secondary: 264 55% 95%;
+    --secondary-foreground: 264 70% 30%; /* 10.8:1 sur la pastille */
+    --muted: 250 30% 96%;
+    --muted-foreground: 250 12% 42%; /* 6.0:1 sur le fond */
+    --accent: 250 30% 96%;
+    --accent-foreground: 250 45% 11%;
+    --destructive: 0 65% 45%; /* 5.8:1 */
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 32%; /* 4.8:1 */
+    --success-foreground: 0 0% 100%;
+    --border: 250 18% 84%;
+    --input: 250 18% 84%;
+    --ring: 264 70% 45%;
     --radius: 7px;
     --radius-card: 24px;
   }
@@ -89,6 +95,18 @@
 @layer components {
   .input {
     @apply rounded-md border border-input bg-background px-3 py-1.5 text-sm;
+  }
+
+  /* Zone qui défile sans montrer sa barre de défilement : utilisé à
+     l'intérieur de la maquette de téléphone du hero, où une barre
+     grise de navigateur trahirait tout de suite que ce n'est pas un
+     vrai écran de téléphone. Le contenu reste bien défilable, seule
+     la barre est masquée. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 
   /* --- Utilitaires visuels de la landing ---
@@ -156,11 +174,252 @@
     box-shadow: 0 0 80px -16px hsl(var(--secondary) / 0.75);
   }
 
+  /* Défilement infini (bandeaux et mur d'avis). Le contenu doit être
+     dupliqué exactement une fois dans le JSX : la translation de -50%
+     ramène alors la copie pile à la position de l'original, la boucle est
+     invisible. Reprise de l'implémentation de webglow.ca. */
+  @keyframes infinite-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-infinite-scroll {
+    animation: infinite-scroll 60s linear infinite;
+  }
+  .group:hover .animate-infinite-scroll {
+    animation-play-state: paused;
+  }
+
+  /* Particules qui montent et s'effacent (fond de la section À propos). */
+  @keyframes float-up {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0;
+    }
+    20%,
+    80% {
+      opacity: 0.55;
+    }
+    100% {
+      transform: translateY(-120px) scale(0);
+      opacity: 0;
+    }
+  }
+  .animate-float-up {
+    animation: float-up 10s linear infinite;
+  }
+
+  /* Badges qui flottent autour du telephone du hero (product-mockup.tsx) :
+     un leger va-et-vient vertical, sans jamais se superposer au telephone
+     grace a leurs positions figees en dur dans le composant. */
+  @keyframes float-badge {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  .animate-float-badge {
+    animation: float-badge 4.5s ease-in-out infinite;
+  }
+
+  /* Vue AR du telephone (product-mockup.tsx) : reticule qui pulse sur la
+     surface detectee, et plat qui flotte doucement au-dessus. */
+  @keyframes ar-scan-ring {
+    0% {
+      transform: scale(0.6);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+  .ar-scan-ring {
+    animation: ar-scan-ring 2.2s ease-out infinite;
+  }
+  @keyframes ar-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  .ar-float {
+    animation: ar-float 3s ease-in-out infinite;
+  }
+
+  /* Étoile filante : un point dont la traînée (::before, dégradé qui
+     s'éteint vers l'arrière) glisse en diagonale et s'efface. L'élément
+     est pré-tourné en JSX (transform: rotate) selon l'angle de chaque
+     étoile ; l'animation ne translate qu'en X, dans le repère déjà
+     tourné, ce qui donne un mouvement diagonal sans recalculer de
+     vecteur par étoile. */
+  .shooting-star {
+    position: relative;
+    animation: shooting-star linear infinite;
+    box-shadow: 0 0 6px 1px hsl(var(--primary) / 0.8);
+  }
+  .shooting-star::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    width: 64px;
+    height: 1px;
+    background: linear-gradient(to left, hsl(var(--primary) / 0.7), transparent);
+    transform: translateY(-50%);
+  }
+  @keyframes shooting-star {
+    0% {
+      transform: translateX(-40px);
+      opacity: 0;
+    }
+    10%,
+    75% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(220px);
+      opacity: 0;
+    }
+  }
+
+  /* Trait lumineux qui parcourt le contour du coeur de la section Avis
+     en boucle (cf. reviews-section.tsx, l'attribut `pathLength="1"` sur
+     le path concerné normalise dasharray/dashoffset en fraction du
+     tracé : la boucle reste exacte quelle que soit la longueur réelle
+     de la courbe). */
+  @keyframes heart-trace {
+    to {
+      stroke-dashoffset: -1;
+    }
+  }
+  .heart-trace {
+    animation: heart-trace 5s linear infinite;
+  }
+
+  /* Bordure animée : même idée que `.border-gradient`, un pseudo-élément
+     peint le dégradé et le masque n'en garde que l'épaisseur, mais le
+     dégradé est conique et tourne en continu (via la propriété
+     enregistrée `--border-angle`, qui rend l'angle animable en CSS pur).
+     Lit comme une lumière qui parcourt le contour de la carte en boucle,
+     demandé pour la carte "Croissance" du tarif. */
+  @property --border-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .border-gradient-animated {
+    position: relative;
+  }
+  .border-gradient-animated::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 0%,
+      hsl(var(--secondary) / 0.4) 6%,
+      hsl(var(--primary)) 12%,
+      hsl(var(--secondary) / 0.4) 18%,
+      transparent 30%,
+      transparent 100%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: border-spin 3.5s linear infinite;
+  }
+  @keyframes border-spin {
+    to {
+      --border-angle: 360deg;
+    }
+  }
+
+  /* Ligne d'accent qui glisse le long du haut du footer, en boucle. Un
+     dégradé deux fois plus large que son conteneur, dont on anime la
+     position plutôt que sa forme : moins coûteux qu'une transformation,
+     et le motif reste net à toutes les tailles d'écran. */
+  @keyframes footer-scanline {
+    to {
+      background-position: -200% 0;
+    }
+  }
+  .footer-scanline {
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      hsl(var(--primary) / 0.7) 45%,
+      hsl(var(--secondary) / 0.7) 55%,
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: footer-scanline 8s linear infinite;
+  }
+
+  /* Des mécaniques distinctes pour les cartes "Pourquoi Vorae" : avant,
+     les trois utilisaient le même champ de texte défilant, ce qui les
+     faisait paraître interchangeables malgré des messages différents.
+     Service garde ce champ défilant (cf. feature-field.tsx), Allergènes
+     et Langues ont chacune la leur (feature-allergen-ring.tsx,
+     feature-language-flip.tsx). La bascule des langues est pilotée en
+     JavaScript et non ici, cf. le commentaire en tête de ce composant. */
+
+  /* Pastilles d'allergènes qui s'illuminent à tour de rôle autour de
+     l'anneau (section Allergènes). */
+  @keyframes allergen-pulse {
+    0%,
+    88%,
+    100% {
+      border-color: hsl(0 0% 100% / 0.1);
+      background-color: hsl(0 0% 100% / 0.06);
+      color: hsl(var(--foreground) / 0.7);
+      box-shadow: none;
+    }
+    6% {
+      border-color: hsl(var(--primary) / 0.7);
+      background-color: hsl(var(--primary) / 0.18);
+      color: hsl(var(--foreground));
+      box-shadow: 0 0 16px -2px hsl(var(--primary) / 0.7);
+    }
+  }
+  .allergen-tag {
+    animation: allergen-pulse 6s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .surface-card,
     .surface-card:hover {
       transform: none;
       transition: none;
+    }
+    .animate-infinite-scroll,
+    .animate-float-up,
+    .shooting-star,
+    .heart-trace,
+    .footer-scanline,
+    .allergen-tag,
+    .animate-float-badge,
+    .ar-scan-ring,
+    .ar-float,
+    .border-gradient-animated::before {
+      animation: none;
+    }
+    .heart-trace {
+      stroke-dasharray: none;
     }
   }
 

@@ -104,7 +104,7 @@ export function PricingSection() {
   });
 
   return (
-    <section id="pricing" className="relative px-5 py-28 sm:py-36">
+    <section id="pricing" className="relative isolate px-5 py-28 sm:py-36">
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-1/4 -z-10 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,hsl(var(--secondary)/0.28),transparent)] blur-2xl"
@@ -142,7 +142,7 @@ export function PricingSection() {
                 <div
                   className={`surface-card flex h-full flex-col gap-7 p-7 ${
                     highlighted
-                      ? "border-gradient !from-secondary/25 !to-white/[0.02] shadow-[0_0_60px_-20px_hsl(var(--secondary)/0.9)] sm:-my-3 sm:py-10"
+                      ? "border-gradient-animated !from-secondary/25 !to-white/[0.02] shadow-[0_0_60px_-20px_hsl(var(--secondary)/0.9)] sm:-my-3 sm:py-10"
                       : ""
                   }`}
                 >

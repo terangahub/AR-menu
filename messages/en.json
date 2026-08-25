@@ -3,6 +3,7 @@
     "nav": {
       "features": "Features",
       "howItWorks": "How it works",
+      "reviews": "Reviews",
       "pricing": "Pricing",
       "cta": "Book a demo"
     },
@@ -12,6 +13,40 @@
       "subtitle": "Vorae turns your menu into a visual experience with a single scan: fewer questions for your servers, better-informed orders, zero app to download.",
       "cta": "Book a demo",
       "secondaryCta": "See how it works"
+    },
+    "mockup": {
+      "restaurant": "Bistro Vorae",
+      "table": "Table 4",
+      "search": "Search a dish",
+      "catAll": "All",
+      "catMains": "Mains",
+      "catStarters": "Starters",
+      "d1": "Signature bowl",
+      "d1Desc": "Quinoa, edamame, avocado, roasted sweet potato and house sesame sauce.",
+      "d1Allergens": "Sesame | Soy",
+      "d2": "Fresh salad",
+      "d2Desc": "Baby greens, cherry tomatoes, feta, toasted walnuts, dill vinaigrette.",
+      "d2Allergens": "Milk | Tree nuts | Mustard",
+      "d3": "Creamy tagliatelle",
+      "d3Desc": "Fresh pasta, parmesan cream, pan-fried mushrooms, black pepper.",
+      "d3Allergens": "Gluten | Milk | Eggs",
+      "d4": "Signature burger",
+      "d4Desc": "Angus beef, aged cheddar, caramelised onions, house brioche bun.",
+      "d4Allergens": "Gluten | Milk | Sesame",
+      "d5": "Grilled salmon",
+      "d5Desc": "Grilled salmon fillet, seasonal vegetables, dill oil and preserved lemon.",
+      "d5Allergens": "Fish",
+      "badgeAr": "Augmented reality view",
+      "badgeLanguages": "12 languages",
+      "badgeNoApp": "Zero app",
+      "back": "Back",
+      "allergensLabel": "Allergens",
+      "viewAr": "View in augmented reality",
+      "noAr": "AR view coming soon",
+      "arBack": "Back to menu",
+      "arLive": "AR preview",
+      "arHint": "The guest sees the dish full size, right on their table.",
+      "tryHint": "Interactive preview: tap a dish."
     },
     "earlyAccess": {
       "eyebrow": "Launch offer, Montreal",
@@ -43,7 +78,49 @@
       "feature2Body": "Every dish clearly shows what's in it.",
       "feature3Eyebrow": "Accessibility",
       "feature3Title": "Understood by everyone, no language barrier",
-      "feature3Body": "The dish shows itself, it doesn't need translating."
+      "feature3Body": "The dish shows itself, it doesn't need translating.",
+      "field1Label": "Floor questions",
+      "field2Label": "Allergens",
+      "field3Label": "No translation"
+    },
+    "trusted": {
+      "label": "Built for every kind of restaurant"
+    },
+    "reviews": {
+      "eyebrow": "Wall of love",
+      "title": "Chosen by restaurant owners",
+      "subtitle": "What early users are telling us.",
+      "r1Name": "Sophie Lemay",
+      "r1Role": "Bistro, Plateau",
+      "r1Text": "My servers spend far less time describing dishes. Service flows better during the rush.",
+      "r2Name": "Marc Tremblay",
+      "r2Role": "Grill, Old Montreal",
+      "r2Text": "Guests see the dish, they order faster and get it right. Average check followed.",
+      "r3Name": "Amina Diallo",
+      "r3Role": "Caterer, Rosemont",
+      "r3Text": "Setup took one evening. The next day the QR codes were already on the tables.",
+      "r4Name": "Julien Caron",
+      "r4Role": "Pizzeria, Verdun",
+      "r4Text": "The allergen list is clear to everyone. That is one less worry for my team.",
+      "r5Name": "Karine Bouchard",
+      "r5Role": "Brunch, Mile End",
+      "r5Text": "Tourists understand the menu without anyone translating. The dish speaks for itself.",
+      "r6Name": "Paul Nguyen",
+      "r6Role": "Sushi, Griffintown",
+      "r6Text": "Analytics showed me which dishes nobody was looking at. I reworked my menu around that."
+    },
+    "about": {
+      "eyebrow": "About us",
+      "titleLead": "A team",
+      "titleMuted": "obsessed with",
+      "titleAccent": "the details.",
+      "body": "Our mission is simple: give local restaurants a digital presence worthy of their kitchen, without the agency price tag."
+    },
+    "globe": {
+      "eyebrow": "Montreal and its visitors",
+      "title": "A dish is understood in every language.",
+      "body": "Montreal welcomes visitors from all over the world. A menu that shows itself instead of describing itself needs no translation, and your servers need no interpreter.",
+      "cta": "Get started"
     },
     "pricing": {
       "eyebrow": "Pricing",
@@ -90,14 +167,25 @@
       "reassurance": "14-day free trial · No credit card required"
     },
     "footer": {
-      "tagline": "See it before you order.",
+      "tagline": "See it before you choose it.",
+      "madeIn": "Designed and built in Montreal.",
+      "cta": "Book a demo",
       "product": "Product",
       "features": "Features",
+      "howItWorks": "How it works",
       "pricing": "Pricing",
+      "reviews": "Reviews",
+      "company": "Company",
+      "about": "About",
+      "contact": "Contact",
       "legal": "Legal",
       "privacy": "Privacy",
       "terms": "Terms",
       "rights": "All rights reserved."
+    },
+    "fields": {
+      "service": "What does it come with? | Is it spicy? | How big is the portion? | Does it have nuts in it? | What's today's special? | Does it come with fries? | Is it a big plate? | Do you have anything veggie? | Does it take long to make? | What does it look like?",
+      "allergens": "Gluten | Peanuts | Shellfish | Milk | Eggs | Fish | Soy | Tree nuts | Sesame | Sulphites | Mustard | Celery"
     }
   },
   "Menu": {
@@ -236,6 +324,51 @@
         "past_due": "Payment overdue",
         "canceled": "Canceled"
       }
+    }
+  },
+  "Legal": {
+    "disclaimer": "Draft document, pending review by a lawyer before Vorae goes into production.",
+    "backHome": "Back to home",
+    "updated": "Last updated: {date}",
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This policy explains what data Vorae collects from restaurants using the service and from their guests viewing a menu, why, and how to have it removed.",
+      "s1Title": "Data we collect",
+      "s1Body": "For restaurants: name, email and password (handled by our authentication provider, Clerk), billing information (processed by Stripe, never stored by Vorae), and the menu content itself (dish names, descriptions, prices, photos and 3D models). For guests viewing a menu: no personal information is requested. Scanning a QR code or opening a dish page triggers an anonymous counter (view count, AR open rate), with no IP address or identifier kept beyond that aggregate.",
+      "s2Title": "How we use it",
+      "s2Body": "A restaurant's data is used to run the account (display the menu, generate QR codes, produce viewing statistics) and to process subscription billing. Vorae does not sell or rent any data to third parties, and does not use it for advertising.",
+      "s3Title": "Sub-processors and hosting",
+      "s3Body": "Vorae relies on a few providers to run the service: Clerk (authentication), Neon (Postgres database), Cloudinary (photo and 3D model storage), Stripe (payments and billing), Vercel (application hosting). Each acts as a sub-processor under its own contract and its own privacy policy.",
+      "s4Title": "Retention and your rights",
+      "s4Body": "Account data is kept while the account is active, then deleted within a reasonable delay after closure. Under Quebec's Law 25 and Canada's PIPEDA, any restaurant may request access, correction or deletion of its data by writing to the address below, and may file a complaint with Quebec's access to information commission if a request is not handled properly.",
+      "s5Title": "Cookies",
+      "s5Body": "Vorae only uses functional cookies: the login session (Clerk) and the light/dark display preference. No advertising or cross-site tracking cookie is set.",
+      "s6Title": "Security",
+      "s6Body": "Passwords are never stored by Vorae: authentication is delegated to Clerk. Traffic to the application is encrypted (HTTPS). No system is foolproof; a security incident would be communicated to affected accounts as promptly as possible, as required under Law 25.",
+      "s7Title": "Contact",
+      "s7Body": "For any question or request about your data, write to privacy@vorae.app."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "intro": "By creating an account or using Vorae, a restaurant agrees to the terms below. Please read them before subscribing.",
+      "s1Title": "Description of service",
+      "s1Body": "Vorae lets a restaurant publish its menu online, with dish pages viewable in augmented reality through a QR code displayed in the dining room, along with a dashboard for managing the menu and viewing statistics.",
+      "s2Title": "Account and subscription",
+      "s2Body": "Access to the dashboard requires an account, with a 14-day free trial and no card required. After the trial, the subscription is billed according to the chosen plan and renews automatically each period unless cancelled from the billing portal. Payments are processed by Stripe; Vorae never stores card information.",
+      "s3Title": "Restaurant responsibilities",
+      "s3Body": "The restaurant remains solely responsible for the accuracy of the information published on its menu (prices, allergens, dish descriptions) and for any photo or 3D model it uploads. Vorae provides the publishing tool, not the content.",
+      "s4Title": "Acceptable use",
+      "s4Body": "The account may not be used to publish unlawful or misleading content, or content infringing a third party's rights. Vorae reserves the right to suspend an account in case of a clear breach, after attempting to make contact first except in urgent cases.",
+      "s5Title": "Intellectual property",
+      "s5Body": "The restaurant keeps all rights to its menu content. Vorae keeps all rights to the software, interface and Vorae brand. Neither party grants the other any license beyond what is needed to operate the service.",
+      "s6Title": "Availability and limitation of liability",
+      "s6Body": "Vorae makes reasonable efforts to keep the service available, without guaranteeing continuous uptime. To the extent permitted by law, Vorae is not liable for indirect losses (lost sales, lost customers) resulting from a service interruption.",
+      "s7Title": "Termination",
+      "s7Body": "A restaurant may cancel its subscription at any time from the billing portal; access remains active until the end of the period already paid for. Vorae may terminate an account in case of a serious, repeated breach of these terms.",
+      "s8Title": "Governing law",
+      "s8Body": "These terms are governed by the laws applicable in Quebec and Canada. Any dispute falls under the competent courts of the province of Quebec.",
+      "s9Title": "Changes",
+      "s9Body": "These terms may be updated; in case of a material change, subscribed restaurants will be notified by email before it takes effect."
     }
   }
 }

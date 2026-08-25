@@ -90,7 +90,7 @@ src/
   components/
     menu/                        ← composants du menu public
     dashboard/                   ← composants du dashboard (dont analytics-table, dish-trend-chart, billing-panel)
-    landing/                     ← reveal.tsx (scroll-reveal), site-header.tsx (header sticky + menu mobile), pricing-section.tsx (tarifs, toggle mensuel/annuel)
+    landing/                     ← reveal.tsx, site-header.tsx, pricing-section.tsx, trusted-marquee.tsx, reviews-section.tsx, about-section.tsx, back-to-top.tsx, feature-field.tsx (champs de mots defilants), globe-section.tsx (globe canvas)
     theme-toggle.tsx             ← bascule dark/light (next-themes)
     ui/                          ← shadcn/ui (button, etc. - installés à la main, voir section 4)
   lib/
@@ -105,6 +105,8 @@ src/
     dish-schema.ts                ← validation zod du formulaire plat
     dish-categories.ts           ← catégories existantes (pour le dropdown)
   i18n/                          ← next-intl (routing, navigation, request config)
+scripts/
+  check-contrast.mjs             ← verifie les ratios WCAG de la palette claire
 prisma/
   schema.prisma
   seed.ts                        ← restaurant démo "demo" + 3 plats + 1 QR code
@@ -329,6 +331,105 @@ concerné - cette liste est un résumé, pas la seule source.
   (`.mp4`) : la regex d'exclusion listait `jpe?g|webp|png|...` mais pas
   `mp4|webm|mov|mp3`. Vérifier ce matcher à chaque nouveau type de fichier
   statique ajouté au projet.
+- **Un calque décoratif en `-z-10` (halo, particules) peut être invisible
+  à l'écran tout en étant bien présent dans le DOM, si la section qui le
+  contient ne forme pas son propre contexte d'empilement CSS.** `position:
+  relative` seul, sans `z-index`, ne suffit pas : l'élément `-z-10` remonte
+  alors jusqu'au premier ancêtre qui en forme un (souvent la racine de la
+  page), et se retrouve peint **sous** le fond opaque de cet ancêtre au
+  lieu de juste derrière le texte de sa propre section. Repéré en ajoutant
+  les étoiles filantes des sections À propos et Avis (Sprint 4.5, S45-13) :
+  invisibles malgré un `opacity` et une `animation` corrects en
+  `getComputedStyle`, confirmé en écrivant un carré rouge de test au même
+  endroit et en vérifiant sa couleur de pixel réelle plutôt que de se fier
+  aux styles calculés. Corrigé en ajoutant `isolate` (utilitaire Tailwind
+  pour `isolation: isolate`) sur chaque `<section>` contenant un calque
+  `-z-10` : hero, "Comment ça marche", Fonctionnalités, Avis, À propos,
+  Tarifs, Globe. **Tout nouveau calque `-z-10` doit vivre dans une section
+  qui a `isolate`, sinon vérifier son rendu par une capture d'écran, pas
+  seulement par la lecture du code.**
+- **Un badge positionné en dehors d'un élément avec un simple décalage
+  négatif fixe (`-left-10`, `-right-12`) chevauche cet élément si son
+  propre contenu est plus large que le décalage** - constaté sur les
+  badges flottants du hero (`product-mockup.tsx`) : corrects en anglais,
+  ils chevauchaient l'écran du téléphone en français, le texte y étant
+  plus long. Un décalage fixe suffit pour un élément de taille connue à
+  l'avance, pas pour un texte dont la longueur dépend de la langue.
+  Corrigé avec `right`/`left: calc(100% + Npx)` en style inline : le
+  badge part toujours du bord de son voisin vers l'extérieur, quelle que
+  soit sa propre largeur.
+- **Les pourcentages d'un `@keyframes` CSS se comptent sur le cycle
+  entier, pas sur le créneau d'un élément : on ne peut donc pas faire un
+  chassé-croisé entre N éléments avec une seule animation partagée et des
+  délais négatifs décalés, sauf à écrire des pourcentages qui dépendent
+  de N** - or ils ne peuvent pas être paramétrés. Constaté sur la bascule
+  entre langues (`feature-language-flip.tsx`) : avec 12 langues et une
+  plage visible de 3 % à 88 % du cycle, une dizaine restaient à
+  `opacity: 1` en même temps et le texte s'empilait, illisible. Passer
+  l'alternance en JavaScript (un index qui avance, `transition` CSS pour
+  l'effet) reste correct quel que soit le nombre d'éléments.
+- **Un composant lucide (ou tout `forwardRef`) ne peut pas être passé en
+  prop à un Client Component depuis un Server Component** :
+  "Functions cannot be passed directly to Client Components", erreur
+  **invisible au build** (`next build` passe, les pages se génèrent) qui
+  ne sort qu'à l'exécution, en 500. Rencontrée en rendant
+  `feature-language-flip.tsx` client : il recevait `icon={Icon}` depuis
+  la page. Passer un élément déjà rendu (`icon={<Icon />}`) ne suffit pas
+  non plus ici, le `type` de l'élément restant cette même fonction et le
+  composant étant rendu dans les enfants sérialisés de `Reveal`, lui
+  aussi client. Solution retenue : importer l'icône directement dans le
+  Client Component. **Après avoir ajouté `"use client"` à un composant
+  existant, vérifier la page dans un vrai navigateur, pas seulement le
+  build.**
+- **`transformStyle: preserve-3d` casse le test de collision des
+  descendants : des boutons deviennent incliquables à la souris alors
+  qu'ils répondent encore à un clic déclenché en JavaScript.** Constaté
+  sur la maquette de téléphone du hero, dont le châssis porte une légère
+  rotation 3D qui suit la souris : `mousedown` était attribué au
+  conteneur, `mouseup` au bouton, et le navigateur déclenchait donc le
+  `click` sur leur ancêtre commun, si bien que le bouton ne réagissait
+  jamais. Piège vicieux à diagnostiquer : `document.elementFromPoint`
+  renvoyait bien le bouton, et un `element.click()` en JS fonctionnait.
+  La méthode qui a tranché : écouter `pointerdown`/`mousedown`/`mouseup`/
+  `click` au niveau du document et comparer leurs cibles. `preserve-3d`
+  n'était pas nécessaire ici (aucun enfant n'a sa propre transformation
+  3D), le retirer garde la rotation identique à l'oeil. **Ne pas mettre
+  `preserve-3d` sur un conteneur qui contient des éléments cliquables, et
+  tester les clics à la souris, pas seulement en JavaScript.**
+- **Un élément statique remonté sous un élément positionné passe
+  derrière lui, quel que soit l'ordre du DOM.** Sur la fiche plat de la
+  maquette, le bloc texte était remonté par `-mt-6` pour chevaucher le
+  bas de la photo ; le conteneur de la photo étant `relative` et le bloc
+  texte statique, le nom du plat et le prix étaient invisibles, cachés
+  derrière l'image. Corrigé en donnant `relative` au bloc texte. Aucun
+  test automatique ne l'aurait vu (le texte est bien dans le DOM et
+  `innerText` le renvoie) : c'est la relecture des captures d'écran qui
+  l'a révélé.
+- **Une animation en boucle continue depuis le montage rate son propre
+  effet dès qu'elle est censée être vue au scroll.** La carte
+  Accessibilité tournait en boucle dès le chargement de la page : le
+  flash-back rapide (~2,3s) n'occupe qu'une petite fraction d'un cycle
+  total de ~24s, donc un visiteur qui scrolle jusqu'à la carte arrive le
+  plus souvent en pleine phase lente et ne voit jamais le flash-back.
+  Corrigé avec le même idiome que `Reveal` (`IntersectionObserver` sur le
+  conteneur de la carte), qui remet l'étape à 0 à chaque entrée dans le
+  cadre. **Toute animation en boucle dont le début compte doit se
+  déclencher/relancer à l'entrée dans le viewport, pas au montage.**
+- **`ctx.arc()` plante avec `IndexSizeError` si le rayon calculé est
+  négatif, même de très peu.** Sur le globe, l'anneau d'une onde de choc
+  se calcule à partir de `age = (now - ripple.start) / RIPPLE_MS`, où
+  `now` vient du timestamp de `requestAnimationFrame` et `ripple.start`
+  de `performance.now()` pris dans le gestionnaire `pointerdown`/
+  `pointerup`. Les deux horloges sont censées concorder, mais un appui
+  juste avant le prochain frame peut renvoyer un `age` légèrement négatif
+  (quelques millisecondes), ce qui rend `(1 - Math.pow(1 - age, 2))`
+  négatif et donc le rayon de l'anneau aussi. Reproduit de façon fiable
+  avec un glisser rapide et répété sur le globe (confirmé avec un
+  `CanvasRenderingContext2D.prototype.arc` instrumenté en Playwright).
+  Corrigé en bornant `age` à `[0, 1]`. **Ne jamais faire confiance à ce
+  que deux horloges différentes (event timestamp vs `now` de rAF)
+  produisent un delta positif ; borner toute valeur dérivée d'un delta de
+  temps avant de l'utiliser comme rayon.**
 
 ---
 
@@ -420,6 +521,86 @@ sont codés et buildés. Il reste :
 - Rappel : ne plus réintroduire la palette or/sarcelle de la section 13
   sans revalider avec le client - le remplacement par reflect.app est une
   décision explicite et documentée (section 4), pas un oubli.
+
+---
+
+## 8bis. Sections de landing reprises de webglow.ca (Sprint 4.5)
+
+Le client est aussi propriétaire de l'agence WebGlow (webglow.ca) et a
+fourni le dépôt de son site pour que quatre éléments visuels soient repris
+et adaptés à Vorae. C'est du code lui appartenant, réécrit avec nos tokens
+de couleur, pas une copie d'un site tiers.
+
+| Élément Vorae | Source WebGlow | Adaptation |
+|---|---|---|
+| `trusted-marquee.tsx` | bloc de logos dans `Hero.tsx` | Rouge `#A60000` remplacé par les tokens. Contenu : types d'établissement. |
+| `reviews-section.tsx` | `Reviews.tsx` | Halo en coeur en SVG conservé, dégradés passés en `hsl(var(--primary))`. Photos de personnes remplacées par des pastilles d'initiales. |
+| `about-section.tsx` | `About.tsx` | Le composant `Particles` de Magic UI (canvas, 246 lignes, dépendance) est remplacé par des points en CSS animés : rendu équivalent à cette échelle, aucune dépendance ajoutée. |
+| `back-to-top.tsx` | `BackToTop.tsx` | Repris quasi tel quel, couleurs adaptées. |
+
+Deux points de vigilance :
+
+- **Les avis affichés sont inventés.** Aucun client réel n'existe encore.
+  Volontairement sans portrait photo : associer des photos de banque
+  d'images à de fausses citations donnerait l'illusion de vrais
+  témoignages. Les pastilles d'initiales se lisent comme un gabarit. À
+  remplacer avant toute mise en production, cf. section 12.3 du cahier
+  ("la preuve vient des chiffres et des études de cas, pas de
+  l'adjectif").
+- **Le bandeau défilant liste des types d'établissement**, pas des noms de
+  restaurants ou de marques. Afficher une enseigne réelle comme cliente
+  alors qu'elle ne l'est pas serait une fausse référence. WebGlow fait le
+  même choix sur son propre site.
+
+Les particules de la section à propos ont des positions **figées en dur**
+et non tirées au hasard : une valeur `Math.random()` différente entre le
+rendu serveur et le rendu client provoque une erreur d'hydratation React.
+
+---
+
+## 8ter. Palette claire et animations sans dépendance
+
+**Palette claire refaite (Sprint 4.5).** Les tokens clairs d'origine
+étaient une inversion approximative du sombre. Ils sont maintenant
+construits autour du violet de marque, et chaque paire texte/fond est
+vérifiée en contraste WCAG AA (section 17.5 du cahier). Le script
+`scripts/check-contrast.mjs` recalcule tous les ratios : le relancer
+après toute modification des tokens clairs de `globals.css`.
+
+Deux inversions volontaires de rôle entre sombre et clair, documentées en
+commentaire dans `globals.css` : `--primary` passe d'un lavande clair
+(sombre) au violet profond (clair), et `--secondary` sert de fond de
+pastille en clair alors qu'il sert de violet de halo en sombre.
+
+**Limite de vérification :** le dashboard et le menu public ne peuvent pas
+être rendus dans l'environnement de développement, faute d'accès à la base
+(voir section 5). La palette claire y est donc validée par le calcul, pas
+encore à l'oeil. La validation visuelle passe par la preview Vercel.
+
+**Animations, principe retenu.** Trois effets repris de sites de
+référence sont codés à la main plutôt qu'importés :
+
+| Effet | Référence | Implémentation |
+|---|---|---|
+| Bandeaux défilants | webglow.ca | CSS pur, contenu dupliqué une fois et translation de -50%. |
+| Champs de mots des fonctionnalités | section "Hardened security" de reflect.app | Mêmes bandeaux, en rangées alternées sous masque radial. |
+| Globe en pointillés | section "dotted across the globe" de reflect.app | Canvas 2D, projection orthographique, ~60 lignes. Évite une librairie de globe (cobe, three.js) de plusieurs centaines de Ko. |
+
+Deux règles à respecter pour tout nouvel effet de ce type :
+
+- **Pas de `Math.random()` au rendu.** Une valeur différente entre serveur
+  et client provoque une erreur d'hydratation React. Les positions des
+  particules et les décalages des rangées sont figés ou dérivés de
+  l'index.
+- **Couper l'animation hors écran.** Le globe suspend sa boucle
+  `requestAnimationFrame` via un `IntersectionObserver` : une boucle qui
+  tourne en continu sur une page longue vide la batterie pour rien. Les
+  animations CSS n'ont pas ce problème, le navigateur les gère seul.
+
+Les animations d'apparition au scroll (`reveal.tsx`) se rejouent dans les
+deux sens de défilement, à la demande du client. Deux seuils plutôt qu'un
+pour éviter le clignotement au ras de la limite : apparition dès 30% de
+visibilité, réarmement seulement une fois entièrement sorti du cadre.
 
 ---
 
