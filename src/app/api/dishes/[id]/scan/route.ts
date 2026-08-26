@@ -122,6 +122,20 @@ const MAX_IMAGES = 300;
 // Vercel Function (10 s) est trop court pour cela, d'ou ce relevement.
 export const maxDuration = 60;
 
+// KIRI vise la qualité maximale par défaut, ce qui a produit un modèle de
+// 86 Mo au premier scan réel : assez pour faire planter Safari sur iPhone
+// (S7-18), or le téléphone est précisément la cible du produit. Un plat vu
+// dans un cadre de quelques centimètres sur un écran de téléphone n'a
+// besoin ni d'un maillage de qualité studio ni de textures 4K.
+//
+// La texture pèse le plus lourd dans un modèle de photogrammétrie :
+// passer de 4K à 1K divise sa surface par seize. Réglages surchargeables
+// par requête, pour pouvoir remonter sur un plat vitrine sans toucher au
+// code.
+const DEFAULT_MODEL_QUALITY = 1; // 1 = Medium (0=High, 2=Low, 3=Ultra)
+const DEFAULT_TEXTURE_QUALITY = 2; // 2 = 1K (0=4K, 1=2K, 3=8K)
+const QUALITY_LEVELS = [0, 1, 2, 3] as const;
+
 const ALGORITHMS: ScanAlgorithm[] = ["photo", "featureless", "3dgs"];
 const FORMATS: ScanFileFormat[] = ["glb", "usdz", "obj", "fbx", "stl", "ply", "gltf", "xyz"];
 
@@ -208,6 +222,12 @@ export async function POST(
     ? body.algorithm
     : "featureless";
   const fileFormat: ScanFileFormat = FORMATS.includes(body.format) ? body.format : "glb";
+  const modelQuality = QUALITY_LEVELS.includes(body.modelQuality)
+    ? (body.modelQuality as 0 | 1 | 2 | 3)
+    : DEFAULT_MODEL_QUALITY;
+  const textureQuality = QUALITY_LEVELS.includes(body.textureQuality)
+    ? (body.textureQuality as 0 | 1 | 2 | 3)
+    : DEFAULT_TEXTURE_QUALITY;
 
   const videoUrl: string | undefined = typeof body.videoUrl === "string" ? body.videoUrl : undefined;
   const imageUrls: string[] | undefined = Array.isArray(body.imageUrls) ? body.imageUrls : undefined;
@@ -270,6 +290,8 @@ export async function POST(
         video,
         images,
         isMask: true,
+        modelQuality,
+        textureQuality,
       });
       return prisma.scanJob.update({
         where: { id: job.id },
