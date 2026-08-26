@@ -75,6 +75,10 @@ export async function finalizeScanJob(scanJob: ScanJob): Promise<ScanJob> {
         resultModelUrl: modelUrl,
         resultGlbUrl: glbUrl,
         resultUsdzUrl: usdzUrl,
+        // Effacé explicitement : une reprise réussie après un échec
+        // (finalize_failed) laissait sinon l'ancien message affiché sous
+        // un statut « prêt », ce qui donne un encart contradictoire.
+        errorMessage: null,
         completedAt: new Date(),
       },
     });
