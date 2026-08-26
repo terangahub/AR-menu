@@ -27,9 +27,15 @@ export async function uploadBuffer(
   buffer: Buffer,
   options: { folder: string; resourceType: "image" | "raw"; publicId?: string }
 ) {
+  // upload_large_stream figure dans les types du SDK mais n'existe pas
+  // reellement sur l'objet v2.uploader de cette version (2.10.1) - defini
+  // dans lib/uploader.js mais jamais reporte vers l'API v2 publique
+  // (lib/v2/uploader.js), constate en test reel ("r is not a function").
+  // upload_chunked_stream est la fonction reellement exposee, avec la
+  // meme convention d'appel (options, callback) qu'upload_stream.
   const uploadStreamFn =
     buffer.byteLength > CHUNKED_UPLOAD_THRESHOLD_BYTES
-      ? cloudinary.uploader.upload_large_stream
+      ? cloudinary.uploader.upload_chunked_stream
       : cloudinary.uploader.upload_stream;
 
   return new Promise<{ secure_url: string }>((resolve, reject) => {
