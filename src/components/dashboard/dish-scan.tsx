@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,34 @@ type Step = "idle" | "signing" | "uploading" | "preparing" | "starting" | "done"
 // que le navigateur peut patienter sans limite.
 const PREPARE_TIMEOUT_MS = 5 * 60 * 1000;
 const PREPARE_POLL_MS = 4000;
+
+// Durée typique observée d'un transcodage, sur laquelle la barre progresse
+// pendant la préparation. Ce n'est qu'une estimation : la barre plafonne
+// et n'atteint jamais la fin de cette phase tant que Cloudinary n'a pas
+// répondu, plutôt que d'afficher un « terminé » mensonger.
+const PREPARE_ESTIMATE_MS = 90 * 1000;
+
+// Chaque étape occupe une part de la barre globale. L'envoi pèse le plus
+// lourd parce que c'est la seule dont la progression est réelle, mesurée
+// octet par octet.
+const PHASE_START: Record<Step, number> = {
+  idle: 0,
+  signing: 0,
+  uploading: 8,
+  preparing: 62,
+  starting: 92,
+  done: 100,
+  error: 0,
+};
+const PHASE_END: Record<Step, number> = {
+  idle: 0,
+  signing: 8,
+  uploading: 62,
+  preparing: 92,
+  starting: 99,
+  done: 100,
+  error: 0,
+};
 
 async function waitForDerivedVideo(url: string) {
   const deadline = Date.now() + PREPARE_TIMEOUT_MS;
@@ -39,8 +67,31 @@ export function DishScan({ dishId }: { dishId: string }) {
   const router = useRouter();
   const videoInput = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>("idle");
-  const [progress, setProgress] = useState(0);
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [prepareStartedAt, setPrepareStartedAt] = useState<number | null>(null);
+  const [prepareElapsed, setPrepareElapsed] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
+
+  const busy =
+    step === "signing" || step === "uploading" || step === "preparing" || step === "starting";
+
+  // Sans cet avertissement, un restaurateur qui ferme l'onglet pendant la
+  // préparation perd sa vidéo sans jamais comprendre pourquoi : le scan
+  // n'a pas encore été lancé côté KIRI à ce stade.
+  useEffect(() => {
+    if (!busy) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [busy]);
+
+  // La préparation est la seule étape sans progression mesurable : le
+  // temps écoulé sert de repère, faute de mieux.
+  useEffect(() => {
+    if (step !== "preparing" || prepareStartedAt === null) return;
+    const timer = setInterval(() => setPrepareElapsed(Date.now() - prepareStartedAt), 500);
+    return () => clearInterval(timer);
+  }, [step, prepareStartedAt]);
 
   function uploadToCloudinary(
     signed: {
@@ -67,7 +118,7 @@ export function DishScan({ dishId }: { dishId: string }) {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", signed.uploadUrl);
       xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
+        if (e.lengthComputable) setUploadPercent(Math.round((e.loaded / e.total) * 100));
       };
       xhr.onload = () => {
         if (xhr.status < 200 || xhr.status >= 300) {
@@ -87,7 +138,9 @@ export function DishScan({ dishId }: { dishId: string }) {
     const file = videoInput.current?.files?.[0];
     if (!file) return;
     setMessage(null);
-    setProgress(0);
+    setUploadPercent(0);
+    setPrepareElapsed(0);
+    setPrepareStartedAt(null);
 
     try {
       setStep("signing");
@@ -105,6 +158,7 @@ export function DishScan({ dishId }: { dishId: string }) {
       const videoUrl = await uploadToCloudinary(signed, file);
 
       setStep("preparing");
+      setPrepareStartedAt(Date.now());
       await waitForDerivedVideo(kiriReadyVideoUrl(videoUrl));
 
       setStep("starting");
@@ -131,31 +185,96 @@ export function DishScan({ dishId }: { dishId: string }) {
     }
   }
 
-  const busy =
-    step === "signing" || step === "uploading" || step === "preparing" || step === "starting";
-  const label =
+  // Progression globale : la part réelle quand elle existe (l'envoi), une
+  // estimation plafonnée sinon.
+  function overallPercent(): number {
+    const from = PHASE_START[step];
+    const span = PHASE_END[step] - from;
+    if (step === "uploading") return from + (span * uploadPercent) / 100;
+    if (step === "preparing") {
+      const ratio = Math.min(prepareElapsed / PREPARE_ESTIMATE_MS, 1);
+      // Plafonné à 95 % de la phase : la barre ralentit puis s'arrête
+      // juste avant la fin tant que la vidéo n'est pas prête.
+      return from + span * ratio * 0.95;
+    }
+    if (step === "done") return 100;
+    return from + span / 2;
+  }
+
+  const percent = Math.round(overallPercent());
+  const stepLabel =
     step === "signing"
       ? t("signing")
       : step === "uploading"
-        ? t("uploading", { progress })
+        ? t("uploading")
         : step === "preparing"
           ? t("preparing")
-          : step === "starting"
-            ? t("starting")
-            : t("submit");
+          : t("starting");
+  const elapsedSeconds = Math.floor(prepareElapsed / 1000);
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
       <span className="text-sm font-medium">{t("title")}</span>
       <p className="text-xs text-muted-foreground">{t("help")}</p>
       <input ref={videoInput} type="file" accept="video/*" disabled={busy} />
-      <Button type="button" size="sm" variant="outline" disabled={busy} onClick={startScan} className="w-fit">
-        {label}
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        disabled={busy}
+        onClick={startScan}
+        className="w-fit"
+      >
+        {t("submit")}
       </Button>
       {message && (
         <p className={`text-sm ${step === "error" ? "text-destructive" : "text-muted-foreground"}`}>
           {message}
         </p>
+      )}
+
+      {busy && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="scan-progress-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
+        >
+          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg">
+            <h2 id="scan-progress-title" className="text-lg font-semibold">
+              {t("modalTitle")}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">{t("modalIntro")}</p>
+
+            <div
+              className="mt-5 h-2 w-full overflow-hidden rounded-full bg-muted"
+              role="progressbar"
+              aria-valuenow={percent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <div
+                className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+
+            <div className="mt-2 flex items-baseline justify-between">
+              <span className="text-sm text-foreground">{stepLabel}</span>
+              <span className="text-sm tabular-nums text-muted-foreground">{percent}%</span>
+            </div>
+
+            {step === "preparing" && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                {t("preparingDetail", { seconds: elapsedSeconds })}
+              </p>
+            )}
+
+            <p className="mt-5 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+              {t("modalWarning")}
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

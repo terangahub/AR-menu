@@ -292,10 +292,14 @@
       "help": "Filmez le plat en tournant lentement autour (20 à 30 secondes, éclairage uniforme). La vidéo part directement vers le stockage, puis le modèle 3D est généré automatiquement.",
       "submit": "Lancer le scan",
       "signing": "Préparation…",
-      "uploading": "Envoi de la vidéo… {progress}%",
-      "preparing": "Préparation de la vidéo… (peut prendre 1 à 2 minutes)",
+      "uploading": "Envoi de la vidéo…",
+      "preparing": "Préparation de la vidéo…",
       "starting": "Démarrage du scan…",
-      "started": "Scan lancé. Identifiant du job : {jobId}. Le modèle apparaîtra ici une fois la génération terminée."
+      "started": "Scan lancé. Identifiant du job : {jobId}. Le modèle apparaîtra ici une fois la génération terminée.",
+      "modalTitle": "Capture 3D en cours",
+      "modalIntro": "Votre vidéo est en train d'être envoyée puis préparée pour la génération du modèle 3D. Cette opération se déroule en plusieurs étapes et peut prendre quelques minutes.",
+      "modalWarning": "Ne fermez pas cette page et ne coupez pas votre connexion tant que la barre n'est pas terminée. Une fois le scan lancé, vous pourrez quitter librement : la génération se poursuit sur nos serveurs et le modèle apparaîtra automatiquement sur la fiche du plat.",
+      "preparingDetail": "Conversion de la vidéo au format attendu (durée et résolution). {seconds} secondes écoulées."
     },
     "qrcodes": {
       "title": "QR codes",

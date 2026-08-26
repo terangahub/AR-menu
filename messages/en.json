@@ -292,10 +292,14 @@
       "help": "Film the dish while slowly circling it (20 to 30 seconds, even lighting). The video goes straight to storage, then the 3D model is generated automatically.",
       "submit": "Start scan",
       "signing": "Preparing…",
-      "uploading": "Uploading video… {progress}%",
-      "preparing": "Preparing the video… (may take 1 to 2 minutes)",
+      "uploading": "Uploading the video…",
+      "preparing": "Preparing the video…",
       "starting": "Starting scan…",
-      "started": "Scan started. Job id: {jobId}. The model will appear here once generation completes."
+      "started": "Scan started. Job id: {jobId}. The model will appear here once generation completes.",
+      "modalTitle": "3D capture in progress",
+      "modalIntro": "Your video is being uploaded, then prepared for 3D model generation. This runs in several steps and can take a few minutes.",
+      "modalWarning": "Do not close this page or drop your connection until the bar completes. Once the scan has started you can leave freely: generation continues on our servers and the model will appear on the dish automatically.",
+      "preparingDetail": "Converting the video to the expected duration and resolution. {seconds} seconds elapsed."
     },
     "qrcodes": {
       "title": "QR codes",
