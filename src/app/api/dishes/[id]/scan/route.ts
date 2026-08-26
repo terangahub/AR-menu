@@ -14,6 +14,11 @@ const MAX_IMAGE_SIZE_BYTES = 20 * 1024 * 1024;
 const MIN_IMAGES = 20;
 const MAX_IMAGES = 300;
 
+// La route telecharge la video depuis Cloudinary puis la reverse a KIRI :
+// deux transferts de plusieurs dizaines de Mo. Le plafond par defaut d'une
+// Vercel Function (10 s) est trop court pour cela, d'ou ce relevement.
+export const maxDuration = 60;
+
 const ALGORITHMS: ScanAlgorithm[] = ["photo", "featureless", "3dgs"];
 const FORMATS: ScanFileFormat[] = ["glb", "usdz", "obj", "fbx", "stl", "ply", "gltf", "xyz"];
 
@@ -97,17 +102,31 @@ export async function POST(
   // Créé avant l'appel KIRI pour tracer même un échec au démarrage
   // (crédit insuffisant, clé invalide) - jamais d'appel fournisseur sans
   // ligne correspondante dans ScanJob.
-  const scanJob = await prisma.scanJob.create({
-    data: {
-      dishId: id,
-      provider: "kiri",
-      algorithm,
-      status: "uploading",
-      sourceMediaType: mediaType,
-      sourceMediaUrl: videoUrl ?? imageUrls?.[0],
-      requestedFormat: fileFormat,
-    },
-  });
+  let scanJob;
+  try {
+    scanJob = await prisma.scanJob.create({
+      data: {
+        dishId: id,
+        provider: "kiri",
+        algorithm,
+        status: "uploading",
+        sourceMediaType: mediaType,
+        sourceMediaUrl: videoUrl ?? imageUrls?.[0],
+        requestedFormat: fileFormat,
+      },
+    });
+  } catch (err) {
+    // Sans ce message, une table ou une colonne absente en base donne un
+    // 500 au corps vide, indiagnosticable depuis le navigateur.
+    return NextResponse.json(
+      {
+        error: `Creation du ScanJob impossible : ${
+          err instanceof Error ? err.message : "erreur inconnue"
+        }`,
+      },
+      { status: 500 }
+    );
+  }
 
   try {
     const { externalJobId } = await scan3dProvider.startScan({
@@ -155,6 +174,12 @@ export async function POST(
         { status: 500 }
       );
     }
-    return NextResponse.json({ error: "Le scan n'a pas pu démarrer" }, { status: 502 });
+    return NextResponse.json(
+      {
+        error: "Le scan n'a pas pu démarrer",
+        detail: err instanceof Error ? err.message : "erreur inconnue",
+      },
+      { status: 502 }
+    );
   }
 }
