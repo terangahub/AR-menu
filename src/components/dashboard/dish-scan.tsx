@@ -55,6 +55,12 @@ type ScanJobState = {
   completedAt: string | null;
 };
 
+type ScanQuota = {
+  limit: number;
+  used: number;
+  remaining: number;
+};
+
 // La génération chez KIRI dure plusieurs minutes : un intervalle court
 // n'apporterait rien d'autre que du trafic inutile.
 const JOB_POLL_MS = 15000;
@@ -92,6 +98,7 @@ export function DishScan({ dishId }: { dishId: string }) {
   // se réabonner à chaque changement, et sans effet de bord dans un
   // calculateur d'état.
   const jobRef = useRef<ScanJobState | null>(null);
+  const [quota, setQuota] = useState<ScanQuota | null>(null);
 
   const busy =
     step === "signing" || step === "uploading" || step === "preparing" || step === "starting";
@@ -118,6 +125,7 @@ export function DishScan({ dishId }: { dishId: string }) {
         if (!res.ok) return;
         const body = await res.json();
         if (cancelled) return;
+        setQuota(body.quota ?? null);
         const next: ScanJobState | null = body.scanJob;
         const previous = jobRef.current;
         jobRef.current = next;
@@ -272,6 +280,10 @@ export function DishScan({ dishId }: { dishId: string }) {
           : t("starting");
   const elapsedSeconds = Math.floor(prepareElapsed / 1000);
   const jobActive = job ? ACTIVE_JOB_STATUSES.includes(job.status) : false;
+  const quotaExhausted = quota ? quota.remaining <= 0 : false;
+  // Un scan déjà en cours sur ce plat serait refusé côté serveur : autant
+  // que le bouton le dise avant le clic.
+  const blocked = jobActive || quotaExhausted;
   // Les statuts renvoyés par KIRI se réduisent à trois cas côté
   // restaurateur : ça travaille, c'est prêt, ça a échoué. « expired »
   // rejoint l'échec, la seule action possible étant de rescanner.
@@ -285,17 +297,24 @@ export function DishScan({ dishId }: { dishId: string }) {
     <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
       <span className="text-sm font-medium">{t("title")}</span>
       <p className="text-xs text-muted-foreground">{t("help")}</p>
-      <input ref={videoInput} type="file" accept="video/*" disabled={busy} />
+      <input ref={videoInput} type="file" accept="video/*" disabled={busy || blocked} />
       <Button
         type="button"
         size="sm"
         variant="outline"
-        disabled={busy}
+        disabled={busy || blocked}
         onClick={startScan}
         className="w-fit"
       >
         {t("submit")}
       </Button>
+      {quota && (
+        <p className="text-xs text-muted-foreground">
+          {quotaExhausted
+            ? t("quotaExhausted", { limit: quota.limit })
+            : t("quotaRemaining", { remaining: quota.remaining, limit: quota.limit })}
+        </p>
+      )}
       {message && (
         <p className={`text-sm ${step === "error" ? "text-destructive" : "text-muted-foreground"}`}>
           {message}

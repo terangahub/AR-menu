@@ -4,6 +4,7 @@ import { getCurrentRestaurantUser } from "@/lib/auth";
 import { scan3dProvider, KiriApiError, ScanAlgorithm, ScanFileFormat } from "@/lib/scan3d";
 import { kiriReadyVideoUrl } from "@/lib/scan-video";
 import { ACTIVE_STATUSES, applyKiriStatus } from "@/lib/scan-finalize";
+import { getScanQuota, hasActiveScanJob } from "@/lib/scan-quota";
 
 // GET /api/dishes/[id]/scan - état du dernier scan du plat. Interroge
 // KIRI plutôt que de se contenter de ce que la base contient : le
@@ -25,12 +26,14 @@ export async function GET(
     return NextResponse.json({ error: "Dish not found" }, { status: 404 });
   }
 
+  const quota = await getScanQuota(restaurantUser.restaurantId);
+
   let scanJob = await prisma.scanJob.findFirst({
     where: { dishId: id },
     orderBy: { createdAt: "desc" },
   });
   if (!scanJob) {
-    return NextResponse.json({ scanJob: null });
+    return NextResponse.json({ scanJob: null, quota });
   }
 
   if (scanJob.externalJobId && ACTIVE_STATUSES.includes(scanJob.status)) {
@@ -45,6 +48,7 @@ export async function GET(
   }
 
   return NextResponse.json({
+    quota,
     scanJob: {
       id: scanJob.id,
       status: scanJob.status,
@@ -125,6 +129,27 @@ export async function POST(
   const dish = await prisma.dish.findUnique({ where: { id } });
   if (!dish || dish.restaurantId !== restaurantUser.restaurantId) {
     return NextResponse.json({ error: "Dish not found" }, { status: 404 });
+  }
+
+  // Les deux garde-fous passent avant toute lecture du média : refuser
+  // tôt évite de télécharger inutilement des dizaines de Mo, et surtout
+  // d'engager un crédit facturé.
+  if (await hasActiveScanJob(id)) {
+    return NextResponse.json(
+      { error: "Un scan est déjà en cours pour ce plat" },
+      { status: 409 }
+    );
+  }
+
+  const quota = await getScanQuota(restaurantUser.restaurantId);
+  if (quota.remaining <= 0) {
+    return NextResponse.json(
+      {
+        error: `Quota de scans atteint pour ce mois (${quota.used}/${quota.limit})`,
+        quota,
+      },
+      { status: 429 }
+    );
   }
 
   const body = await req.json().catch(() => null);

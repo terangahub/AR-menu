@@ -310,7 +310,9 @@
         "successful": "Le modèle est rattaché au plat et visible en réalité augmentée sur le menu.",
         "failed": "Aucun modèle n'a pu être produit. Refilmez le plat et relancez un scan."
       },
-      "jobFormats": "Formats obtenus : {formats}."
+      "jobFormats": "Formats obtenus : {formats}.",
+      "quotaRemaining": "{remaining} scan(s) restant(s) ce mois-ci sur {limit}.",
+      "quotaExhausted": "Quota mensuel atteint ({limit} scans). Il se renouvelle le 1er du mois prochain."
     },
     "qrcodes": {
       "title": "QR codes",

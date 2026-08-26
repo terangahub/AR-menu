@@ -310,7 +310,9 @@
         "successful": "The model is attached to the dish and available in augmented reality on the menu.",
         "failed": "No model could be produced. Film the dish again and start a new scan."
       },
-      "jobFormats": "Formats produced: {formats}."
+      "jobFormats": "Formats produced: {formats}.",
+      "quotaRemaining": "{remaining} scan(s) left this month out of {limit}.",
+      "quotaExhausted": "Monthly quota reached ({limit} scans). It resets on the 1st of next month."
     },
     "qrcodes": {
       "title": "QR codes",
