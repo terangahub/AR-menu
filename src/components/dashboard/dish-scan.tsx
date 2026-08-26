@@ -357,7 +357,7 @@ export function DishScan({ dishId }: { dishId: string }) {
                   })}
             </p>
           )}
-          {job.errorMessage && (
+          {job.errorMessage && jobStatusKey !== "successful" && (
             <p className="mt-2 text-xs text-destructive">{job.errorMessage}</p>
           )}
           {job.status === "successful" && (

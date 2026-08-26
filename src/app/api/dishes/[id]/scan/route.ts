@@ -4,7 +4,7 @@ import { getCurrentRestaurantUser } from "@/lib/auth";
 import { scan3dProvider, KiriApiError, ScanAlgorithm, ScanFileFormat } from "@/lib/scan3d";
 import { kiriReadyVideoUrl } from "@/lib/scan-video";
 import { ACTIVE_STATUSES, applyKiriStatus } from "@/lib/scan-finalize";
-import { getScanQuota, hasActiveScanJob } from "@/lib/scan-quota";
+import { CREDITS_PER_SCAN, getScanQuota, hasActiveScanJob } from "@/lib/scan-quota";
 
 // GET /api/dishes/[id]/scan - état du dernier scan du plat. Interroge
 // KIRI plutôt que de se contenter de ce que la base contient : le
@@ -28,11 +28,15 @@ export async function GET(
 
   const quota = await getScanQuota(restaurantUser.restaurantId);
 
-  let scanJob = await prisma.scanJob.findFirst({
+  // Deux jobs par scan depuis S7-17 (un format chacun), donc les deux
+  // plus récents forment exactement le dernier lot. Un plat scanné avant
+  // ce changement n'en a qu'un, et la requête le renvoie seul.
+  const jobs = await prisma.scanJob.findMany({
     where: { dishId: id },
     orderBy: { createdAt: "desc" },
+    take: 2,
   });
-  if (!scanJob) {
+  if (jobs.length === 0) {
     return NextResponse.json({ scanJob: null, quota });
   }
 
@@ -42,32 +46,62 @@ export async function GET(
   let rawStatus: number | null = null;
   let providerError: string | null = null;
 
-  if (scanJob.externalJobId && ACTIVE_STATUSES.includes(scanJob.status)) {
+  // Séquentiel et non parallèle : deux formats prêts en même temps
+  // feraient télécharger puis téléverser deux modèles de plusieurs
+  // dizaines de Mo dans la même invocation, doublant la mémoire et le
+  // temps alors que la Function est plafonnée à 60 s. Le format resté en
+  // arrière sera finalisé au sondage suivant, quinze secondes plus tard.
+  const refreshed = [];
+  for (const job of jobs) {
+    if (!job.externalJobId || !ACTIVE_STATUSES.includes(job.status)) {
+      refreshed.push(job);
+      continue;
+    }
     try {
-      const status = await scan3dProvider.getStatus(scanJob.externalJobId);
+      const status = await scan3dProvider.getStatus(job.externalJobId);
       rawStatus = status.rawStatus;
-      scanJob = await applyKiriStatus(scanJob, status.rawStatus);
+      refreshed.push(await applyKiriStatus(job, status.rawStatus));
     } catch (err) {
       // Un fournisseur injoignable ne doit pas casser l'affichage : le
       // dernier état connu reste préférable à une page en erreur.
       console.error("[scan status] interrogation KIRI échouée", err);
       providerError = err instanceof Error ? err.message : "Interrogation impossible";
+      refreshed.push(job);
     }
   }
+
+  // Le lot est « en cours » tant qu'un seul de ses formats l'est : annoncer
+  // « prêt » alors que l'USDZ manque encore laisserait croire que la
+  // réalité augmentée fonctionne, ce qui est justement le cas qui a
+  // dérouté Mouhamed au premier scan.
+  const active = refreshed.filter((job) => ACTIVE_STATUSES.includes(job.status));
+  const leader = active[0] ?? refreshed.find((job) => job.status === "successful") ?? refreshed[0];
+
+  // Les formats se lisent sur le plat, pas sur un job : chaque job n'en
+  // porte qu'un, et c'est leur réunion qui compte.
+  const dishModels = await prisma.dish.findUnique({
+    where: { id },
+    select: { model3dGlbUrl: true, model3dUsdzUrl: true },
+  });
 
   return NextResponse.json({
     quota,
     rawStatus,
     providerError,
     scanJob: {
-      id: scanJob.id,
-      status: scanJob.status,
-      externalJobId: scanJob.externalJobId,
-      errorMessage: scanJob.errorMessage,
-      glbUrl: scanJob.resultGlbUrl,
-      usdzUrl: scanJob.resultUsdzUrl,
-      createdAt: scanJob.createdAt,
-      completedAt: scanJob.completedAt,
+      id: leader.id,
+      status: leader.status,
+      externalJobId: leader.externalJobId,
+      // Seules les erreurs des jobs non aboutis remontent : un job réussi
+      // après une reprise garde en base le message de sa tentative ratée,
+      // et l'afficher sous un statut « prêt » est contradictoire.
+      errorMessage:
+        refreshed.find((job) => job.status !== "successful" && job.errorMessage)
+          ?.errorMessage ?? null,
+      glbUrl: dishModels?.model3dGlbUrl ?? null,
+      usdzUrl: dishModels?.model3dUsdzUrl ?? null,
+      createdAt: leader.createdAt,
+      completedAt: leader.completedAt,
     },
   });
 }
@@ -151,8 +185,11 @@ export async function POST(
     );
   }
 
+  // Comparé en crédits, pas en plats : un plat consomme deux crédits, et
+  // s'il n'en reste qu'un, le scan partirait pour ne produire qu'un des
+  // deux formats, en gaspillant un crédit sur un résultat inutilisable.
   const quota = await getScanQuota(restaurantUser.restaurantId);
-  if (quota.remaining <= 0) {
+  if (quota.remainingCredits < CREDITS_PER_SCAN) {
     return NextResponse.json(
       {
         error: `Quota de scans atteint pour ce mois (${quota.used}/${quota.limit})`,
@@ -202,12 +239,18 @@ export async function POST(
     );
   }
 
-  // Créé avant l'appel KIRI pour tracer même un échec au démarrage
-  // (crédit insuffisant, clé invalide) - jamais d'appel fournisseur sans
-  // ligne correspondante dans ScanJob.
-  let scanJob;
-  try {
-    scanJob = await prisma.scanJob.create({
+  // Un appel KIRI ne renvoie qu'un seul format (S7-16), or l'aperçu 3D
+  // veut du GLB et la réalité augmentée sur iPhone exige un USDZ. Les
+  // deux appels partent donc de la même requête, avec le même média déjà
+  // en mémoire : le retélécharger pour le second doublerait la durée
+  // d'exécution sans rien apporter.
+  const formats: ScanFileFormat[] = fileFormat === "glb" ? ["glb", "usdz"] : [fileFormat];
+
+  async function startOneFormat(format: ScanFileFormat) {
+    // Créé avant l'appel KIRI pour tracer même un échec au démarrage
+    // (crédit insuffisant, clé invalide) - jamais d'appel fournisseur sans
+    // ligne correspondante dans ScanJob.
+    const job = await prisma.scanJob.create({
       data: {
         dishId: id,
         provider: "kiri",
@@ -215,52 +258,54 @@ export async function POST(
         status: "uploading",
         sourceMediaType: mediaType,
         sourceMediaUrl: videoUrl ?? imageUrls?.[0],
-        requestedFormat: fileFormat,
+        requestedFormat: format,
       },
     });
-  } catch (err) {
-    // Sans ce message, une table ou une colonne absente en base donne un
-    // 500 au corps vide, indiagnosticable depuis le navigateur.
-    return NextResponse.json(
-      {
-        error: `Creation du ScanJob impossible : ${
-          err instanceof Error ? err.message : "erreur inconnue"
-        }`,
-      },
-      { status: 500 }
-    );
+
+    try {
+      const { externalJobId } = await scan3dProvider.startScan({
+        algorithm,
+        mediaType,
+        fileFormat: format,
+        video,
+        images,
+        isMask: true,
+      });
+      return prisma.scanJob.update({
+        where: { id: job.id },
+        data: { externalJobId, status: "processing", creditsUsed: 1 },
+      });
+    } catch (err) {
+      const kiriError = err instanceof KiriApiError ? err : null;
+      await prisma.scanJob.update({
+        where: { id: job.id },
+        data: {
+          status: "failed",
+          errorCode: kiriError?.kiriCode,
+          errorMessage: err instanceof Error ? err.message : "Erreur inconnue",
+        },
+      });
+      throw err;
+    }
   }
 
   try {
-    const { externalJobId } = await scan3dProvider.startScan({
-      algorithm,
-      mediaType,
-      fileFormat,
-      video,
-      images,
-      isMask: true,
-    });
-
-    const updated = await prisma.scanJob.update({
-      where: { id: scanJob.id },
-      data: { externalJobId, status: "processing", creditsUsed: 1 },
-    });
+    // Séquentiel et non parallèle : KIRI reçoit deux fois le même média
+    // volumineux, et deux envois simultanés depuis la même Function
+    // risquent de saturer sa bande passante sortante.
+    const started = [];
+    for (const format of formats) {
+      started.push(await startOneFormat(format));
+    }
 
     return NextResponse.json({
-      scanJobId: updated.id,
-      externalJobId: updated.externalJobId,
-      status: updated.status,
+      scanJobId: started[0].id,
+      externalJobId: started[0].externalJobId,
+      status: started[0].status,
+      formats: started.map((job) => job.requestedFormat),
     });
   } catch (err) {
     const kiriError = err instanceof KiriApiError ? err : null;
-    await prisma.scanJob.update({
-      where: { id: scanJob.id },
-      data: {
-        status: "failed",
-        errorCode: kiriError?.kiriCode,
-        errorMessage: err instanceof Error ? err.message : "Erreur inconnue",
-      },
-    });
 
     // 403 côté KIRI = crédit insuffisant (pas 401) - distingué explicitement
     // pour que le dashboard puisse proposer une recharge plutôt qu'afficher
