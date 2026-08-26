@@ -28,11 +28,21 @@ export async function POST(
   const body = await req.json().catch(() => null);
   const resourceType = body?.resourceType === "image" ? "image" : "video";
 
-  const signed = signUpload({
-    folder: `vorae/${restaurantUser.restaurantId}/scan-sources`,
-    publicId: `${id}-${randomUUID()}`,
-    resourceType,
-  });
-
-  return NextResponse.json(signed);
+  // Message renvoyé tel quel : sans lui, une configuration Cloudinary
+  // absente se traduit par un 500 au corps vide, indiagnosticable depuis
+  // le navigateur. signUpload ne cite que des noms de variables, jamais
+  // leur valeur.
+  try {
+    const signed = signUpload({
+      folder: `vorae/${restaurantUser.restaurantId}/scan-sources`,
+      publicId: `${id}-${randomUUID()}`,
+      resourceType,
+    });
+    return NextResponse.json(signed);
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Signature impossible" },
+      { status: 500 }
+    );
+  }
 }
