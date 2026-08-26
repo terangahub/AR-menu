@@ -12,17 +12,34 @@ cloudinary.config({
 
 export { cloudinary };
 
+// Au-delà de ce seuil, l'upload passe en plusieurs morceaux (voir plus
+// bas) : le compte Cloudinary refuse tout fichier de plus de 10 Mo en un
+// seul envoi ("File size too large. Got X. Maximum is 10485760."),
+// rencontré en test réel sur un modèle 3D KIRI d'environ 86 Mo. Un modèle
+// glb/usdz issu de la photogrammétrie dépasse ça couramment ; une photo
+// de plat, jamais.
+const CHUNKED_UPLOAD_THRESHOLD_BYTES = 8 * 1024 * 1024;
+// Sous le plafond de 10 Mo par envoi du compte : chaque morceau doit
+// tenir seul dans cette limite, pas seulement le fichier reconstitué.
+const UPLOAD_CHUNK_SIZE_BYTES = 6 * 1024 * 1024;
+
 export async function uploadBuffer(
   buffer: Buffer,
   options: { folder: string; resourceType: "image" | "raw"; publicId?: string }
 ) {
+  const uploadStreamFn =
+    buffer.byteLength > CHUNKED_UPLOAD_THRESHOLD_BYTES
+      ? cloudinary.uploader.upload_large_stream
+      : cloudinary.uploader.upload_stream;
+
   return new Promise<{ secure_url: string }>((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
+    const stream = uploadStreamFn(
       {
         folder: options.folder,
         resource_type: options.resourceType,
         public_id: options.publicId,
         overwrite: true,
+        chunk_size: UPLOAD_CHUNK_SIZE_BYTES,
       },
       (error, result) => {
         if (error || !result) {
