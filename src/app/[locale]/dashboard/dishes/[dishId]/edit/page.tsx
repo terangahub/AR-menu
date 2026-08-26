@@ -2,9 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
+import { Link } from "@/i18n/navigation";
 import { DishForm, type DishFormValues } from "@/components/dashboard/dish-form";
-import { DishMedia } from "@/components/dashboard/dish-media";
-import { DishScan } from "@/components/dashboard/dish-scan";
 import { getExistingCategories } from "@/lib/dish-categories";
 
 export default async function EditDishPage({
@@ -47,14 +46,15 @@ export default async function EditDishPage({
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
+      {/* Les médias et le scan 3D vivent sur la fiche du plat, pas ici :
+          cette page ne sert qu'à modifier les champs. */}
+      <Link
+        href={`/dashboard/dishes/${dish.id}`}
+        className="text-sm text-muted-foreground hover:text-foreground"
+      >
+        {t("backToDish")}
+      </Link>
       <h1 className="text-2xl font-semibold tracking-tight">{t("editTitle")}</h1>
-      <DishMedia
-        dishId={dish.id}
-        imageUrl={dish.imageUrl}
-        model3dGlbUrl={dish.model3dGlbUrl}
-        model3dUsdzUrl={dish.model3dUsdzUrl}
-      />
-      <DishScan dishId={dish.id} />
       <DishForm
         mode="edit"
         dishId={dish.id}

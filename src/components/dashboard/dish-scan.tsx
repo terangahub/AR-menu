@@ -99,6 +99,9 @@ export function DishScan({ dishId }: { dishId: string }) {
   // calculateur d'état.
   const jobRef = useRef<ScanJobState | null>(null);
   const [quota, setQuota] = useState<ScanQuota | null>(null);
+  const [rawStatus, setRawStatus] = useState<number | null>(null);
+  const [providerError, setProviderError] = useState<string | null>(null);
+  const [lastCheckedAt, setLastCheckedAt] = useState<number | null>(null);
 
   const busy =
     step === "signing" || step === "uploading" || step === "preparing" || step === "starting";
@@ -126,6 +129,9 @@ export function DishScan({ dishId }: { dishId: string }) {
         const body = await res.json();
         if (cancelled) return;
         setQuota(body.quota ?? null);
+        setRawStatus(typeof body.rawStatus === "number" ? body.rawStatus : null);
+        setProviderError(body.providerError ?? null);
+        setLastCheckedAt(Date.now());
         const next: ScanJobState | null = body.scanJob;
         const previous = jobRef.current;
         jobRef.current = next;
@@ -339,6 +345,18 @@ export function DishScan({ dishId }: { dishId: string }) {
           <p className="mt-1 text-xs text-muted-foreground">
             {t(`jobHelp.${jobStatusKey}`)}
           </p>
+          {jobActive && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {providerError
+                ? t("providerUnreachable", { detail: providerError })
+                : t("lastChecked", {
+                    stage: rawStatus === 3 ? t("stageQueued") : t("stageProcessing"),
+                    time: lastCheckedAt
+                      ? new Date(lastCheckedAt).toLocaleTimeString()
+                      : "-",
+                  })}
+            </p>
+          )}
           {job.errorMessage && (
             <p className="mt-2 text-xs text-destructive">{job.errorMessage}</p>
           )}

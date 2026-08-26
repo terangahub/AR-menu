@@ -36,19 +36,29 @@ export async function GET(
     return NextResponse.json({ scanJob: null, quota });
   }
 
+  // Remontés au client pour distinguer « le fournisseur travaille » de
+  // « on n'arrive plus à le joindre » : sans eux, les deux cas donnent le
+  // même affichage figé, et un scan bloqué ressemble à un scan lent.
+  let rawStatus: number | null = null;
+  let providerError: string | null = null;
+
   if (scanJob.externalJobId && ACTIVE_STATUSES.includes(scanJob.status)) {
     try {
-      const { rawStatus } = await scan3dProvider.getStatus(scanJob.externalJobId);
-      scanJob = await applyKiriStatus(scanJob, rawStatus);
+      const status = await scan3dProvider.getStatus(scanJob.externalJobId);
+      rawStatus = status.rawStatus;
+      scanJob = await applyKiriStatus(scanJob, status.rawStatus);
     } catch (err) {
       // Un fournisseur injoignable ne doit pas casser l'affichage : le
       // dernier état connu reste préférable à une page en erreur.
       console.error("[scan status] interrogation KIRI échouée", err);
+      providerError = err instanceof Error ? err.message : "Interrogation impossible";
     }
   }
 
   return NextResponse.json({
     quota,
+    rawStatus,
+    providerError,
     scanJob: {
       id: scanJob.id,
       status: scanJob.status,

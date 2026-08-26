@@ -285,7 +285,8 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel",
-      "error": "Something went wrong. Try again."
+      "error": "Something went wrong. Try again.",
+      "backToDish": "Back to dish"
     },
     "dishScan": {
       "title": "Automated 3D scan",
@@ -312,7 +313,11 @@
       },
       "jobFormats": "Formats produced: {formats}.",
       "quotaRemaining": "{remaining} scan(s) left this month out of {limit}.",
-      "quotaExhausted": "Monthly quota reached ({limit} scans). It resets on the 1st of next month."
+      "quotaExhausted": "Monthly quota reached ({limit} scans). It resets on the 1st of next month.",
+      "lastChecked": "{stage} · checked with the provider at {time}.",
+      "stageProcessing": "Processing",
+      "stageQueued": "Queued",
+      "providerUnreachable": "The provider could not be reached on the last attempt ({detail}). Retrying automatically in a few seconds."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -351,6 +356,25 @@
         "past_due": "Payment overdue",
         "canceled": "Canceled"
       }
+    },
+    "dishDetail": {
+      "backToList": "Back to dishes",
+      "photo": "Photo",
+      "noPhoto": "No photo for this dish.",
+      "model": "3D model",
+      "noModelYet": "No 3D model for this dish. Start a scan below or upload a file.",
+      "price": "Price",
+      "category": "Category",
+      "prepTime": "Prep time",
+      "minutes": "{minutes} min",
+      "availability": "Availability",
+      "ar": "Augmented reality",
+      "description": "Description",
+      "ingredients": "Ingredients",
+      "allergens": "Allergens",
+      "noAllergens": "No allergens declared.",
+      "analytics": "Analytics",
+      "publicPage": "View on public menu"
     }
   },
   "Legal": {

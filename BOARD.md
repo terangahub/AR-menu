@@ -153,6 +153,7 @@ en premier.
 | # | Ticket | Statut | Notes |
 |---|---|---|---|
 | S46-01 | Établir une vraie palette claire | `DEV` | Fait. Palette reconstruite autour du violet de marque au lieu d'une inversion mécanique du sombre, et chaque paire texte/fond vérifiée en contraste WCAG AA via `scripts/check-contrast.mjs`. **Reste à valider visuellement sur la preview Vercel** : la base locale étant factice, le dashboard et le menu ne s'affichent pas dans cet environnement. |
+| S46-05 | Fiche plat dans le dashboard | `FAIT` (non stylé) | **Signalé par Mouhamed en testant : cliquer sur un plat ne faisait rien.** La liste n'ouvrait que le formulaire d'édition, il n'existait aucun écran pour simplement regarder un plat. Nouvelle page `/dashboard/dishes/[dishId]` : photo, modèle 3D avec le même visualiseur que le menu public, prix, catégorie, temps de préparation, disponibilité, description, ingrédients, allergènes, et les actions (modifier, statistiques, voir sur le menu public). Les médias et le panneau de scan y sont déplacés depuis la page d'édition, qui ne sert plus qu'à modifier les champs. Reste à styler avec le reste du dashboard. |
 | S46-02 | Refonte du menu public et de la fiche plat | `TODO` | Écran vu par le convive, le plus critique commercialement. Absorbe S45-07 (photos sur la grille). |
 | S46-03 | Refonte de la coquille du dashboard | `TODO` | Navigation, en-tête, mise en page générale. |
 | S46-04 | Refonte des écrans du dashboard | `TODO` | Vue d'ensemble, plats, QR codes, analytics, facturation. |

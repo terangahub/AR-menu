@@ -128,13 +128,19 @@ export function DishList({
 
             return (
             <div key={dish.id} className="flex items-center justify-between gap-4 p-4">
-              <div className="flex min-w-0 flex-col gap-0.5">
+              {/* Le lien ne couvre que le nom et la ligne d'information :
+                  une ligne entière cliquable engloberait la case
+                  Disponible et le bouton Supprimer. */}
+              <Link
+                href={`/dashboard/dishes/${dish.id}`}
+                className="flex min-w-0 flex-col gap-0.5 hover:opacity-80"
+              >
                 <span className="truncate font-medium">{name}</span>
                 <span className="text-xs text-muted-foreground">
                   {categoryLabel} · {dish.price.toFixed(2)} $ ·{" "}
                   {dish.isArReady ? t("arReady") : t("noModel")}
                 </span>
-              </div>
+              </Link>
               <div className="flex shrink-0 items-center gap-2">
                 <label className="flex items-center gap-1.5 text-xs">
                   <input

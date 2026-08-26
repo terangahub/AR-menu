@@ -285,7 +285,8 @@
       "save": "Enregistrer",
       "saving": "Enregistrement…",
       "cancel": "Annuler",
-      "error": "Une erreur est survenue. Réessayez."
+      "error": "Une erreur est survenue. Réessayez.",
+      "backToDish": "Retour à la fiche du plat"
     },
     "dishScan": {
       "title": "Scan 3D automatisé",
@@ -312,7 +313,11 @@
       },
       "jobFormats": "Formats obtenus : {formats}.",
       "quotaRemaining": "{remaining} scan(s) restant(s) ce mois-ci sur {limit}.",
-      "quotaExhausted": "Quota mensuel atteint ({limit} scans). Il se renouvelle le 1er du mois prochain."
+      "quotaExhausted": "Quota mensuel atteint ({limit} scans). Il se renouvelle le 1er du mois prochain.",
+      "lastChecked": "{stage} · vérifié auprès du fournisseur à {time}.",
+      "stageProcessing": "Traitement en cours",
+      "stageQueued": "En file d'attente",
+      "providerUnreachable": "Le fournisseur n'a pas pu être interrogé au dernier essai ({detail}). Nouvel essai automatique dans quelques secondes."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -351,6 +356,25 @@
         "past_due": "Paiement en retard",
         "canceled": "Annulé"
       }
+    },
+    "dishDetail": {
+      "backToList": "Retour aux plats",
+      "photo": "Photo",
+      "noPhoto": "Aucune photo pour ce plat.",
+      "model": "Modèle 3D",
+      "noModelYet": "Aucun modèle 3D pour ce plat. Lancez un scan ci-dessous ou téléversez un fichier.",
+      "price": "Prix",
+      "category": "Catégorie",
+      "prepTime": "Temps de préparation",
+      "minutes": "{minutes} min",
+      "availability": "Disponibilité",
+      "ar": "Réalité augmentée",
+      "description": "Description",
+      "ingredients": "Ingrédients",
+      "allergens": "Allergènes",
+      "noAllergens": "Aucun allergène déclaré.",
+      "analytics": "Statistiques",
+      "publicPage": "Voir sur le menu public"
     }
   },
   "Legal": {
