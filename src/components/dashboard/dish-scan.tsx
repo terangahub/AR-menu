@@ -44,6 +44,22 @@ const PHASE_END: Record<Step, number> = {
   error: 0,
 };
 
+type ScanJobState = {
+  id: string;
+  status: string;
+  externalJobId: string | null;
+  errorMessage: string | null;
+  glbUrl: string | null;
+  usdzUrl: string | null;
+  createdAt: string;
+  completedAt: string | null;
+};
+
+// La génération chez KIRI dure plusieurs minutes : un intervalle court
+// n'apporterait rien d'autre que du trafic inutile.
+const JOB_POLL_MS = 15000;
+const ACTIVE_JOB_STATUSES = ["uploading", "processing", "queuing"];
+
 async function waitForDerivedVideo(url: string) {
   const deadline = Date.now() + PREPARE_TIMEOUT_MS;
   for (;;) {
@@ -71,6 +87,11 @@ export function DishScan({ dishId }: { dishId: string }) {
   const [prepareStartedAt, setPrepareStartedAt] = useState<number | null>(null);
   const [prepareElapsed, setPrepareElapsed] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
+  const [job, setJob] = useState<ScanJobState | null>(null);
+  // Doublé par une référence : le minuteur doit lire l'état courant sans
+  // se réabonner à chaque changement, et sans effet de bord dans un
+  // calculateur d'état.
+  const jobRef = useRef<ScanJobState | null>(null);
 
   const busy =
     step === "signing" || step === "uploading" || step === "preparing" || step === "starting";
@@ -84,6 +105,45 @@ export function DishScan({ dishId }: { dishId: string }) {
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [busy]);
+
+  // État du scan en cours, rafraîchi tant qu'il n'est pas terminé. Le
+  // suivi ne s'arrête jamais sur un job actif : sans lui, la page ne
+  // dirait plus rien entre le lancement et l'arrivée du modèle.
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refresh() {
+      try {
+        const res = await fetch(`/api/dishes/${dishId}/scan`);
+        if (!res.ok) return;
+        const body = await res.json();
+        if (cancelled) return;
+        const next: ScanJobState | null = body.scanJob;
+        const previous = jobRef.current;
+        jobRef.current = next;
+        setJob(next);
+        // Le modèle vient d'arriver : la fiche du plat doit se recharger
+        // pour l'afficher.
+        if (previous && next && previous.status !== next.status && next.glbUrl) {
+          router.refresh();
+        }
+      } catch {
+        // Réseau instable : on retentera au prochain tour.
+      }
+    }
+
+    void refresh();
+    const timer = setInterval(() => {
+      const current = jobRef.current;
+      if (current && !ACTIVE_JOB_STATUSES.includes(current.status)) return;
+      void refresh();
+    }, JOB_POLL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [dishId, router]);
 
   // La préparation est la seule étape sans progression mesurable : le
   // temps écoulé sert de repère, faute de mieux.
@@ -211,6 +271,15 @@ export function DishScan({ dishId }: { dishId: string }) {
           ? t("preparing")
           : t("starting");
   const elapsedSeconds = Math.floor(prepareElapsed / 1000);
+  const jobActive = job ? ACTIVE_JOB_STATUSES.includes(job.status) : false;
+  // Les statuts renvoyés par KIRI se réduisent à trois cas côté
+  // restaurateur : ça travaille, c'est prêt, ça a échoué. « expired »
+  // rejoint l'échec, la seule action possible étant de rescanner.
+  const jobStatusKey = jobActive
+    ? "active"
+    : job?.status === "successful"
+      ? "successful"
+      : "failed";
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
@@ -231,6 +300,39 @@ export function DishScan({ dishId }: { dishId: string }) {
         <p className={`text-sm ${step === "error" ? "text-destructive" : "text-muted-foreground"}`}>
           {message}
         </p>
+      )}
+
+      {job && (
+        <div className="rounded-lg border border-border bg-muted/30 p-3">
+          <div className="flex items-center gap-2">
+            <span
+              aria-hidden
+              className={`h-2 w-2 shrink-0 rounded-full ${
+                jobActive
+                  ? "animate-pulse bg-primary"
+                  : job.status === "successful"
+                    ? "bg-primary"
+                    : "bg-destructive"
+              }`}
+            />
+            <span className="text-sm font-medium">{t(`jobStatus.${jobStatusKey}`)}</span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t(`jobHelp.${jobStatusKey}`)}
+          </p>
+          {job.errorMessage && (
+            <p className="mt-2 text-xs text-destructive">{job.errorMessage}</p>
+          )}
+          {job.status === "successful" && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t("jobFormats", {
+                formats: [job.glbUrl ? "GLB" : null, job.usdzUrl ? "USDZ" : null]
+                  .filter(Boolean)
+                  .join(" + "),
+              })}
+            </p>
+          )}
+        </div>
       )}
 
       {busy && (

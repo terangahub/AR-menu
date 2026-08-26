@@ -3,6 +3,60 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { scan3dProvider, KiriApiError, ScanAlgorithm, ScanFileFormat } from "@/lib/scan3d";
 import { kiriReadyVideoUrl } from "@/lib/scan-video";
+import { ACTIVE_STATUSES, applyKiriStatus } from "@/lib/scan-finalize";
+
+// GET /api/dishes/[id]/scan - état du dernier scan du plat. Interroge
+// KIRI plutôt que de se contenter de ce que la base contient : le
+// webhook peut ne jamais arriver (notification perdue, callback mal
+// configuré), et le restaurateur resterait alors devant un job
+// éternellement « en cours » alors que son modèle est prêt.
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const restaurantUser = await getCurrentRestaurantUser();
+  if (!restaurantUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const dish = await prisma.dish.findUnique({ where: { id } });
+  if (!dish || dish.restaurantId !== restaurantUser.restaurantId) {
+    return NextResponse.json({ error: "Dish not found" }, { status: 404 });
+  }
+
+  let scanJob = await prisma.scanJob.findFirst({
+    where: { dishId: id },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!scanJob) {
+    return NextResponse.json({ scanJob: null });
+  }
+
+  if (scanJob.externalJobId && ACTIVE_STATUSES.includes(scanJob.status)) {
+    try {
+      const { rawStatus } = await scan3dProvider.getStatus(scanJob.externalJobId);
+      scanJob = await applyKiriStatus(scanJob, rawStatus);
+    } catch (err) {
+      // Un fournisseur injoignable ne doit pas casser l'affichage : le
+      // dernier état connu reste préférable à une page en erreur.
+      console.error("[scan status] interrogation KIRI échouée", err);
+    }
+  }
+
+  return NextResponse.json({
+    scanJob: {
+      id: scanJob.id,
+      status: scanJob.status,
+      externalJobId: scanJob.externalJobId,
+      errorMessage: scanJob.errorMessage,
+      glbUrl: scanJob.resultGlbUrl,
+      usdzUrl: scanJob.resultUsdzUrl,
+      createdAt: scanJob.createdAt,
+      completedAt: scanJob.completedAt,
+    },
+  });
+}
 
 // Limites larges plutôt que strictes : la vraie validation (durée vidéo
 // 3 min max, 1920x1080, 20 à 300 photos) doit vivre côté dashboard

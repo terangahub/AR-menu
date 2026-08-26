@@ -299,7 +299,18 @@
       "modalTitle": "3D capture in progress",
       "modalIntro": "Your video is being uploaded, then prepared for 3D model generation. This runs in several steps and can take a few minutes.",
       "modalWarning": "Do not close this page or drop your connection until the bar completes. Once the scan has started you can leave freely: generation continues on our servers and the model will appear on the dish automatically.",
-      "preparingDetail": "Converting the video to the expected duration and resolution. {seconds} seconds elapsed."
+      "preparingDetail": "Converting the video to the expected duration and resolution. {seconds} seconds elapsed.",
+      "jobStatus": {
+        "active": "3D model generation in progress",
+        "successful": "3D model ready",
+        "failed": "Generation failed"
+      },
+      "jobHelp": {
+        "active": "You can leave this page: generation continues on our servers. The status updates automatically.",
+        "successful": "The model is attached to the dish and available in augmented reality on the menu.",
+        "failed": "No model could be produced. Film the dish again and start a new scan."
+      },
+      "jobFormats": "Formats produced: {formats}."
     },
     "qrcodes": {
       "title": "QR codes",

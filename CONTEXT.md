@@ -79,7 +79,7 @@ src/
       dishes/[id]/photo/         ← upload image → Cloudinary
       dishes/[id]/model3d/       ← upload .glb (+.usdz optionnel) → Cloudinary
       dishes/[id]/scan/upload-url/ ← POST signature d'upload direct vers Cloudinary (jamais le fichier lui-même, voir section 5)
-      dishes/[id]/scan/          ← POST { videoUrl | imageUrls } déclenche une capture 3D via KIRI Engine (Sprint 4.7)
+      dishes/[id]/scan/          ← POST { videoUrl | imageUrls } déclenche une capture 3D via KIRI Engine (Sprint 4.7) / GET état du dernier ScanJob, interrogé côté KIRI (voir section 5)
       webhooks/kiri/             ← POST callback KIRI (statut de scan), voir lib/scan3d.ts
       qrcodes/                   ← GET liste / POST création
       qrcodes/[id]/              ← DELETE
@@ -104,6 +104,8 @@ src/
     dish-locale.ts               ← localizedDishName() - résout name/nameEn selon la locale (voir section 4)
     billing.ts                   ← TIERS (source unique des prix, section 15.1), getStripe(), subscriptionFieldsFrom()
     scan3d.ts                    ← Scan3dProvider (Sprint 4.7) : adaptateur KIRI Engine, sur le même principe que billing.ts
+    scan-video.ts                ← URL Cloudinary dérivée conforme aux contraintes vidéo de KIRI, partagée serveur/navigateur
+    scan-finalize.ts             ← extraction du zip résultat et rattachement au plat, partagé webhook/suivi
     qrcode.ts                    ← génération PNG + URL absolue
     cloudinary.ts                ← config + upload
     dish-schema.ts                ← validation zod du formulaire plat
@@ -489,6 +491,14 @@ concerné - cette liste est un résumé, pas la seule source.
   d'où une reprise espacée dans `fetchAsFile`. Le plafond de durée de la
   Function est relevé à 60 s : télécharger la vidéo puis la reverser à
   KIRI ne tient pas dans les 10 s par défaut.
+- **Ne jamais faire dépendre un résultat d'une seule notification
+  entrante.** Le modèle 3D revient normalement par le webhook KIRI, mais
+  une notification peut se perdre, arriver sur une URL de preview
+  périmée, ou ne jamais être configurée. `GET /api/dishes/[id]/scan`
+  interroge donc KIRI directement quand le job est encore actif, et
+  finalise lui-même si le modèle est prêt. Le traitement du résultat vit
+  dans `lib/scan-finalize.ts`, appelé par les deux chemins, pour qu'il
+  n'existe qu'une seule façon d'extraire les fichiers du zip.
 
 ---
 

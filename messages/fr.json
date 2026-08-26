@@ -299,7 +299,18 @@
       "modalTitle": "Capture 3D en cours",
       "modalIntro": "Votre vidéo est en train d'être envoyée puis préparée pour la génération du modèle 3D. Cette opération se déroule en plusieurs étapes et peut prendre quelques minutes.",
       "modalWarning": "Ne fermez pas cette page et ne coupez pas votre connexion tant que la barre n'est pas terminée. Une fois le scan lancé, vous pourrez quitter librement : la génération se poursuit sur nos serveurs et le modèle apparaîtra automatiquement sur la fiche du plat.",
-      "preparingDetail": "Conversion de la vidéo au format attendu (durée et résolution). {seconds} secondes écoulées."
+      "preparingDetail": "Conversion de la vidéo au format attendu (durée et résolution). {seconds} secondes écoulées.",
+      "jobStatus": {
+        "active": "Génération du modèle 3D en cours",
+        "successful": "Modèle 3D prêt",
+        "failed": "La génération a échoué"
+      },
+      "jobHelp": {
+        "active": "Vous pouvez quitter cette page : la génération se poursuit sur nos serveurs. L'état se met à jour automatiquement.",
+        "successful": "Le modèle est rattaché au plat et visible en réalité augmentée sur le menu.",
+        "failed": "Aucun modèle n'a pu être produit. Refilmez le plat et relancez un scan."
+      },
+      "jobFormats": "Formats obtenus : {formats}."
     },
     "qrcodes": {
       "title": "QR codes",
