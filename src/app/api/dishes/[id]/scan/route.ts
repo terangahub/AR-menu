@@ -22,8 +22,32 @@ export const maxDuration = 60;
 const ALGORITHMS: ScanAlgorithm[] = ["photo", "featureless", "3dgs"];
 const FORMATS: ScanFileFormat[] = ["glb", "usdz", "obj", "fbx", "stl", "ply", "gltf", "xyz"];
 
+// KIRI refuse toute vidéo au-delà de 3 min ou de 1920x1080 (code 2009,
+// rencontré en test réel sur une capture d'iPhone). Plutôt que d'exiger
+// du restaurateur qu'il convertisse lui-même, la vidéo est déjà chez
+// Cloudinary : on demande simplement une version dérivée conforme.
+// c_limit préserve le cadrage et ne fait que réduire, y compris pour une
+// vidéo portrait ; eo_180 coupe à 3 minutes ; f_mp4/vc_h264 garantit un
+// conteneur que KIRI accepte, là où le .mov d'un iPhone est incertain.
+const KIRI_VIDEO_TRANSFORM = "c_limit,w_1920,h_1080,eo_180,f_mp4,vc_h264";
+
+function kiriReadyVideoUrl(url: string): string {
+  const marker = "/video/upload/";
+  const at = url.indexOf(marker);
+  if (at === -1) return url;
+  const head = url.slice(0, at + marker.length);
+  const tail = url.slice(at + marker.length).replace(/\.[^./]+$/, ".mp4");
+  return `${head}${KIRI_VIDEO_TRANSFORM}/${tail}`;
+}
+
 async function fetchAsFile(url: string, maxSizeBytes: number) {
-  const res = await fetch(url);
+  let res = await fetch(url);
+  // Une transformation vidéo demandée pour la première fois n'est pas
+  // encore calculée : Cloudinary répond alors 423 le temps de la produire.
+  for (let attempt = 0; attempt < 5 && res.status === 423; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 4000));
+    res = await fetch(url);
+  }
   if (!res.ok) {
     throw new Error(`Téléchargement du média échoué (${res.status})`);
   }
@@ -79,7 +103,7 @@ export async function POST(
   try {
     if (videoUrl) {
       mediaType = "video";
-      video = await fetchAsFile(videoUrl, MAX_VIDEO_SIZE_BYTES);
+      video = await fetchAsFile(kiriReadyVideoUrl(videoUrl), MAX_VIDEO_SIZE_BYTES);
     } else if (imageUrls?.length) {
       if (imageUrls.length < MIN_IMAGES || imageUrls.length > MAX_IMAGES) {
         return NextResponse.json(

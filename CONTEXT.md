@@ -465,6 +465,30 @@ concerné - cette liste est un résumé, pas la seule source.
   fichier entre 4,5 et 15 Mo y échoue donc probablement déjà en
   production avec le même 413, non corrigé pour l'instant (hors
   périmètre du Sprint 4.7, à traiter séparément).
+- **Une erreur renvoyée sans corps lisible coûte un cycle de déploiement
+  par hypothèse.** La mise au point du flux de scan a buté trois fois de
+  suite sur un `500` au corps vide : une exception non rattrapée dans une
+  route App Router ne laisse rien passer au navigateur. Trois correctifs
+  en ont découlé, tous conservés : la signature Cloudinary nomme la
+  variable d'environnement qui manque (jamais sa valeur), la création du
+  `ScanJob` renvoie l'erreur Prisma réelle, et un échec fournisseur porte
+  son statut HTTP et son code détaillé. `lib/scan3d.ts` lit désormais la
+  réponse en texte avant de l'analyser : une passerelle en erreur répond
+  en HTML, et un `res.json()` direct levait une `SyntaxError` qui
+  masquait complètement le vrai statut. **Dans une route appelée depuis
+  le navigateur, toute branche d'échec doit renvoyer un corps JSON
+  exploitable.**
+- **KIRI refuse toute vidéo au-delà de 3 minutes ou de 1920x1080 (code
+  2009).** Constaté sur une capture d'iPhone ordinaire, qui filme en 4K
+  ou en portrait 1080x1920. Plutôt que d'imposer une conversion manuelle
+  au restaurateur, `POST /api/dishes/[id]/scan` demande à Cloudinary une
+  version dérivée conforme de la vidéo déjà téléversée
+  (`c_limit,w_1920,h_1080,eo_180,f_mp4,vc_h264`) : `c_limit` ne fait que
+  réduire et préserve le cadrage, y compris en portrait. **Cloudinary
+  répond `423` tant qu'une transformation inédite n'est pas calculée**,
+  d'où une reprise espacée dans `fetchAsFile`. Le plafond de durée de la
+  Function est relevé à 60 s : télécharger la vidéo puis la reverser à
+  KIRI ne tient pas dans les 10 s par défaut.
 
 ---
 
