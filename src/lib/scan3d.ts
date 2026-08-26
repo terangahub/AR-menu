@@ -1,4 +1,4 @@
-// Adaptateur pour la capture 3D automatisée des plats (Sprint 4.7,
+// Adaptateur pour la capture 3D automatisée des plats (Sprint 7,
 // docs/roadmap-ai-instant-3d.md section 0). Sur le principe de
 // src/lib/billing.ts : la logique métier (routes, ScanJob) ne parle
 // jamais directement à un fournisseur, elle passe par cette interface -

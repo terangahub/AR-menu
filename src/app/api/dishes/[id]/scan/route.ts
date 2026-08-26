@@ -74,7 +74,7 @@ export async function GET(
 
 // Limites larges plutôt que strictes : la vraie validation (durée vidéo
 // 3 min max, 1920x1080, 20 à 300 photos) doit vivre côté dashboard
-// (S47-07), avant l'upload, pour ne jamais gaspiller un crédit KIRI sur
+// (S7-11), avant l'upload, pour ne jamais gaspiller un crédit KIRI sur
 // une requête vouée à échouer (codes 2004/2005/2007/2009/2010, voir
 // docs/roadmap-ai-instant-3d.md). Cette route reste la ligne de défense
 // suivante, pas la première.
@@ -118,7 +118,7 @@ async function fetchAsFile(url: string, maxSizeBytes: number) {
 }
 
 // POST /api/dishes/[id]/scan - déclenche une capture 3D automatisée via
-// KIRI Engine (Sprint 4.7). Reçoit un JSON { videoUrl } ou
+// KIRI Engine (Sprint 7). Reçoit un JSON { videoUrl } ou
 // { imageUrls: string[] }, jamais le fichier lui-même : les Vercel
 // Functions refusent tout corps de requête au-delà d'environ 4,5 Mo
 // (FUNCTION_PAYLOAD_TOO_LARGE), bien en-deçà de ce que pèse une vidéo de

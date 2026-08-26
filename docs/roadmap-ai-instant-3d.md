@@ -107,7 +107,7 @@ réel avant d'écrire la route d'upload** :
   (auquel cas rien ne change au plan).
 - Il faut deux appels (deux crédits) par plat pour obtenir les deux
   formats, ce qui double le coût réel par plat et change le calcul de
-  S47-06 (garde-fous d'usage).
+  S7-10 (garde-fous d'usage).
 Ne pas annoncer la dette **D-03** résolue tant que ce point n'est pas
 vérifié.
 
@@ -165,7 +165,7 @@ traiter comme une erreur générique.
 | 2002 | Modèle expiré | Correspond au statut 4 - le plat doit être re-scanné, un crédit est reperdu |
 | 2003 | Statut du modèle impossible à récupérer | Retenter, puis marquer en erreur si ça persiste |
 | 2004 | Photoset vide | Erreur de validation - à intercepter **avant** l'appel API pour ne pas gaspiller un crédit |
-| 2005 | Trop de photos envoyées (max 300) | Idem, validation côté client dans S47-07 |
+| 2005 | Trop de photos envoyées (max 300) | Idem, validation côté client dans S7-11 |
 | 2006 | Modèle introuvable, mauvais numéro de série | Bug côté Vorae si ça arrive, à logger sérieusement |
 | 2007 | Pas assez d'images (min 20) | Idem 2004/2005, validation avant envoi |
 | 2008 | Modèle en file d'attente | Normal, continuer à sonder |
@@ -174,7 +174,7 @@ traiter comme une erreur générique.
 
 Les codes 2004, 2005, 2007, 2009 et 2010 sont tous évitables par une
 validation côté client **avant** d'appeler l'API - à construire dans
-l'interface du dashboard (S47-07), pour ne jamais dépenser un crédit sur
+l'interface du dashboard (S7-11), pour ne jamais dépenser un crédit sur
 une requête vouée à échouer.
 
 ### Plan B conservé : RealityScan 2.1 (Epic)

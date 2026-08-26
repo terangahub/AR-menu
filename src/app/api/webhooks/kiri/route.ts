@@ -4,7 +4,7 @@ import { applyKiriStatus } from "@/lib/scan-finalize";
 
 // POST /api/webhooks/kiri - callback unique pour tous les ScanJob du
 // compte (configuré manuellement dans Settings > Webhooks du dashboard
-// KIRI, cf. S47-05bis, URL de production :
+// KIRI, cf. S7-09, URL de production :
 // https://vorae-menu.vercel.app/api/webhooks/kiri). Le champ `serialize`
 // du corps identifie le ScanJob concerné, pas l'URL elle-même - un seul
 // webhook reçoit les événements de tous les plats de tous les

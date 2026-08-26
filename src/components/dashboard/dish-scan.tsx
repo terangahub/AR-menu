@@ -80,7 +80,7 @@ async function waitForDerivedVideo(url: string) {
   }
 }
 
-// Panneau de capture 3D (Sprint 4.7). La vidéo part directement du
+// Panneau de capture 3D (Sprint 7). La vidéo part directement du
 // navigateur vers Cloudinary : elle ne traverse jamais une Vercel
 // Function, dont la limite de payload (~4,5 Mo) est bien en-deçà du poids
 // d'une vidéo de scan. Voir CONTEXT.md section 5.

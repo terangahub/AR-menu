@@ -79,7 +79,7 @@ src/
       dishes/[id]/photo/         ← upload image → Cloudinary
       dishes/[id]/model3d/       ← upload .glb (+.usdz optionnel) → Cloudinary
       dishes/[id]/scan/upload-url/ ← POST signature d'upload direct vers Cloudinary (jamais le fichier lui-même, voir section 5)
-      dishes/[id]/scan/          ← POST { videoUrl | imageUrls } déclenche une capture 3D via KIRI Engine (Sprint 4.7) / GET état du dernier ScanJob, interrogé côté KIRI (voir section 5)
+      dishes/[id]/scan/          ← POST { videoUrl | imageUrls } déclenche une capture 3D via KIRI Engine (Sprint 7) / GET état du dernier ScanJob, interrogé côté KIRI (voir section 5)
       webhooks/kiri/             ← POST callback KIRI (statut de scan), voir lib/scan3d.ts
       qrcodes/                   ← GET liste / POST création
       qrcodes/[id]/              ← DELETE
@@ -103,7 +103,7 @@ src/
     analytics.ts                 ← requêtes agrégées pour le dashboard (10.1, 10.3)
     dish-locale.ts               ← localizedDishName() - résout name/nameEn selon la locale (voir section 4)
     billing.ts                   ← TIERS (source unique des prix, section 15.1), getStripe(), subscriptionFieldsFrom()
-    scan3d.ts                    ← Scan3dProvider (Sprint 4.7) : adaptateur KIRI Engine, sur le même principe que billing.ts
+    scan3d.ts                    ← Scan3dProvider (Sprint 7) : adaptateur KIRI Engine, sur le même principe que billing.ts
     scan-video.ts                ← URL Cloudinary dérivée conforme aux contraintes vidéo de KIRI, partagée serveur/navigateur
     scan-finalize.ts             ← extraction du zip résultat et rattachement au plat, partagé webhook/suivi
     qrcode.ts                    ← génération PNG + URL absolue
@@ -344,7 +344,7 @@ concerné - cette liste est un résumé, pas la seule source.
   alors jusqu'au premier ancêtre qui en forme un (souvent la racine de la
   page), et se retrouve peint **sous** le fond opaque de cet ancêtre au
   lieu de juste derrière le texte de sa propre section. Repéré en ajoutant
-  les étoiles filantes des sections À propos et Avis (Sprint 4.5, S45-13) :
+  les étoiles filantes des sections À propos et Avis (Sprint 5, S5-12) :
   invisibles malgré un `opacity` et une `animation` corrects en
   `getComputedStyle`, confirmé en écrivant un carré rouge de test au même
   endroit et en vérifiant sa couleur de pixel réelle plutôt que de se fier
@@ -466,7 +466,7 @@ concerné - cette liste est un résumé, pas la seule source.
   son propre code, largement au-dessus du seuil réel de Vercel - tout
   fichier entre 4,5 et 15 Mo y échoue donc probablement déjà en
   production avec le même 413, non corrigé pour l'instant (hors
-  périmètre du Sprint 4.7, à traiter séparément).
+  périmètre du Sprint 7, à traiter séparément).
 - **Une erreur renvoyée sans corps lisible coûte un cycle de déploiement
   par hypothèse.** La mise au point du flux de scan a buté trois fois de
   suite sur un `500` au corps vide : une exception non rattrapée dans une
@@ -593,7 +593,7 @@ sont codés et buildés. Il reste :
 
 ---
 
-## 8bis. Sections de landing reprises de webglow.ca (Sprint 4.5)
+## 8bis. Sections de landing reprises de webglow.ca (Sprint 5)
 
 Le client est aussi propriétaire de l'agence WebGlow (webglow.ca) et a
 fourni le dépôt de son site pour que quatre éléments visuels soient repris
@@ -629,7 +629,7 @@ rendu serveur et le rendu client provoque une erreur d'hydratation React.
 
 ## 8ter. Palette claire et animations sans dépendance
 
-**Palette claire refaite (Sprint 4.5).** Les tokens clairs d'origine
+**Palette claire refaite (Sprint 6, S6-01).** Les tokens clairs d'origine
 étaient une inversion approximative du sombre. Ils sont maintenant
 construits autour du violet de marque, et chaque paire texte/fond est
 vérifiée en contraste WCAG AA (section 17.5 du cahier). Le script
