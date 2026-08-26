@@ -3,6 +3,7 @@ import type { ScanJob } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { scan3dProvider } from "@/lib/scan3d";
 import { uploadBuffer } from "@/lib/cloudinary";
+import { ACTIVE_SCAN_STATUSES } from "@/lib/scan-status";
 
 // Statut brut KIRI - 4 = Expired (rétention de 3 jours dépassée), pas
 // "Exported" comme noté par erreur dans une première version de ce
@@ -16,7 +17,7 @@ export const STATUS_MAP: Record<number, string> = {
   4: "expired",
 };
 
-export const ACTIVE_STATUSES = ["uploading", "processing", "queuing"];
+export const ACTIVE_STATUSES = ACTIVE_SCAN_STATUSES;
 
 // Partagé entre le webhook KIRI et le suivi interrogé par le dashboard :
 // les deux peuvent apprendre qu'un job a réussi, et il ne doit exister
@@ -91,12 +92,17 @@ export async function finalizeScanJob(scanJob: ScanJob): Promise<ScanJob> {
     return updated;
   } catch (err) {
     console.error("[scan] échec du traitement du résultat", err);
+    // "finalize_failed", pas "failed" : KIRI a bel et bien réussi
+    // (rawStatus 2), c'est notre propre traitement du résultat qui a
+    // échoué (zip, extraction, téléversement). Rester dans
+    // ACTIVE_SCAN_STATUSES pour que le prochain sondage retente, sans
+    // dépenser un nouveau crédit KIRI puisqu'aucun scan n'est relancé.
     return prisma.scanJob.update({
       where: { id: scanJob.id },
       data: {
-        status: "failed",
+        status: "finalize_failed",
         errorMessage: err instanceof Error ? err.message : "Erreur inconnue",
-        completedAt: new Date(),
+        completedAt: null,
       },
     });
   }

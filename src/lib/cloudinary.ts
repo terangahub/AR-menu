@@ -25,8 +25,21 @@ export async function uploadBuffer(
         overwrite: true,
       },
       (error, result) => {
-        if (error || !result) reject(error ?? new Error("Upload failed"));
-        else resolve(result);
+        if (error || !result) {
+          // Le SDK Cloudinary rejette parfois avec un objet simple
+          // ({message, http_code}), pas une vraie instance Error : sans
+          // cette normalisation, `err instanceof Error` échoue plus loin
+          // (lib/scan-finalize.ts) et son vrai message se perd derrière
+          // un générique "Erreur inconnue".
+          reject(
+            error instanceof Error
+              ? error
+              : new Error(
+                  (error as { message?: string } | undefined)?.message ??
+                    "Échec de l'upload Cloudinary"
+                )
+          );
+        } else resolve(result);
       }
     );
     stream.end(buffer);

@@ -6,6 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
 import { kiriReadyVideoUrl } from "@/lib/scan-video";
+import { ACTIVE_SCAN_STATUSES } from "@/lib/scan-status";
 
 type Step = "idle" | "signing" | "uploading" | "preparing" | "starting" | "done" | "error";
 
@@ -64,7 +65,6 @@ type ScanQuota = {
 // La génération chez KIRI dure plusieurs minutes : un intervalle court
 // n'apporterait rien d'autre que du trafic inutile.
 const JOB_POLL_MS = 15000;
-const ACTIVE_JOB_STATUSES = ["uploading", "processing", "queuing"];
 
 async function waitForDerivedVideo(url: string) {
   const deadline = Date.now() + PREPARE_TIMEOUT_MS;
@@ -149,7 +149,7 @@ export function DishScan({ dishId }: { dishId: string }) {
     void refresh();
     const timer = setInterval(() => {
       const current = jobRef.current;
-      if (current && !ACTIVE_JOB_STATUSES.includes(current.status)) return;
+      if (current && !ACTIVE_SCAN_STATUSES.includes(current.status)) return;
       void refresh();
     }, JOB_POLL_MS);
 
@@ -285,7 +285,7 @@ export function DishScan({ dishId }: { dishId: string }) {
           ? t("preparing")
           : t("starting");
   const elapsedSeconds = Math.floor(prepareElapsed / 1000);
-  const jobActive = job ? ACTIVE_JOB_STATUSES.includes(job.status) : false;
+  const jobActive = job ? ACTIVE_SCAN_STATUSES.includes(job.status) : false;
   const quotaExhausted = quota ? quota.remaining <= 0 : false;
   // Un scan déjà en cours sur ce plat serait refusé côté serveur : autant
   // que le bouton le dise avant le clic.
