@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import type { ScanJob } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { scan3dProvider } from "@/lib/scan3d";
-import { uploadBuffer } from "@/lib/cloudinary";
+import { uploadModelToBlob } from "@/lib/blob-storage";
 import { ACTIVE_SCAN_STATUSES } from "@/lib/scan-status";
 
 // Statut brut KIRI - 4 = Expired (rétention de 3 jours dépassée), pas
@@ -54,13 +54,12 @@ export async function finalizeScanJob(scanJob: ScanJob): Promise<ScanJob> {
       if (!extension) continue;
 
       const buffer = await entry.async("nodebuffer");
-      const result = await uploadBuffer(buffer, {
-        folder: `vorae/${scanJob.dishId}/models`,
-        resourceType: "raw",
-        publicId: `${scanJob.dishId}-${scanJob.id}.${extension}`,
+      const result = await uploadModelToBlob(buffer, {
+        pathname: `vorae/${scanJob.dishId}/models/${scanJob.dishId}-${scanJob.id}.${extension}`,
+        extension,
       });
-      if (extension === "glb") glbUrl = result.secure_url;
-      else usdzUrl = result.secure_url;
+      if (extension === "glb") glbUrl = result.url;
+      else usdzUrl = result.url;
     }
 
     if (!glbUrl && !usdzUrl) {

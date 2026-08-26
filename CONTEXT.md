@@ -106,8 +106,9 @@ src/
     scan3d.ts                    ← Scan3dProvider (Sprint 7) : adaptateur KIRI Engine, sur le même principe que billing.ts
     scan-video.ts                ← URL Cloudinary dérivée conforme aux contraintes vidéo de KIRI, partagée serveur/navigateur
     scan-finalize.ts             ← extraction du zip résultat et rattachement au plat, partagé webhook/suivi
+    blob-storage.ts              ← Vercel Blob pour les modèles 3D issus du scan (Cloudinary refuse les fichiers `raw` au-delà de 10 Mo, voir section 5)
     qrcode.ts                    ← génération PNG + URL absolue
-    cloudinary.ts                ← config + upload
+    cloudinary.ts                ← config + upload (photos de plats, vidéo source du scan - plus les modèles 3D résultat, voir blob-storage.ts)
     dish-schema.ts                ← validation zod du formulaire plat
     dish-categories.ts           ← catégories existantes (pour le dropdown)
   i18n/                          ← next-intl (routing, navigation, request config)
@@ -499,6 +500,34 @@ concerné - cette liste est un résumé, pas la seule source.
   finalise lui-même si le modèle est prêt. Le traitement du résultat vit
   dans `lib/scan-finalize.ts`, appelé par les deux chemins, pour qu'il
   n'existe qu'une seule façon d'extraire les fichiers du zip.
+- **Un plafond de taille de fichier annoncé "par requête" peut en réalité
+  porter sur le fichier total reconstitué.** Le premier modèle 3D réel
+  produit par KIRI pèse environ 86 Mo, refusé par Cloudinary
+  (`File size too large. Got 89973380. Maximum is 10485760.`, soit
+  10 Mo). Un envoi fractionné en morceaux de 6 Mo semblait la solution
+  évidente, mais a échoué avec `Got 12582912` - exactement deux morceaux
+  cumulés, pas la taille d'un seul. La preuve que la limite du compte
+  porte sur le fichier entier, pas sur chaque requête : aucun découpage
+  ne pouvait la contourner. Vérifié aussi que monter en plan Cloudinary
+  n'aide pas : le plan Plus à 99 $/mois plafonne encore à 20 Mo. Les
+  modèles 3D sont donc stockés sur **Vercel Blob** (`lib/blob-storage.ts`)
+  plutôt que Cloudinary, choisi sur AWS S3 (prévu par la section 7 du
+  cahier) parce qu'aucun compte AWS n'existe et que Vercel Blob s'active
+  depuis les réglages du projet déjà en place. Les photos de plats et la
+  vidéo source du scan restent sur Cloudinary, bien en-dessous de ses
+  plafonds.
+- **`upload_large_stream` du SDK Cloudinary existe dans ses types
+  TypeScript mais pas réellement sur l'objet `v2.uploader`** dans la
+  version installée (2.10.1) : défini dans `lib/uploader.js`, jamais
+  reporté vers l'API v2 publique (`lib/v2/uploader.js`). Un appel lève
+  `TypeError` (`r is not a function` une fois minifié). Confirmé à
+  l'exécution (`typeof cloudinary.uploader.upload_large_stream ===
+  "undefined"`) avant de chercher l'alternative réellement exposée,
+  `upload_chunked_stream`, avec la même convention d'appel
+  `(options, callback)`. **Vérifier qu'une fonction citée dans les types
+  d'un SDK existe réellement à l'exécution avant de s'y fier**, surtout
+  pour une fonctionnalité annexe (l'upload fractionné) qui a pu ne pas
+  suivre le reste de l'API lors d'un portage v1 vers v2.
 
 ---
 
