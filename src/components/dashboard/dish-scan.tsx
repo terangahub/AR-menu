@@ -5,7 +5,30 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
-type Step = "idle" | "signing" | "uploading" | "starting" | "done" | "error";
+import { kiriReadyVideoUrl } from "@/lib/scan-video";
+
+type Step = "idle" | "signing" | "uploading" | "preparing" | "starting" | "done" | "error";
+
+// Cloudinary répond 423 tant qu'une transformation vidéo inédite n'est
+// pas calculée. L'attente vit ici plutôt que dans la route : une Function
+// Vercel est plafonnée à 60 s, ce qu'un transcodage dépasse souvent, alors
+// que le navigateur peut patienter sans limite.
+const PREPARE_TIMEOUT_MS = 5 * 60 * 1000;
+const PREPARE_POLL_MS = 4000;
+
+async function waitForDerivedVideo(url: string) {
+  const deadline = Date.now() + PREPARE_TIMEOUT_MS;
+  for (;;) {
+    // HEAD plutôt que GET : inutile de retélécharger la vidéo entière à
+    // chaque tentative, a fortiori sur un forfait mobile.
+    const res = await fetch(url, { method: "HEAD" });
+    if (res.status !== 423) return;
+    if (Date.now() > deadline) {
+      throw new Error("La préparation de la vidéo a pris trop de temps");
+    }
+    await new Promise((resolve) => setTimeout(resolve, PREPARE_POLL_MS));
+  }
+}
 
 // Panneau de capture 3D (Sprint 4.7). La vidéo part directement du
 // navigateur vers Cloudinary : elle ne traverse jamais une Vercel
@@ -81,6 +104,9 @@ export function DishScan({ dishId }: { dishId: string }) {
       setStep("uploading");
       const videoUrl = await uploadToCloudinary(signed, file);
 
+      setStep("preparing");
+      await waitForDerivedVideo(kiriReadyVideoUrl(videoUrl));
+
       setStep("starting");
       const scanRes = await fetch(`/api/dishes/${dishId}/scan`, {
         method: "POST",
@@ -105,15 +131,18 @@ export function DishScan({ dishId }: { dishId: string }) {
     }
   }
 
-  const busy = step === "signing" || step === "uploading" || step === "starting";
+  const busy =
+    step === "signing" || step === "uploading" || step === "preparing" || step === "starting";
   const label =
     step === "signing"
       ? t("signing")
       : step === "uploading"
         ? t("uploading", { progress })
-        : step === "starting"
-          ? t("starting")
-          : t("submit");
+        : step === "preparing"
+          ? t("preparing")
+          : step === "starting"
+            ? t("starting")
+            : t("submit");
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border p-4">

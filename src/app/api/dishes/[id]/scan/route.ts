@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { scan3dProvider, KiriApiError, ScanAlgorithm, ScanFileFormat } from "@/lib/scan3d";
+import { kiriReadyVideoUrl } from "@/lib/scan-video";
 
 // Limites larges plutôt que strictes : la vraie validation (durée vidéo
 // 3 min max, 1920x1080, 20 à 300 photos) doit vivre côté dashboard
@@ -22,31 +23,20 @@ export const maxDuration = 60;
 const ALGORITHMS: ScanAlgorithm[] = ["photo", "featureless", "3dgs"];
 const FORMATS: ScanFileFormat[] = ["glb", "usdz", "obj", "fbx", "stl", "ply", "gltf", "xyz"];
 
-// KIRI refuse toute vidéo au-delà de 3 min ou de 1920x1080 (code 2009,
-// rencontré en test réel sur une capture d'iPhone). Plutôt que d'exiger
-// du restaurateur qu'il convertisse lui-même, la vidéo est déjà chez
-// Cloudinary : on demande simplement une version dérivée conforme.
-// c_limit préserve le cadrage et ne fait que réduire, y compris pour une
-// vidéo portrait ; eo_180 coupe à 3 minutes ; f_mp4/vc_h264 garantit un
-// conteneur que KIRI accepte, là où le .mov d'un iPhone est incertain.
-const KIRI_VIDEO_TRANSFORM = "c_limit,w_1920,h_1080,eo_180,f_mp4,vc_h264";
-
-function kiriReadyVideoUrl(url: string): string {
-  const marker = "/video/upload/";
-  const at = url.indexOf(marker);
-  if (at === -1) return url;
-  const head = url.slice(0, at + marker.length);
-  const tail = url.slice(at + marker.length).replace(/\.[^./]+$/, ".mp4");
-  return `${head}${KIRI_VIDEO_TRANSFORM}/${tail}`;
-}
-
 async function fetchAsFile(url: string, maxSizeBytes: number) {
   let res = await fetch(url);
-  // Une transformation vidéo demandée pour la première fois n'est pas
-  // encore calculée : Cloudinary répond alors 423 le temps de la produire.
-  for (let attempt = 0; attempt < 5 && res.status === 423; attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 4000));
+  // Filet de sécurité seulement : c'est le navigateur qui attend que la
+  // transformation soit calculée (Cloudinary répond 423 en attendant),
+  // parce qu'un transcodage vidéo depasse souvent le plafond de 60 s
+  // d'une Function. Arrivé ici, le fichier dérivé est normalement prêt.
+  for (let attempt = 0; attempt < 3 && res.status === 423; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     res = await fetch(url);
+  }
+  if (res.status === 423) {
+    throw new Error(
+      "La vidéo est encore en cours de préparation, réessayez dans un instant"
+    );
   }
   if (!res.ok) {
     throw new Error(`Téléchargement du média échoué (${res.status})`);

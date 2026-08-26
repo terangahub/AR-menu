@@ -293,6 +293,7 @@
       "submit": "Start scan",
       "signing": "Preparing…",
       "uploading": "Uploading video… {progress}%",
+      "preparing": "Preparing the video… (may take 1 to 2 minutes)",
       "starting": "Starting scan…",
       "started": "Scan started. Job id: {jobId}. The model will appear here once generation completes."
     },

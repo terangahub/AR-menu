@@ -293,6 +293,7 @@
       "submit": "Lancer le scan",
       "signing": "Préparation…",
       "uploading": "Envoi de la vidéo… {progress}%",
+      "preparing": "Préparation de la vidéo… (peut prendre 1 à 2 minutes)",
       "starting": "Démarrage du scan…",
       "started": "Scan lancé. Identifiant du job : {jobId}. Le modèle apparaîtra ici une fois la génération terminée."
     },
