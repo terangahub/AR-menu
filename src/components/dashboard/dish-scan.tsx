@@ -89,7 +89,11 @@ export function DishScan({ dishId }: { dishId: string }) {
       });
       const scanBody = await scanRes.json().catch(() => null);
       if (!scanRes.ok) {
-        throw new Error(scanBody?.error ?? `scan ${scanRes.status}`);
+        // detail porte la cause reelle renvoyee par le fournisseur : sans
+        // elle, un echec KIRI se resume a un message generique qui
+        // n'oriente vers rien.
+        const detail = scanBody?.detail ? ` (${scanBody.detail})` : "";
+        throw new Error(`${scanBody?.error ?? `scan ${scanRes.status}`}${detail}`);
       }
 
       setStep("done");

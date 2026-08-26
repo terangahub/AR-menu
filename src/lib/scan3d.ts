@@ -101,12 +101,34 @@ async function kiriFetch(url: string, init: RequestInit) {
       ...(init.headers ?? {}),
     },
   });
-  const body = await res.json();
+  // Lu en texte d'abord : une passerelle en erreur (413, 502) répond en
+  // HTML, et un res.json() direct lèverait alors une SyntaxError qui
+  // masquerait complètement le vrai statut.
+  const raw = await res.text();
+  let body: {
+    ok?: boolean;
+    code?: number;
+    msg?: string;
+    data: Record<string, unknown>;
+  };
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    throw new KiriApiError(
+      res.status,
+      undefined,
+      `Réponse non JSON de KIRI (HTTP ${res.status}) : ${raw.slice(0, 200)}`
+    );
+  }
   // Le champ `code` n'est pas fiable comme indicateur de succès : un
   // appel réussi a renvoyé `code: 200` en test réel, alors que les
   // exemples de la doc montrent `code: 0`. Se fier au champ `ok`.
   if (!body.ok) {
-    throw new KiriApiError(res.status, body.code, body.msg ?? "Erreur API KIRI");
+    throw new KiriApiError(
+      res.status,
+      body.code,
+      `${body.msg ?? "Erreur API KIRI"} (HTTP ${res.status}, code ${body.code})`
+    );
   }
   return body;
 }
