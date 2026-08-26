@@ -35,16 +35,32 @@ export async function uploadModelToBlob(
   // vérification figée sur une seule variable bloquerait à tort le
   // chemin normal. S'il manque vraiment une configuration, put() échoue
   // avec son propre message, qui remonte tel quel.
-  const blob = await put(options.pathname, buffer, {
-    access: "public",
-    contentType: CONTENT_TYPES[options.extension],
-    addRandomSuffix: false,
-    // Une reprise (S7-14) peut retenter le même fichier après un échec
-    // partiel précédent : sans ceci, le deuxième essai échouerait sur un
-    // chemin déjà occupé plutôt que de le remplacer.
-    allowOverwrite: true,
-    multipart: buffer.byteLength > MULTIPART_THRESHOLD_BYTES,
-  });
+  try {
+    const blob = await put(options.pathname, buffer, {
+      access: "public",
+      contentType: CONTENT_TYPES[options.extension],
+      addRandomSuffix: false,
+      // Une reprise (S7-14) peut retenter le même fichier après un échec
+      // partiel précédent : sans ceci, le deuxième essai échouerait sur un
+      // chemin déjà occupé plutôt que de le remplacer.
+      allowOverwrite: true,
+      multipart: buffer.byteLength > MULTIPART_THRESHOLD_BYTES,
+    });
 
-  return { url: blob.url };
+    return { url: blob.url };
+  } catch (err) {
+    // Le message du SDK liste les variables possibles sans dire lesquelles
+    // sont réellement présentes, ce qui ne permet pas de distinguer « la
+    // variable n'a pas été ajoutée » de « elle existe mais le déploiement
+    // est antérieur à son ajout ». On joint donc l'état réel, en noms et
+    // en booléens seulement, jamais une valeur.
+    const seen = [
+      `BLOB_READ_WRITE_TOKEN=${Boolean(process.env.BLOB_READ_WRITE_TOKEN)}`,
+      `BLOB_STORE_ID=${Boolean(process.env.BLOB_STORE_ID)}`,
+      `VERCEL_OIDC_TOKEN=${Boolean(process.env.VERCEL_OIDC_TOKEN)}`,
+      `VERCEL_ENV=${process.env.VERCEL_ENV ?? "absent"}`,
+    ].join(", ");
+    const detail = err instanceof Error ? err.message : "erreur inconnue";
+    throw new Error(`${detail} [vu par la Function : ${seen}]`);
+  }
 }
