@@ -47,8 +47,18 @@ export function signUpload(params: {
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  // Les noms manquants sont cites explicitement : savoir laquelle des
+  // trois fait defaut evite un aller-retour de deploiement complet. Seuls
+  // les noms sortent, jamais les valeurs.
+  const missing = [
+    !cloudName && "CLOUDINARY_CLOUD_NAME",
+    !apiKey && "CLOUDINARY_API_KEY",
+    !apiSecret && "CLOUDINARY_API_SECRET",
+  ].filter(Boolean);
   if (!apiSecret || !apiKey || !cloudName) {
-    throw new Error("Configuration Cloudinary manquante - voir .env.example");
+    throw new Error(
+      `Configuration Cloudinary manquante : ${missing.join(", ")} - voir .env.example`
+    );
   }
 
   const timestamp = Math.round(Date.now() / 1000);
