@@ -286,7 +286,11 @@
       "saving": "Enregistrement…",
       "cancel": "Annuler",
       "error": "Une erreur est survenue. Réessayez.",
-      "backToDish": "Retour à la fiche du plat"
+      "backToDish": "Retour à la fiche du plat",
+      "savePhoto": "Enregistrer la photo",
+      "saveModel": "Enregistrer le modèle",
+      "noPhotoSelected": "Choisissez d'abord une photo.",
+      "noGlbSelected": "Ce bouton enregistre le modèle 3D. Choisissez un fichier .glb, ou utilisez le bouton de la section Photo pour enregistrer une photo."
     },
     "dishScan": {
       "title": "Scan 3D automatisé",

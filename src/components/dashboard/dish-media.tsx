@@ -26,7 +26,12 @@ export function DishMedia({
 
   async function uploadPhoto() {
     const file = photoInput.current?.files?.[0];
-    if (!file) return;
+    // Sans ce message, le bouton semble cassé : il ne se passait
+    // strictement rien quand aucun fichier n'était choisi.
+    if (!file) {
+      setError(t("noPhotoSelected"));
+      return;
+    }
     setUploading("photo");
     setError(null);
 
@@ -47,7 +52,13 @@ export function DishMedia({
 
   async function uploadModel() {
     const glb = glbInput.current?.files?.[0];
-    if (!glb) return;
+    // Le cas qui a dérouté Mouhamed : une photo choisie plus haut, ce
+    // bouton pressé, et rien ne se passe. Ce bouton n'envoie que le
+    // modèle 3D, la photo a le sien.
+    if (!glb) {
+      setError(t("noGlbSelected"));
+      return;
+    }
     setUploading("model3d");
     setError(null);
 
@@ -77,8 +88,16 @@ export function DishMedia({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt="" className="h-32 w-32 rounded-md object-cover" />
         )}
-        <div className="flex items-center gap-2">
-          <input ref={photoInput} type="file" accept="image/png,image/jpeg,image/webp" />
+        {/* flex-wrap et max-w-full : sur mobile, le sélecteur de fichier
+            natif est large et poussait le bouton hors de l'écran, si bien
+            qu'on ne voyait plus qu'un seul des deux boutons Enregistrer. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            ref={photoInput}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="max-w-full"
+          />
           <Button
             type="button"
             size="sm"
@@ -86,7 +105,7 @@ export function DishMedia({
             disabled={uploading === "photo"}
             onClick={uploadPhoto}
           >
-            {uploading === "photo" ? t("saving") : t("save")}
+            {uploading === "photo" ? t("saving") : t("savePhoto")}
           </Button>
         </div>
       </div>
@@ -96,13 +115,13 @@ export function DishMedia({
         {model3dGlbUrl && (
           <p className="truncate text-xs text-muted-foreground">{model3dGlbUrl}</p>
         )}
-        <input ref={glbInput} type="file" accept=".glb" />
+        <input ref={glbInput} type="file" accept=".glb" className="max-w-full" />
 
         <span className="text-sm font-medium">{t("model3dUsdz")}</span>
         {model3dUsdzUrl && (
           <p className="truncate text-xs text-muted-foreground">{model3dUsdzUrl}</p>
         )}
-        <input ref={usdzInput} type="file" accept=".usdz" />
+        <input ref={usdzInput} type="file" accept=".usdz" className="max-w-full" />
 
         <Button
           type="button"
@@ -112,7 +131,7 @@ export function DishMedia({
           onClick={uploadModel}
           className="w-fit"
         >
-          {uploading === "model3d" ? t("saving") : t("save")}
+          {uploading === "model3d" ? t("saving") : t("saveModel")}
         </Button>
       </div>
 

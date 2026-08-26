@@ -286,7 +286,11 @@
       "saving": "Saving…",
       "cancel": "Cancel",
       "error": "Something went wrong. Try again.",
-      "backToDish": "Back to dish"
+      "backToDish": "Back to dish",
+      "savePhoto": "Save photo",
+      "saveModel": "Save model",
+      "noPhotoSelected": "Choose a photo first.",
+      "noGlbSelected": "This button saves the 3D model. Choose a .glb file, or use the button in the Photo section to save a photo."
     },
     "dishScan": {
       "title": "Automated 3D scan",
