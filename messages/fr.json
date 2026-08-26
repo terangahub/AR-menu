@@ -203,7 +203,7 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "Voir en AR",
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
-    "arUnavailable": "AR non disponible sur cet appareil : affichage 2D",
+    "arUnavailable": "Modèle 3D indisponible pour l'instant : photo affichée",
     "back": "Retour au menu"
   },
   "Dashboard": {

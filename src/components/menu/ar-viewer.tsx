@@ -3,9 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-// Fallback 2D non-négociable (section 17.1, 25) : si le modèle 3D ne se
-// charge pas sous 3s, ou échoue, on retombe immédiatement sur l'image.
-const LOAD_TIMEOUT_MS = 3000;
+// Fallback 2D non-négociable (section 17.1, 25) : si le modèle 3D échoue,
+// on retombe sur l'image.
+//
+// Le délai était de 3 s, ce qui rendait le fallback systématique dès le
+// premier vrai modèle : aucun maillage de photogrammétrie ne se charge en
+// 3 s sur un téléphone en 4G, et le convive voyait toujours la photo avec
+// un message annonçant à tort que son appareil ne gère pas l'AR. Le
+// convive n'attend pas devant un écran vide pour autant : `poster`
+// affiche la photo du plat pendant tout le chargement, et le modèle la
+// remplace dès qu'il est prêt. Ce délai n'est donc plus un seuil de
+// confort mais un filet contre un modèle qui ne se chargerait jamais.
+const LOAD_TIMEOUT_MS = 25000;
 
 export function ArViewer({
   glbUrl,
