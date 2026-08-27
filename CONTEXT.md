@@ -78,6 +78,9 @@ src/
       dishes/[id]/               ← GET public / PUT / DELETE
       dishes/[id]/photo/         ← upload image → Cloudinary
       dishes/[id]/model3d/       ← upload .glb (+.usdz optionnel) → Cloudinary
+      dishes/[id]/scan/upload-url/ ← POST signature d'upload direct vers Cloudinary (jamais le fichier lui-même, voir section 5)
+      dishes/[id]/scan/          ← POST { videoUrl | imageUrls } déclenche une capture 3D via KIRI Engine (Sprint 7) / GET état du dernier ScanJob, interrogé côté KIRI (voir section 5)
+      webhooks/kiri/             ← POST callback KIRI (statut de scan), voir lib/scan3d.ts
       qrcodes/                   ← GET liste / POST création
       qrcodes/[id]/              ← DELETE
       qrcodes/[id]/png/          ← régénère le PNG à la volée (Content-Disposition: attachment)
@@ -100,8 +103,12 @@ src/
     analytics.ts                 ← requêtes agrégées pour le dashboard (10.1, 10.3)
     dish-locale.ts               ← localizedDishName() - résout name/nameEn selon la locale (voir section 4)
     billing.ts                   ← TIERS (source unique des prix, section 15.1), getStripe(), subscriptionFieldsFrom()
+    scan3d.ts                    ← Scan3dProvider (Sprint 7) : adaptateur KIRI Engine, sur le même principe que billing.ts
+    scan-video.ts                ← URL Cloudinary dérivée conforme aux contraintes vidéo de KIRI, partagée serveur/navigateur
+    scan-finalize.ts             ← extraction du zip résultat et rattachement au plat, partagé webhook/suivi
+    blob-storage.ts              ← Vercel Blob pour les modèles 3D issus du scan (Cloudinary refuse les fichiers `raw` au-delà de 10 Mo, voir section 5)
     qrcode.ts                    ← génération PNG + URL absolue
-    cloudinary.ts                ← config + upload
+    cloudinary.ts                ← config + upload (photos de plats, vidéo source du scan - plus les modèles 3D résultat, voir blob-storage.ts)
     dish-schema.ts                ← validation zod du formulaire plat
     dish-categories.ts           ← catégories existantes (pour le dropdown)
   i18n/                          ← next-intl (routing, navigation, request config)
@@ -338,7 +345,7 @@ concerné - cette liste est un résumé, pas la seule source.
   alors jusqu'au premier ancêtre qui en forme un (souvent la racine de la
   page), et se retrouve peint **sous** le fond opaque de cet ancêtre au
   lieu de juste derrière le texte de sa propre section. Repéré en ajoutant
-  les étoiles filantes des sections À propos et Avis (Sprint 4.5, S45-13) :
+  les étoiles filantes des sections À propos et Avis (Sprint 5, S5-12) :
   invisibles malgré un `opacity` et une `animation` corrects en
   `getComputedStyle`, confirmé en écrivant un carré rouge de test au même
   endroit et en vérifiant sa couleur de pixel réelle plutôt que de se fier
@@ -430,6 +437,97 @@ concerné - cette liste est un résumé, pas la seule source.
   que deux horloges différentes (event timestamp vs `now` de rAF)
   produisent un delta positif ; borner toute valeur dérivée d'un delta de
   temps avant de l'utiliser comme rayon.**
+- **`Buffer` de Node n'est pas assignable à `BlobPart` sous TypeScript
+  strict.** Rencontré dans `lib/scan3d.ts` en construisant un `FormData`
+  pour l'upload multipart vers KIRI : `new Blob([buffer])` échoue à la
+  compilation (`Buffer<ArrayBufferLike>` vs `ArrayBufferView<ArrayBuffer>`,
+  une incompatibilité de types liée à `SharedArrayBuffer`). Corrigé en
+  enveloppant explicitement : `new Blob([new Uint8Array(buffer)])`.
+- **Le champ `code` d'une API tierce n'est pas forcément un indicateur de
+  succès fiable, même documenté comme tel.** La doc KIRI montre `code: 0`
+  sur ses exemples de réponse réussie, mais un appel réel testé en
+  direct a renvoyé `code: 200` pour le même succès. `lib/scan3d.ts` se
+  fie au champ `ok` (booléen), jamais à `code`. **Vérifier le comportement
+  réel d'une API avant de coder une condition sur un champ de statut
+  documenté par des exemples plutôt que par une spec stricte.**
+- **Les Vercel Functions (Node.js) refusent tout corps de requête entrant
+  au-delà d'environ 4,5 Mo, avec l'erreur `FUNCTION_PAYLOAD_TOO_LARGE`
+  (HTTP 413) - avant même que le code de la route s'exécute.** Découvert
+  en testant `POST /api/dishes/[id]/scan` avec une vraie vidéo de 13,6 Mo,
+  pourtant conforme aux critères KIRI (1080p, moins de 3 minutes). Aucune
+  vidéo de scan utilisable ne tient sous ce seuil. Corrigé en faisant
+  transiter le média par un upload direct client → Cloudinary (signature
+  générée par `POST /api/dishes/[id]/scan/upload-url`, jamais les octets
+  eux-mêmes) : la route `/scan` ne reçoit plus qu'une URL en JSON, et va
+  chercher le fichier elle-même côté serveur (un appel sortant depuis une
+  Function n'est pas soumis à cette limite, seul le corps entrant l'est).
+  **Cette limite s'applique à toute route qui reçoit un fichier en
+  multipart directement.** `POST /api/dishes/[id]/model3d` (upload manuel
+  de `.glb`/`.usdz`, section 9.2) accepte actuellement jusqu'à 15 Mo dans
+  son propre code, largement au-dessus du seuil réel de Vercel - tout
+  fichier entre 4,5 et 15 Mo y échoue donc probablement déjà en
+  production avec le même 413, non corrigé pour l'instant (hors
+  périmètre du Sprint 7, à traiter séparément).
+- **Une erreur renvoyée sans corps lisible coûte un cycle de déploiement
+  par hypothèse.** La mise au point du flux de scan a buté trois fois de
+  suite sur un `500` au corps vide : une exception non rattrapée dans une
+  route App Router ne laisse rien passer au navigateur. Trois correctifs
+  en ont découlé, tous conservés : la signature Cloudinary nomme la
+  variable d'environnement qui manque (jamais sa valeur), la création du
+  `ScanJob` renvoie l'erreur Prisma réelle, et un échec fournisseur porte
+  son statut HTTP et son code détaillé. `lib/scan3d.ts` lit désormais la
+  réponse en texte avant de l'analyser : une passerelle en erreur répond
+  en HTML, et un `res.json()` direct levait une `SyntaxError` qui
+  masquait complètement le vrai statut. **Dans une route appelée depuis
+  le navigateur, toute branche d'échec doit renvoyer un corps JSON
+  exploitable.**
+- **KIRI refuse toute vidéo au-delà de 3 minutes ou de 1920x1080 (code
+  2009).** Constaté sur une capture d'iPhone ordinaire, qui filme en 4K
+  ou en portrait 1080x1920. Plutôt que d'imposer une conversion manuelle
+  au restaurateur, `POST /api/dishes/[id]/scan` demande à Cloudinary une
+  version dérivée conforme de la vidéo déjà téléversée
+  (`c_limit,w_1920,h_1080,eo_180,f_mp4,vc_h264`) : `c_limit` ne fait que
+  réduire et préserve le cadrage, y compris en portrait. **Cloudinary
+  répond `423` tant qu'une transformation inédite n'est pas calculée**,
+  d'où une reprise espacée dans `fetchAsFile`. Le plafond de durée de la
+  Function est relevé à 60 s : télécharger la vidéo puis la reverser à
+  KIRI ne tient pas dans les 10 s par défaut.
+- **Ne jamais faire dépendre un résultat d'une seule notification
+  entrante.** Le modèle 3D revient normalement par le webhook KIRI, mais
+  une notification peut se perdre, arriver sur une URL de preview
+  périmée, ou ne jamais être configurée. `GET /api/dishes/[id]/scan`
+  interroge donc KIRI directement quand le job est encore actif, et
+  finalise lui-même si le modèle est prêt. Le traitement du résultat vit
+  dans `lib/scan-finalize.ts`, appelé par les deux chemins, pour qu'il
+  n'existe qu'une seule façon d'extraire les fichiers du zip.
+- **Un plafond de taille de fichier annoncé "par requête" peut en réalité
+  porter sur le fichier total reconstitué.** Le premier modèle 3D réel
+  produit par KIRI pèse environ 86 Mo, refusé par Cloudinary
+  (`File size too large. Got 89973380. Maximum is 10485760.`, soit
+  10 Mo). Un envoi fractionné en morceaux de 6 Mo semblait la solution
+  évidente, mais a échoué avec `Got 12582912` - exactement deux morceaux
+  cumulés, pas la taille d'un seul. La preuve que la limite du compte
+  porte sur le fichier entier, pas sur chaque requête : aucun découpage
+  ne pouvait la contourner. Vérifié aussi que monter en plan Cloudinary
+  n'aide pas : le plan Plus à 99 $/mois plafonne encore à 20 Mo. Les
+  modèles 3D sont donc stockés sur **Vercel Blob** (`lib/blob-storage.ts`)
+  plutôt que Cloudinary, choisi sur AWS S3 (prévu par la section 7 du
+  cahier) parce qu'aucun compte AWS n'existe et que Vercel Blob s'active
+  depuis les réglages du projet déjà en place. Les photos de plats et la
+  vidéo source du scan restent sur Cloudinary, bien en-dessous de ses
+  plafonds.
+- **`upload_large_stream` du SDK Cloudinary existe dans ses types
+  TypeScript mais pas réellement sur l'objet `v2.uploader`** dans la
+  version installée (2.10.1) : défini dans `lib/uploader.js`, jamais
+  reporté vers l'API v2 publique (`lib/v2/uploader.js`). Un appel lève
+  `TypeError` (`r is not a function` une fois minifié). Confirmé à
+  l'exécution (`typeof cloudinary.uploader.upload_large_stream ===
+  "undefined"`) avant de chercher l'alternative réellement exposée,
+  `upload_chunked_stream`, avec la même convention d'appel
+  `(options, callback)`. **Vérifier qu'une fonction citée dans les types
+  d'un SDK existe réellement à l'exécution avant de s'y fier**, surtout
+  pour une fonctionnalité annexe (l'upload fractionné) qui a pu ne pas
+  suivre le reste de l'API lors d'un portage v1 vers v2.
 
 ---
 
@@ -524,7 +622,7 @@ sont codés et buildés. Il reste :
 
 ---
 
-## 8bis. Sections de landing reprises de webglow.ca (Sprint 4.5)
+## 8bis. Sections de landing reprises de webglow.ca (Sprint 5)
 
 Le client est aussi propriétaire de l'agence WebGlow (webglow.ca) et a
 fourni le dépôt de son site pour que quatre éléments visuels soient repris
@@ -560,7 +658,7 @@ rendu serveur et le rendu client provoque une erreur d'hydratation React.
 
 ## 8ter. Palette claire et animations sans dépendance
 
-**Palette claire refaite (Sprint 4.5).** Les tokens clairs d'origine
+**Palette claire refaite (Sprint 6, S6-01).** Les tokens clairs d'origine
 étaient une inversion approximative du sombre. Ils sont maintenant
 construits autour du violet de marque, et chaque paire texte/fond est
 vérifiée en contraste WCAG AA (section 17.5 du cahier). Le script

@@ -71,6 +71,7 @@ model Dish {
   isAvailable     Boolean        @default(true)
   allergens       DishAllergen[]
   scans           ScanEvent[]
+  scanJobs        ScanJob[]
   createdAt       DateTime       @default(now())
 }
 
@@ -151,6 +152,41 @@ model DishCaptureOrder {
   status        String // scheduled | in_progress | delivered
   scheduledDate DateTime?
   completedAt   DateTime?
+}
+
+// Scan 3D automatise (Sprint 4.7, docs/roadmap-ai-instant-3d.md section 0)
+// - self-service, complementaire a DishCaptureOrder (service humain de la
+// section 15.3, plus cher, plus lent, sans limite de rapport de forme).
+// externalJobId = "serialize" cote KIRI, l'identifiant qui permet de
+// retrouver ce job depuis un webhook recu (un seul callback pour tous les
+// jobs du compte, cf. la doc officielle).
+model ScanJob {
+  id              String    @id @default(cuid())
+  dishId          String
+  dish            Dish      @relation(fields: [dishId], references: [id])
+  provider        String // "kiri" | "realityscan" (plan B, non implemente)
+  algorithm       String // "photo" | "featureless" | "3dgs"
+  status          String // uploading | processing | queuing | successful | failed | expired
+  externalJobId   String? // "serialize" cote KIRI, absent si l'appel initial a echoue
+  sourceMediaType String // "video" | "image"
+  // URL Cloudinary temporaire du média source (upload direct client, ne
+  // transite jamais par la Function - voir CONTEXT.md section 5). Pour
+  // un scan photo, seule la première URL est gardée ici, à titre de
+  // traçabilité, pas la liste complète.
+  sourceMediaUrl  String?
+  // Format demande a l'appel : fileFormat de l'API KIRI n'accepte qu'une
+  // seule valeur par appel (pas une liste) - voir la mise en garde en
+  // section 0 du document de roadmap sur le doute glb+usdz en un seul
+  // appel ou deux.
+  requestedFormat String // "glb" | "usdz"
+  resultModelUrl  String? // lien getModelZip, valable 60 minutes seulement
+  resultGlbUrl    String? // apres televersement Cloudinary (permanent)
+  resultUsdzUrl   String?
+  creditsUsed     Int? // 1 par appel reussi, cf. tarif confirme (1 $/credit)
+  errorCode       Int? // code detaille KIRI (2000-2010), pas juste le statut HTTP
+  errorMessage    String?
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
 }
 
 model SuperAdminNote {

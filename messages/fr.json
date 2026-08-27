@@ -203,7 +203,7 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "Voir en AR",
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
-    "arUnavailable": "AR non disponible sur cet appareil : affichage 2D",
+    "arUnavailable": "Modèle 3D indisponible pour l'instant : photo affichée",
     "back": "Retour au menu"
   },
   "Dashboard": {
@@ -285,7 +285,43 @@
       "save": "Enregistrer",
       "saving": "Enregistrement…",
       "cancel": "Annuler",
-      "error": "Une erreur est survenue. Réessayez."
+      "error": "Une erreur est survenue. Réessayez.",
+      "backToDish": "Retour à la fiche du plat",
+      "savePhoto": "Enregistrer la photo",
+      "saveModel": "Enregistrer le modèle",
+      "noPhotoSelected": "Choisissez d'abord une photo.",
+      "noGlbSelected": "Ce bouton enregistre le modèle 3D. Choisissez un fichier .glb, ou utilisez le bouton de la section Photo pour enregistrer une photo."
+    },
+    "dishScan": {
+      "title": "Scan 3D automatisé",
+      "help": "Filmez le plat en tournant lentement autour (20 à 30 secondes, éclairage uniforme). La vidéo part directement vers le stockage, puis le modèle 3D est généré automatiquement.",
+      "submit": "Lancer le scan",
+      "signing": "Préparation…",
+      "uploading": "Envoi de la vidéo…",
+      "preparing": "Préparation de la vidéo…",
+      "starting": "Démarrage du scan…",
+      "started": "Scan lancé. Identifiant du job : {jobId}. Le modèle apparaîtra ici une fois la génération terminée.",
+      "modalTitle": "Capture 3D en cours",
+      "modalIntro": "Votre vidéo est en train d'être envoyée puis préparée pour la génération du modèle 3D. Cette opération se déroule en plusieurs étapes et peut prendre quelques minutes.",
+      "modalWarning": "Ne fermez pas cette page et ne coupez pas votre connexion tant que la barre n'est pas terminée. Une fois le scan lancé, vous pourrez quitter librement : la génération se poursuit sur nos serveurs et le modèle apparaîtra automatiquement sur la fiche du plat.",
+      "preparingDetail": "Conversion de la vidéo au format attendu (durée et résolution). {seconds} secondes écoulées.",
+      "jobStatus": {
+        "active": "Génération du modèle 3D en cours",
+        "successful": "Modèle 3D prêt",
+        "failed": "La génération a échoué"
+      },
+      "jobHelp": {
+        "active": "Vous pouvez quitter cette page : la génération se poursuit sur nos serveurs. L'état se met à jour automatiquement.",
+        "successful": "Le modèle est rattaché au plat et visible en réalité augmentée sur le menu.",
+        "failed": "Aucun modèle n'a pu être produit. Refilmez le plat et relancez un scan."
+      },
+      "jobFormats": "Formats obtenus : {formats}.",
+      "quotaRemaining": "{remaining} scan(s) restant(s) ce mois-ci sur {limit}.",
+      "quotaExhausted": "Quota mensuel atteint ({limit} scans). Il se renouvelle le 1er du mois prochain.",
+      "lastChecked": "{stage} · vérifié auprès du fournisseur à {time}.",
+      "stageProcessing": "Traitement en cours",
+      "stageQueued": "En file d'attente",
+      "providerUnreachable": "Le fournisseur n'a pas pu être interrogé au dernier essai ({detail}). Nouvel essai automatique dans quelques secondes."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -324,6 +360,25 @@
         "past_due": "Paiement en retard",
         "canceled": "Annulé"
       }
+    },
+    "dishDetail": {
+      "backToList": "Retour aux plats",
+      "photo": "Photo",
+      "noPhoto": "Aucune photo pour ce plat.",
+      "model": "Modèle 3D",
+      "noModelYet": "Aucun modèle 3D pour ce plat. Lancez un scan ci-dessous ou téléversez un fichier.",
+      "price": "Prix",
+      "category": "Catégorie",
+      "prepTime": "Temps de préparation",
+      "minutes": "{minutes} min",
+      "availability": "Disponibilité",
+      "ar": "Réalité augmentée",
+      "description": "Description",
+      "ingredients": "Ingrédients",
+      "allergens": "Allergènes",
+      "noAllergens": "Aucun allergène déclaré.",
+      "analytics": "Statistiques",
+      "publicPage": "Voir sur le menu public"
     }
   },
   "Legal": {

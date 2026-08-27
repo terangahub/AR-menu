@@ -203,7 +203,7 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "View in AR",
     "rotateHint": "Rotate and zoom before activating AR",
-    "arUnavailable": "AR unavailable on this device: showing 2D",
+    "arUnavailable": "3D model unavailable right now: showing the photo",
     "back": "Back to menu"
   },
   "Dashboard": {
@@ -285,7 +285,43 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel",
-      "error": "Something went wrong. Try again."
+      "error": "Something went wrong. Try again.",
+      "backToDish": "Back to dish",
+      "savePhoto": "Save photo",
+      "saveModel": "Save model",
+      "noPhotoSelected": "Choose a photo first.",
+      "noGlbSelected": "This button saves the 3D model. Choose a .glb file, or use the button in the Photo section to save a photo."
+    },
+    "dishScan": {
+      "title": "Automated 3D scan",
+      "help": "Film the dish while slowly circling it (20 to 30 seconds, even lighting). The video goes straight to storage, then the 3D model is generated automatically.",
+      "submit": "Start scan",
+      "signing": "Preparing…",
+      "uploading": "Uploading the video…",
+      "preparing": "Preparing the video…",
+      "starting": "Starting scan…",
+      "started": "Scan started. Job id: {jobId}. The model will appear here once generation completes.",
+      "modalTitle": "3D capture in progress",
+      "modalIntro": "Your video is being uploaded, then prepared for 3D model generation. This runs in several steps and can take a few minutes.",
+      "modalWarning": "Do not close this page or drop your connection until the bar completes. Once the scan has started you can leave freely: generation continues on our servers and the model will appear on the dish automatically.",
+      "preparingDetail": "Converting the video to the expected duration and resolution. {seconds} seconds elapsed.",
+      "jobStatus": {
+        "active": "3D model generation in progress",
+        "successful": "3D model ready",
+        "failed": "Generation failed"
+      },
+      "jobHelp": {
+        "active": "You can leave this page: generation continues on our servers. The status updates automatically.",
+        "successful": "The model is attached to the dish and available in augmented reality on the menu.",
+        "failed": "No model could be produced. Film the dish again and start a new scan."
+      },
+      "jobFormats": "Formats produced: {formats}.",
+      "quotaRemaining": "{remaining} scan(s) left this month out of {limit}.",
+      "quotaExhausted": "Monthly quota reached ({limit} scans). It resets on the 1st of next month.",
+      "lastChecked": "{stage} · checked with the provider at {time}.",
+      "stageProcessing": "Processing",
+      "stageQueued": "Queued",
+      "providerUnreachable": "The provider could not be reached on the last attempt ({detail}). Retrying automatically in a few seconds."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -324,6 +360,25 @@
         "past_due": "Payment overdue",
         "canceled": "Canceled"
       }
+    },
+    "dishDetail": {
+      "backToList": "Back to dishes",
+      "photo": "Photo",
+      "noPhoto": "No photo for this dish.",
+      "model": "3D model",
+      "noModelYet": "No 3D model for this dish. Start a scan below or upload a file.",
+      "price": "Price",
+      "category": "Category",
+      "prepTime": "Prep time",
+      "minutes": "{minutes} min",
+      "availability": "Availability",
+      "ar": "Augmented reality",
+      "description": "Description",
+      "ingredients": "Ingredients",
+      "allergens": "Allergens",
+      "noAllergens": "No allergens declared.",
+      "analytics": "Analytics",
+      "publicPage": "View on public menu"
     }
   },
   "Legal": {

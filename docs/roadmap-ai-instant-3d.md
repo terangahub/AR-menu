@@ -16,6 +16,212 @@ concurrence, à traiter comme les autres écarts déjà documentés dans
 
 ---
 
+## 0. Décision arbitrée (août 2026) : photogrammétrie, pas génération IA
+
+**Ce document a été écrit avant l'arbitrage. La section 0 le corrige ; les
+sections suivantes restent valables pour tout ce qui touche à
+l'architecture, mais leur hypothèse de départ (génération IA à partir
+d'une seule photo) est abandonnée.** Version illustrée sur trois pages
+dans `docs/scan-3d-plats-vorae.pdf`.
+
+### Ce qui a été écarté et pourquoi
+
+La **génération IA à partir d'une photo unique** (Meshy, Tripo3D, Stable
+Fast 3D) est écartée. Elle ne capture pas le plat, elle en invente une
+interprétation. Les analyses techniques 2026 situent explicitement ces
+moteurs sur le contenu stylisé de jeu vidéo, avec des arêtes au rendu
+"pâte à modeler" de près. Sur un menu où le convive doit reconnaître ce
+qu'il va commander, l'écart entre le plat servi et le modèle affiché est
+un risque commercial, pas un détail esthétique. Test mené sur une photo
+de burger avec Meshy : géométrie approximative et export bloqué derrière
+l'abonnement. Le doute soulevé en section 5 de ce document (« la
+nourriture est un cas difficile ») s'est confirmé en pratique.
+
+Écartés également :
+- **Luma AI** : leur outil de capture (Genie) a été arrêté au 1er janvier
+  2026, l'offre a pivoté vers le Gaussian Splatting de scènes et la
+  vidéo. La mention "Polycam/Luma AI" de la section 15.3 du cahier est
+  donc périmée sur la moitié Luma.
+- **Polycam** : le palier gratuit n'exporte qu'en GLTF, ni GLB ni USDZ.
+  Sans USDZ, pas d'AR Quick Look sur iPhone. Reste une option payante de
+  secours.
+- **Rig multi-caméras** (proposé en session par un collaborateur) : bonne
+  intuition sur le multi-vues, mais construire une station physique est
+  disproportionné pour un pilote à un seul restaurant. À reconsidérer si
+  le passage à l'échelle le justifie.
+
+### Ce qui est retenu : KIRI Engine API
+
+Photogrammétrie **managée** : capture réelle du plat, pas de génération,
+et aucune infrastructure à héberger de notre côté. Spécification vérifiée
+sur la documentation officielle complète (`docs.kiriengine.app`, PDF fourni
+par Mouhamed le 25 août 2026, plus fiable que le dépôt GitHub utilisé pour
+la première version de ce document) :
+
+| Élément | Valeur |
+|---|---|
+| Base URL | `https://api.kiriengine.app/api/` |
+| Authentification | Bearer, clé au format `kiri-<random>` |
+| Entrée vidéo | 3 min max, 1920x1080 |
+| Entrée photos | 20 à 300 images |
+| Sorties | OBJ, FBX, STL, PLY, GLB, glTF, USDZ, XYZ - **une seule valeur par appel** (voir mise en garde ci-dessous) |
+| Qualité | `modelQuality` 0=High à 3=Ultra, `textureQuality` 0=4K à 3=8K |
+| Suivi | `getStatus`, `getModelZip` (lien 60 min), `balance` |
+| Limites | 3 Go par envoi |
+| Tarif | 1 appel API = 1 crédit = 1 $ US, quel que soit le type de scan (Photo Scan, Featureless, 3DGS) |
+| Essai | 10 crédits offerts à l'inscription (confirmé en direct : `balance: 10`) |
+| Recharge | Minimum 500 crédits (500 $) au-delà du gratuit |
+| Rétention | **3 jours seulement**, suppression automatique ensuite |
+
+**Endpoints réels, un par algorithme et par type de média** (pas un
+endpoint générique comme supposé dans la première version de ce
+document) :
+
+| Algorithme | Vidéo | Photos |
+|---|---|---|
+| Photo Scan | `POST /v1/open/photo/video` | `POST /v1/open/photo/image` |
+| Featureless Object | `POST /v1/open/featureless/video` | `POST /v1/open/featureless/image` |
+| 3DGS | `POST /v1/open/3dgs/video` | `POST /v1/open/3dgs/image` |
+
+Chaque appel renvoie `{ code, msg, data: { serialize, calculateType }, ok }`.
+**`serialize` est l'identifiant du job à stocker dans `ScanJob.externalJobId`.**
+Le champ `code` n'est pas fiable comme indicateur de succès (un appel
+réussi a renvoyé `code: 200` en test réel, alors que les exemples de la
+doc montrent `code: 0`) - **se fier au champ `ok`**, pas à `code`.
+
+Deux points décisifs pour notre cas :
+
+1. **`Featureless Object`** vise les surfaces brillantes et sans texture,
+   exactement le cas des assiettes blanches et des sauces réfléchissantes
+   où la photogrammétrie classique échoue.
+2. **L'entrée vidéo** rend le geste réaliste pour un restaurateur : filmer
+   30 secondes le tour de l'assiette, au lieu de cadrer 20 à 300 photos.
+
+**Mise en garde sur les formats GLB et USDZ (corrige une affirmation
+erronée de la première version de ce document) :** `fileFormat` est une
+**valeur unique** par appel selon la doc officielle, pas une liste. Rien
+ne garantit qu'un seul appel produise à la fois le `.glb` et le `.usdz`
+dont `Dish` a besoin. Deux scénarios possibles, à trancher **par un test
+réel avant d'écrire la route d'upload** :
+- Le zip contient plusieurs formats malgré un seul `fileFormat` demandé
+  (auquel cas rien ne change au plan).
+- Il faut deux appels (deux crédits) par plat pour obtenir les deux
+  formats, ce qui double le coût réel par plat et change le calcul de
+  S7-10 (garde-fous d'usage).
+Ne pas annoncer la dette **D-03** résolue tant que ce point n'est pas
+vérifié.
+
+### Webhooks : configurés dans le dashboard, pas par appel
+
+Correction importante par rapport à la première version de ce document :
+**les webhooks ne se passent pas en paramètre à chaque appel de scan**.
+Ils se configurent une fois, dans *Settings » Webhooks* du dashboard
+KIRI (ou via une API dédiée, pas encore explorée). Trois éléments :
+
+1. **Callback URL** - où KIRI envoie un `POST` JSON `{ status, serialize }`
+   à chaque changement de statut de n'importe quel job du compte. C'est
+   `serialize` qui permet de retrouver le bon `ScanJob` côté Vorae, pas
+   l'URL elle-même (une seule URL pour tous les jobs).
+2. **Signing secret** - chaîne de 6 à 40 caractères à valider sur chaque
+   requête entrante pour confirmer qu'elle vient bien de KIRI. Le
+   mécanisme exact de signature (quel header, quel algorithme) n'est pas
+   détaillé dans la doc fournie - **à observer sur la première requête
+   réelle reçue**, ne pas le deviner à l'avance.
+3. Répondre **HTTP 200** à la notification, sinon KIRI la considère non
+   délivrée.
+
+Statuts renvoyés par `getStatus` et par le webhook (`status`) :
+
+| Code | Sens |
+|---|---|
+| -1 | Uploading |
+| 0 | Processing |
+| 1 | Failed |
+| 2 | Successful |
+| 3 | Queuing |
+| 4 | **Expired** (rétention de 3 jours dépassée - corrige "Exported" annoncé par erreur dans la première version de ce document) |
+
+### Erreurs
+
+| Code | Sens |
+|---|---|
+| 400 | Paramètre manquant ou mal formé |
+| 401 | Clé API absente ou invalide |
+| 403 | **Crédit insuffisant** (pas 402 comme on pourrait s'y attendre) |
+| 404 | Ressource introuvable |
+| 5xx | Erreur serveur KIRI, rare |
+
+Notre route doit distinguer explicitement le 403 ("recharger des
+crédits") du 401 ("clé invalide, vérifier la config") plutôt que les
+traiter comme une erreur générique.
+
+**Codes détaillés (`code` dans le corps de la réponse, notamment sur les
+5xx)** :
+
+| Code | Sens | Action côté Vorae |
+|---|---|---|
+| 2000 | Modèle en cours de traitement | Normal, continuer à sonder `getStatus` |
+| 2001 | Échec de génération, lien de téléchargement impossible | Marquer le `ScanJob` `failed`, informer le restaurateur |
+| 2002 | Modèle expiré | Correspond au statut 4 - le plat doit être re-scanné, un crédit est reperdu |
+| 2003 | Statut du modèle impossible à récupérer | Retenter, puis marquer en erreur si ça persiste |
+| 2004 | Photoset vide | Erreur de validation - à intercepter **avant** l'appel API pour ne pas gaspiller un crédit |
+| 2005 | Trop de photos envoyées (max 300) | Idem, validation côté client dans S7-11 |
+| 2006 | Modèle introuvable, mauvais numéro de série | Bug côté Vorae si ça arrive, à logger sérieusement |
+| 2007 | Pas assez d'images (min 20) | Idem 2004/2005, validation avant envoi |
+| 2008 | Modèle en file d'attente | Normal, continuer à sonder |
+| 2009 | Vidéo non conforme (durée, résolution) | Validation côté client : max 3 min, 1920x1080 |
+| 2010 | Format de fichier non conforme | Vérifier `fileFormat` avant l'appel |
+
+Les codes 2004, 2005, 2007, 2009 et 2010 sont tous évitables par une
+validation côté client **avant** d'appeler l'API - à construire dans
+l'interface du dashboard (S7-11), pour ne jamais dépenser un crédit sur
+une requête vouée à échouer.
+
+### Plan B conservé : RealityScan 2.1 (Epic)
+
+Le moteur de photogrammétrie le plus qualitatif du marché. Depuis
+novembre 2025 il expose un **Remote Command Plugin REST et gRPC**,
+utilisable en service headless, avec support Linux complet. Licence
+**gratuite même en usage commercial sous 1 M$ de revenu annuel**, ce qui
+couvre largement Vorae aujourd'hui (au-delà : 1 250 $/siège/an).
+
+Non retenu en premier choix parce qu'il faut héberger et maintenir notre
+propre machine GPU. C'est le repli si la qualité ou le coût de KIRI ne
+tiennent pas à l'échelle. L'adaptateur de la section 4.1 permet d'en
+changer sans réécrire le flux.
+
+### Reste à trancher avant de coder
+
+- **Le prix par crédit est confirmé, la décision de budget ne l'est pas.**
+  1 $/scan est raisonnable à l'usage, mais la recharge minimale de 500 $
+  est un vrai engagement à planifier avant de dépasser les 10 plats
+  gratuits, pas un détail technique. Si ce montant est prématuré pour le
+  stade pilote, solution de repli manuelle : l'abonnement web KIRI à
+  17,99 $/mois en scan illimité, utilisé à la main (upload sur
+  kiriengine.app, export, puis transfert dans Vorae) le temps de valider
+  avec plus de plats, avant de basculer sur l'API à 500 $ quand le volume
+  le justifie.
+- **Juger la qualité sur de vrais plats du restaurant pilote**, pas sur
+  des photos de stock.
+
+### Corrections à apporter au reste du document
+
+- Section 4.1 : l'interface s'appelle désormais `Scan3dProvider`
+  (`src/lib/scan3d.ts`), et prend des médias de capture, pas une photo
+  unique. Le fournisseur par défaut est KIRI.
+- Section 4.2 : le modèle Prisma devient `ScanJob` plutôt que
+  `Ai3dGenerationJob`, avec `sourceMediaUrls` (pluriel) au lieu de
+  `sourceImageUrl`.
+- Section 6 (contrainte Vercel) : résolue par les webhooks KIRI.
+- Le positionnement de la section 2 reste valable tel quel : ce flux
+  complète le service de capture professionnel à 45 $/plat de la section
+  15.3 du cahier, il ne le remplace pas.
+- Les garde-fous de la section 5 restent obligatoires : chaque scan coûte
+  de l'argent réel, donc compteur et limite par restaurant dès la première
+  version, jamais d'accès illimité non facturé.
+
+---
+
 ## 1. Ce que fait réellement le concurrent (et ce qui est vérifié vs approximatif)
 
 | Affirmation de l'analyse d'origine | Vérification |
