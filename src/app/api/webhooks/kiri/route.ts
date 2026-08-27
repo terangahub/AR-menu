@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { applyKiriStatus } from "@/lib/scan-finalize";
 
@@ -14,18 +15,49 @@ import { applyKiriStatus } from "@/lib/scan-finalize";
 // le suivi interrogé par le dashboard : une notification peut se perdre,
 // et le modèle doit rester récupérable sans elle.
 //
-// Validation de signature volontairement absente pour l'instant : la doc
-// KIRI mentionne un secret de signature (KIRI_WEBHOOK_SECRET une fois
-// configuré) mais ne précise ni l'en-tête ni l'algorithme utilisé.
-// Plutôt que de deviner un mécanisme qui donnerait une fausse impression
-// de sécurité, on journalise les en-têtes reçus pour déterminer le vrai
-// mécanisme au premier appel réel, puis on l'implémente.
+// **Authentification par jeton dans l'URL de callback.** La doc KIRI
+// mentionne un secret de signature mais ne précise ni l'en-tête ni
+// l'algorithme, et deviner un mécanisme donnerait une fausse impression
+// de sécurité. Or c'est nous qui choisissons l'URL enregistrée chez eux :
+// y placer un jeton que seul KIRI connaîtra protège tout aussi bien, sans
+// rien supposer de leur implémentation. À enregistrer sous la forme
+// `.../api/webhooks/kiri?token=<KIRI_WEBHOOK_SECRET>`.
+//
+// Refus strict quand le jeton manque ou ne correspond pas, y compris si
+// le secret n'est pas configuré : ce webhook n'est plus indispensable
+// depuis que le suivi interroge KIRI directement (S7-08), donc le fermer
+// ne fait rien perdre, alors qu'un webhook ouvert laisse n'importe qui
+// déclarer un scan réussi ou échoué.
 export const maxDuration = 60;
 
+function isAuthorized(req: NextRequest): boolean {
+  const expected = process.env.KIRI_WEBHOOK_SECRET;
+  if (!expected) return false;
+  const provided = new URL(req.url).searchParams.get("token");
+  if (!provided) return false;
+
+  // Comparaison à durée constante : une comparaison ordinaire s'arrête au
+  // premier caractère différent, ce qui laisse deviner le secret caractère
+  // par caractère en mesurant le temps de réponse.
+  const expectedBytes = Buffer.from(expected);
+  const providedBytes = Buffer.from(provided);
+  if (expectedBytes.length !== providedBytes.length) return false;
+  return timingSafeEqual(expectedBytes, providedBytes);
+}
+
 export async function POST(req: NextRequest) {
+  if (!isAuthorized(req)) {
+    console.warn("[webhook kiri] appel refusé : jeton absent ou invalide");
+    // 401 et non 200 : ce n'est pas une notification mal formée de KIRI
+    // mais un appel non authentifié, qu'il faut voir dans les journaux.
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const headersSnapshot = Object.fromEntries(req.headers.entries());
   const body = await req.json().catch(() => null);
 
+  // Toujours journalisés : le jour où KIRI documentera sa signature, ces
+  // en-têtes diront quel mécanisme adopter pour remplacer le jeton d'URL.
   console.log("[webhook kiri] en-têtes reçus", headersSnapshot);
   console.log("[webhook kiri] corps reçu", body);
 
