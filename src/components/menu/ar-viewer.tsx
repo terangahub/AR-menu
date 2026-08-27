@@ -74,19 +74,19 @@ export function ArViewer({
 
   if (status === "fallback" || !glbUrl) {
     return (
-      <div className="relative flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-lg bg-muted">
+      <div className="surface-menu aspect-[4/3] w-full">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imageUrl}
-            alt={alt}
-            className="h-full w-full rounded-lg object-cover"
-          />
+          <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
         ) : (
-          <span className="text-muted-foreground">{alt}</span>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-secondary/40 to-primary/15">
+            <span className="font-heading text-6xl text-foreground/25">
+              {alt.charAt(0).toUpperCase()}
+            </span>
+          </div>
         )}
         {glbUrl && (
-          <p className="absolute bottom-2 text-xs text-muted-foreground">
+          <p className="absolute inset-x-0 bottom-0 bg-background/85 px-4 py-2 text-center text-xs text-muted-foreground backdrop-blur">
             {t("arUnavailable")}
           </p>
         )}
@@ -95,27 +95,31 @@ export function ArViewer({
   }
 
   if (!ready) {
-    return <div className="aspect-square w-full animate-pulse rounded-lg bg-muted" />;
+    return <div className="aspect-[4/3] w-full animate-pulse rounded-card bg-muted" />;
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <model-viewer
-        ref={ref}
-        src={glbUrl}
-        ios-src={usdzUrl ?? undefined}
-        alt={alt}
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        camera-controls
-        auto-rotate
-        poster={imageUrl ?? undefined}
-        shadow-intensity="1"
-        style={{ width: "100%", aspectRatio: "1 / 1", borderRadius: "0.5rem" }}
-      />
-      <p className="text-center text-xs text-muted-foreground">
-        {t("rotateHint")}
-      </p>
+    <div className="flex flex-col gap-3">
+      {/* Fond neutre et discret derrière le modèle : une photogrammétrie
+          de plat est déjà très colorée, un cadre chargé la desservirait.
+          Le ratio 4:3 est celui des cartes du menu, pour que le passage de
+          la liste à la fiche ne provoque pas de saut visuel. */}
+      <div className="surface-menu aspect-[4/3] w-full bg-gradient-to-b from-muted/60 to-background hover:translate-y-0 hover:shadow-none">
+        <model-viewer
+          ref={ref}
+          src={glbUrl}
+          ios-src={usdzUrl ?? undefined}
+          alt={alt}
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          camera-controls
+          auto-rotate
+          poster={imageUrl ?? undefined}
+          shadow-intensity="1"
+          style={{ width: "100%", height: "100%", backgroundColor: "transparent" }}
+        />
+      </div>
+      <p className="text-center text-xs text-muted-foreground">{t("rotateHint")}</p>
     </div>
   );
 }

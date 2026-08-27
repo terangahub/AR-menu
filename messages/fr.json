@@ -194,7 +194,13 @@
     "allergenFilter": "Filtrer par allergène",
     "regimeFilter": "Filtrer par régime",
     "viewInAr": "Voir en AR",
-    "empty": "Aucun plat pour l'instant."
+    "empty": "Aucun plat pour l'instant.",
+    "allergenFilterActive": "Allergènes ({count})",
+    "allergenHint": "Sélectionnez les allergènes à écarter. Les plats qui en contiennent seront masqués.",
+    "dishCount": "{count, plural, =0 {Aucun plat} one {# plat} other {# plats}}",
+    "clearFilters": "Tout afficher",
+    "arIntro": "{count, plural, one {# plat de ce menu se visualise} other {# plats de ce menu se visualisent}} en taille réelle sur votre table. Touchez une carte marquée du cube, puis lancez la vue 3D.",
+    "poweredBy": "Menu propulsé par Vorae"
   },
   "Dish": {
     "ingredients": "Ingrédients",
@@ -204,7 +210,8 @@
     "viewInAr": "Voir en AR",
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
     "arUnavailable": "Modèle 3D indisponible pour l'instant : photo affichée",
-    "back": "Retour au menu"
+    "back": "Retour au menu",
+    "backToMenu": "Retour au menu de {restaurant}"
   },
   "Dashboard": {
     "noRestaurant": "Aucun restaurant associé à ce compte.",

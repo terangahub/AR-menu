@@ -194,7 +194,13 @@
     "allergenFilter": "Filter by allergen",
     "regimeFilter": "Filter by diet",
     "viewInAr": "View in AR",
-    "empty": "No dishes yet."
+    "empty": "No dishes yet.",
+    "allergenFilterActive": "Allergens ({count})",
+    "allergenHint": "Select the allergens to rule out. Dishes containing them will be hidden.",
+    "dishCount": "{count, plural, =0 {No dishes} one {# dish} other {# dishes}}",
+    "clearFilters": "Show all",
+    "arIntro": "{count, plural, one {# dish on this menu can be viewed} other {# dishes on this menu can be viewed}} at full size on your table. Tap a card marked with the cube, then open the 3D view.",
+    "poweredBy": "Menu powered by Vorae"
   },
   "Dish": {
     "ingredients": "Ingredients",
@@ -204,7 +210,8 @@
     "viewInAr": "View in AR",
     "rotateHint": "Rotate and zoom before activating AR",
     "arUnavailable": "3D model unavailable right now: showing the photo",
-    "back": "Back to menu"
+    "back": "Back to menu",
+    "backToMenu": "Back to {restaurant}'s menu"
   },
   "Dashboard": {
     "noRestaurant": "No restaurant linked to this account.",

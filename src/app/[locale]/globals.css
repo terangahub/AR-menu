@@ -166,6 +166,68 @@
     transform: translateY(-2px);
   }
 
+  /* --- Surfaces du menu public (Sprint 6) ---
+     `surface-card` ci-dessus appartient à la landing, qui force le mode
+     sombre : ses valeurs en `white/0.06` sont invisibles sur un fond
+     clair. Le menu public doit tenir dans les deux thèmes, d'où cette
+     variante bâtie sur les tokens sémantiques. */
+  .surface-menu {
+    @apply relative overflow-hidden rounded-card border border-border/70 bg-card transition-all duration-300;
+  }
+  .surface-menu:hover {
+    @apply border-primary/40;
+    transform: translateY(-3px);
+    box-shadow:
+      0 12px 32px -18px hsl(var(--primary) / 0.45),
+      0 2px 8px -4px hsl(250 45% 11% / 0.08);
+  }
+  /* `[data-theme="dark"]` et non `.dark` : c'est le sélecteur configuré
+     dans tailwind.config.ts et posé par next-themes (`attribute`). */
+  [data-theme="dark"] .surface-menu:hover {
+    box-shadow: 0 16px 40px -20px hsl(var(--primary) / 0.35);
+  }
+
+  /* Voile posé sur une photo de plat pour que le texte blanc reste
+     lisible quel que soit le cliché : sans lui, une assiette claire sur
+     nappe blanche ferait disparaître le nom du plat. Toujours sombre,
+     dans les deux thèmes, parce qu'il se superpose à une photo et non au
+     fond de la page. */
+  .photo-scrim {
+    background: linear-gradient(
+      to top,
+      hsl(250 45% 6% / 0.9) 0%,
+      hsl(250 45% 6% / 0.55) 38%,
+      hsl(250 45% 6% / 0.1) 68%,
+      transparent 100%
+    );
+  }
+
+  /* Halo d'ambiance derrière l'en-tête du menu : deux teintes proches du
+     violet de marque, très diffuses, pour éviter l'aplat sans jamais
+     concurrencer les photos de plats. */
+  .menu-aurora {
+    background:
+      radial-gradient(
+        60% 55% at 15% 0%,
+        hsl(var(--primary) / 0.16) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        50% 50% at 85% 8%,
+        hsl(var(--secondary) / 0.14) 0%,
+        transparent 70%
+      );
+  }
+
+  /* Barre de filtres collée en haut : le convive fait défiler un long
+     menu, les catégories doivent rester atteignables sans remonter. Le
+     flou d'arrière-plan évite que les cartes défilant dessous rendent les
+     libellés illisibles. */
+  .menu-sticky-bar {
+    @apply sticky top-0 z-30 -mx-4 border-b border-border/60 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6;
+    background: hsl(var(--background) / 0.82);
+  }
+
   /* Halo diffus derrière un élément (orbe lumineuse). */
   .glow-primary {
     box-shadow: 0 0 60px -12px hsl(var(--primary) / 0.5);

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { recordScan } from "@/lib/scan";
 import { Link } from "@/i18n/navigation";
 import { DishArSection } from "@/components/menu/dish-ar-section";
+import { LocaleSwitch } from "@/components/menu/locale-switch";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Fiche plat (F05) : prix, ingrédients, allergènes, temps de préparation,
 // affichage AR avec fallback 2D obligatoire (F03/F04, section 17.1).
@@ -21,7 +23,7 @@ export default async function DishPage({
   const dish = await prisma.dish.findUnique({
     where: { id: dishId },
     include: {
-      restaurant: { select: { slug: true } },
+      restaurant: { select: { slug: true, name: true } },
       allergens: {
         select: {
           allergen: { select: { code: true, nameFr: true, nameEn: true } },
@@ -41,71 +43,119 @@ export default async function DishPage({
     await recordScan({ qrCodeId: qr, dishId: dish.id }).catch(() => undefined);
   }
 
-  const name = locale === "en" && dish.nameEn ? dish.nameEn : dish.name;
-  const description =
-    locale === "en" && dish.descriptionEn ? dish.descriptionEn : dish.description;
-  const ingredients =
-    locale === "en" && dish.ingredientsEn ? dish.ingredientsEn : dish.ingredients;
+  const isEn = locale === "en";
+  const name = isEn && dish.nameEn ? dish.nameEn : dish.name;
+  const description = isEn && dish.descriptionEn ? dish.descriptionEn : dish.description;
+  const ingredients = isEn && dish.ingredientsEn ? dish.ingredientsEn : dish.ingredients;
+  const category = isEn && dish.categoryEn ? dish.categoryEn : dish.category;
   const allergens = dish.allergens.map((a) => a.allergen);
 
-  return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <Link
-        href={`/${restaurantSlug}`}
-        className="text-sm text-muted-foreground hover:underline"
-      >
-        ← {t("back")}
-      </Link>
+  // Le lien de retour conserve le QR : sans lui, revenir au menu perdrait
+  // le rattachement de la visite à la table, et fausserait les statistiques.
+  const backHref = qr
+    ? `/${restaurantSlug}?qr=${encodeURIComponent(qr)}`
+    : `/${restaurantSlug}`;
 
-      <DishArSection
-        dishId={dish.id}
-        qrCodeId={qr}
-        glbUrl={dish.model3dGlbUrl}
-        usdzUrl={dish.model3dUsdzUrl}
-        imageUrl={dish.imageUrl}
-        alt={name}
+  return (
+    <div className="relative min-h-screen">
+      <div
+        aria-hidden
+        className="menu-aurora pointer-events-none absolute inset-x-0 top-0 h-[360px]"
       />
 
-      <div className="flex items-start justify-between gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">{name}</h1>
-        <span className="whitespace-nowrap text-lg text-muted-foreground">
-          {Number(dish.price).toFixed(2)} $
-        </span>
-      </div>
-
-      {description && <p className="text-muted-foreground">{description}</p>}
-
-      {ingredients && (
-        <div>
-          <h2 className="text-sm font-medium">{t("ingredients")}</h2>
-          <p className="text-sm text-muted-foreground">{ingredients}</p>
-        </div>
-      )}
-
-      {allergens.length > 0 && (
-        <div>
-          <h2 className="text-sm font-medium">{t("allergens")}</h2>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {allergens.map((a) => (
-              <span
-                key={a.code}
-                className="rounded-full bg-destructive/10 px-2.5 py-0.5 text-xs text-destructive"
-              >
-                {locale === "en" ? a.nameEn : a.nameFr}
-              </span>
-            ))}
+      <main className="relative mx-auto flex max-w-3xl flex-col px-4 pb-20 sm:px-6">
+        <div className="flex items-center justify-between gap-4 py-6">
+          <Link
+            href={backHref}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/60 px-3 py-1.5 text-sm text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+          >
+            <span aria-hidden>&larr;</span>
+            {t("back")}
+          </Link>
+          <div className="flex items-center gap-2">
+            <LocaleSwitch />
+            <ThemeToggle />
           </div>
         </div>
-      )}
 
-      {dish.prepTimeMinutes != null && (
-        <div>
-          <h2 className="text-sm font-medium">{t("prepTime")}</h2>
-          <p className="text-sm text-muted-foreground">
-            {t("prepTimeMinutes", { minutes: dish.prepTimeMinutes })}
-          </p>
+        <DishArSection
+          dishId={dish.id}
+          qrCodeId={qr}
+          glbUrl={dish.model3dGlbUrl}
+          usdzUrl={dish.model3dUsdzUrl}
+          imageUrl={dish.imageUrl}
+          alt={name}
+        />
+
+        <div className="mt-8 flex flex-col gap-3">
+          {category && (
+            <span className="w-fit rounded-full bg-secondary/60 px-3 py-1 text-xs font-medium text-secondary-foreground">
+              {category}
+            </span>
+          )}
+          <div className="flex items-start justify-between gap-6">
+            <h1 className="font-heading text-3xl leading-tight tracking-tight sm:text-4xl">
+              {name}
+            </h1>
+            <span className="shrink-0 pt-1 font-heading text-2xl text-primary">
+              {Number(dish.price).toFixed(2)} $
+            </span>
+          </div>
+          {description && (
+            <p className="text-[15px] leading-relaxed text-muted-foreground">{description}</p>
+          )}
         </div>
-      )}
-    </main>
+
+        {/* Les allergènes en premier et en pleine largeur : c'est
+            l'information dont dépend une décision de santé, elle ne se
+            traite pas comme une ligne de détail parmi d'autres. */}
+        {allergens.length > 0 && (
+          <section className="mt-8 rounded-card border border-destructive/25 bg-destructive/[0.06] p-4">
+            <h2 className="text-sm font-medium text-destructive">{t("allergens")}</h2>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {allergens.map((a) => (
+                <span
+                  key={a.code}
+                  className="rounded-full border border-destructive/30 bg-background/60 px-3 py-1 text-sm text-destructive"
+                >
+                  {isEn ? a.nameEn : a.nameFr}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {(ingredients || dish.prepTimeMinutes != null) && (
+          <section className="mt-6 grid gap-px overflow-hidden rounded-card border border-border/70 bg-border/70 sm:grid-cols-2">
+            {ingredients && (
+              <div className="bg-card p-4">
+                <h2 className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {t("ingredients")}
+                </h2>
+                <p className="mt-1.5 text-sm leading-relaxed">{ingredients}</p>
+              </div>
+            )}
+            {dish.prepTimeMinutes != null && (
+              <div className="bg-card p-4">
+                <h2 className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {t("prepTime")}
+                </h2>
+                <p className="mt-1.5 text-sm leading-relaxed">
+                  {t("prepTimeMinutes", { minutes: dish.prepTimeMinutes })}
+                </p>
+              </div>
+            )}
+          </section>
+        )}
+
+        <Link
+          href={backHref}
+          className="mt-10 inline-flex w-fit items-center gap-1.5 text-sm text-primary underline-offset-4 hover:underline"
+        >
+          <span aria-hidden>&larr;</span>
+          {t("backToMenu", { restaurant: dish.restaurant.name })}
+        </Link>
+      </main>
+    </div>
   );
 }

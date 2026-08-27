@@ -500,6 +500,19 @@ concerné - cette liste est un résumé, pas la seule source.
   finalise lui-même si le modèle est prêt. Le traitement du résultat vit
   dans `lib/scan-finalize.ts`, appelé par les deux chemins, pour qu'il
   n'existe qu'une seule façon d'extraire les fichiers du zip.
+- **Les utilitaires visuels de la landing ne fonctionnent que sur fond
+  sombre.** `surface-card`, et plus généralement tout ce qui est bâti sur
+  `white/[0.06]`, suppose le mode sombre que la landing force
+  (`[locale]/page.tsx`). Le menu public et le dashboard doivent tenir dans
+  les deux thèmes : ils utilisent `surface-menu`, `photo-scrim`,
+  `menu-aurora` et `menu-sticky-bar`, bâtis sur les tokens sémantiques.
+  **Ne pas réutiliser une classe de la landing sur un écran qui peut
+  s'afficher en clair sans vérifier ce qu'elle contient.**
+- **Le sélecteur du mode sombre de ce projet est `[data-theme="dark"]`,
+  pas `.dark`.** Fixé par `tailwind.config.ts`
+  (`darkMode: ["selector", '[data-theme="dark"]']`) et posé par
+  next-themes via `attribute="data-theme"`. Une règle CSS écrite avec
+  `.dark` passe la compilation et le lint sans jamais s'appliquer.
 - **Un plafond de taille de fichier annoncé "par requête" peut en réalité
   porter sur le fichier total reconstitué.** Le premier modèle 3D réel
   produit par KIRI pèse environ 86 Mo, refusé par Cloudinary
