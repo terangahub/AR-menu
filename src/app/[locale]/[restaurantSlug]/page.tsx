@@ -88,7 +88,7 @@ export default async function RestaurantMenuPage({
                 <img
                   src={restaurant.logoUrl}
                   alt=""
-                  className="h-14 w-14 rounded-2xl border border-border/70 object-cover sm:h-16 sm:w-16"
+                  className="h-14 w-14 rounded-2xl border border-border/60 object-cover sm:h-16 sm:w-16"
                 />
               )}
               <div className="flex flex-col gap-1">
@@ -106,7 +106,7 @@ export default async function RestaurantMenuPage({
           </div>
 
           {/* Annoncé une seule fois, en tête : le convive comprend d'emblée
-              ce que le cube violet des cartes signifie, plutôt que de le
+              ce que le cube des vignettes signifie, plutôt que de le
               découvrir plat par plat. */}
           {arCount > 0 && (
             <p className="max-w-xl text-[15px] leading-relaxed text-muted-foreground">

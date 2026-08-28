@@ -23,7 +23,7 @@ export function LocaleSwitch({ className = "" }: { className?: string }) {
 
   return (
     <div
-      className={`inline-flex items-center rounded-full border border-border/70 bg-card/60 p-0.5 backdrop-blur ${className}`}
+      className={`inline-flex items-center rounded-full border border-border/60 p-0.5 backdrop-blur ${className}`}
     >
       {routing.locales.map((locale) => {
         const active = locale === current;
@@ -37,7 +37,7 @@ export function LocaleSwitch({ className = "" }: { className?: string }) {
             onClick={() => router.replace(pathname, { locale })}
             className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               active
-                ? "bg-primary text-primary-foreground"
+                ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { ArCubeIcon } from "./ar-cube-icon";
 
 // Fallback 2D non-négociable (section 17.1, 25) : si le modèle 3D échoue,
 // on retombe sur l'image.
@@ -79,8 +80,8 @@ export function ArViewer({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-secondary/40 to-primary/15">
-            <span className="font-heading text-6xl text-foreground/25">
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-foreground/[0.07] to-foreground/[0.02]">
+            <span className="font-heading text-6xl text-foreground/20">
               {alt.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -104,7 +105,7 @@ export function ArViewer({
           de plat est déjà très colorée, un cadre chargé la desservirait.
           Le ratio 4:3 est celui des cartes du menu, pour que le passage de
           la liste à la fiche ne provoque pas de saut visuel. */}
-      <div className="surface-menu aspect-[4/3] w-full bg-gradient-to-b from-muted/60 to-background hover:translate-y-0 hover:shadow-none">
+      <div className="surface-menu aspect-[4/3] w-full">
         <model-viewer
           ref={ref}
           src={glbUrl}
@@ -117,7 +118,18 @@ export function ArViewer({
           poster={imageUrl ?? undefined}
           shadow-intensity="1"
           style={{ width: "100%", height: "100%", backgroundColor: "transparent" }}
-        />
+        >
+          {/* Bouton d'activation maison plutôt que celui de model-viewer :
+              le bouton par défaut est un rectangle blanc générique posé en
+              bas à droite, sans rapport avec le reste du menu. Le slot
+              `ar-button` est masqué automatiquement par model-viewer quand
+              l'appareil ne peut pas activer l'AR, donc aucun bouton mort
+              n'apparaît sur un ordinateur de bureau. */}
+          <button slot="ar-button" type="button" className="ar-launch">
+            <ArCubeIcon className="h-4 w-4" />
+            {t("viewInAr")}
+          </button>
+        </model-viewer>
       </div>
       <p className="text-center text-xs text-muted-foreground">{t("rotateHint")}</p>
     </div>

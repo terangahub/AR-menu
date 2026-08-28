@@ -67,7 +67,7 @@ export default async function DishPage({
         <div className="flex items-center justify-between gap-4 py-6">
           <Link
             href={backHref}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/60 px-3 py-1.5 text-sm text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/60 px-3 py-1.5 text-sm text-muted-foreground backdrop-blur transition-colors hover:border-foreground/30 hover:text-foreground"
           >
             <span aria-hidden>&larr;</span>
             {t("back")}
@@ -89,7 +89,7 @@ export default async function DishPage({
 
         <div className="mt-8 flex flex-col gap-3">
           {category && (
-            <span className="w-fit rounded-full bg-secondary/60 px-3 py-1 text-xs font-medium text-secondary-foreground">
+            <span className="w-fit rounded-full border border-border/60 px-3 py-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
               {category}
             </span>
           )}
@@ -97,7 +97,7 @@ export default async function DishPage({
             <h1 className="font-heading text-3xl leading-tight tracking-tight sm:text-4xl">
               {name}
             </h1>
-            <span className="shrink-0 pt-1 font-heading text-2xl text-primary">
+            <span className="shrink-0 pt-1 font-heading text-2xl tabular-nums text-foreground">
               {Number(dish.price).toFixed(2)} $
             </span>
           </div>
@@ -126,9 +126,9 @@ export default async function DishPage({
         )}
 
         {(ingredients || dish.prepTimeMinutes != null) && (
-          <section className="mt-6 grid gap-px overflow-hidden rounded-card border border-border/70 bg-border/70 sm:grid-cols-2">
+          <section className="surface-menu mt-6 grid divide-y divide-border/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             {ingredients && (
-              <div className="bg-card p-4">
+              <div className="p-4">
                 <h2 className="text-xs uppercase tracking-wide text-muted-foreground">
                   {t("ingredients")}
                 </h2>
@@ -136,7 +136,7 @@ export default async function DishPage({
               </div>
             )}
             {dish.prepTimeMinutes != null && (
-              <div className="bg-card p-4">
+              <div className="p-4">
                 <h2 className="text-xs uppercase tracking-wide text-muted-foreground">
                   {t("prepTime")}
                 </h2>
@@ -150,7 +150,7 @@ export default async function DishPage({
 
         <Link
           href={backHref}
-          className="mt-10 inline-flex w-fit items-center gap-1.5 text-sm text-primary underline-offset-4 hover:underline"
+          className="mt-10 inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
         >
           <span aria-hidden>&larr;</span>
           {t("backToMenu", { restaurant: dish.restaurant.name })}

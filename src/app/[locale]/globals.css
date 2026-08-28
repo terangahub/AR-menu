@@ -169,54 +169,97 @@
   /* --- Surfaces du menu public (Sprint 6) ---
      `surface-card` ci-dessus appartient à la landing, qui force le mode
      sombre : ses valeurs en `white/0.06` sont invisibles sur un fond
-     clair. Le menu public doit tenir dans les deux thèmes, d'où cette
-     variante bâtie sur les tokens sémantiques. */
+     clair. Le menu public doit tenir dans les deux themes, d'où cette
+     variante bâtie sur les tokens sémantiques.
+
+     Discipline chromatique du menu, corrigée après la première version :
+     la page est neutre sur toute sa surface, le violet de marque est
+     réservé à la seule réalité augmentée et le rouge aux seuls
+     allergènes. En sombre, une carte n'est donc plus l'indigo `--card`
+     (#181848) mais un voile blanc très faible posé sur le fond quasi
+     noir : c'est la photo du plat qui porte la couleur, jamais son
+     cadre. Trois violets différents se disputaient l'écran (pastille
+     lavande, carte indigo, halo), il n'en reste aucun. */
   .surface-menu {
-    @apply relative overflow-hidden rounded-card border border-border/70 bg-card transition-all duration-300;
-  }
-  .surface-menu:hover {
-    @apply border-primary/40;
-    transform: translateY(-3px);
-    box-shadow:
-      0 12px 32px -18px hsl(var(--primary) / 0.45),
-      0 2px 8px -4px hsl(250 45% 11% / 0.08);
+    @apply relative overflow-hidden rounded-card border border-border/60 bg-card transition-all duration-300;
   }
   /* `[data-theme="dark"]` et non `.dark` : c'est le sélecteur configuré
      dans tailwind.config.ts et posé par next-themes (`attribute`). */
-  [data-theme="dark"] .surface-menu:hover {
-    box-shadow: 0 16px 40px -20px hsl(var(--primary) / 0.35);
+  [data-theme="dark"] .surface-menu {
+    background-color: hsl(var(--background));
+    background-image: linear-gradient(
+      to bottom,
+      hsl(0 0% 100% / 0.05),
+      hsl(0 0% 100% / 0.018)
+    );
+    border-color: hsl(0 0% 100% / 0.08);
+  }
+
+  /* Élévation réservée aux surfaces cliquables : une fiche d'information
+     qui se soulève au survol laisse croire qu'elle mène quelque part. */
+  .surface-menu-interactive:hover {
+    border-color: hsl(var(--foreground) / 0.18);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 34px -20px hsl(250 45% 11% / 0.25);
+  }
+  [data-theme="dark"] .surface-menu-interactive:hover {
+    border-color: hsl(0 0% 100% / 0.16);
+    background-image: linear-gradient(
+      to bottom,
+      hsl(0 0% 100% / 0.08),
+      hsl(0 0% 100% / 0.03)
+    );
+    box-shadow: none;
   }
 
   /* Voile posé sur une photo de plat pour que le texte blanc reste
      lisible quel que soit le cliché : sans lui, une assiette claire sur
      nappe blanche ferait disparaître le nom du plat. Toujours sombre,
      dans les deux thèmes, parce qu'il se superpose à une photo et non au
-     fond de la page. */
+     fond de la page. Noir neutre et non violet : teinter le voile
+     déplacerait les couleurs de l'assiette. */
   .photo-scrim {
     background: linear-gradient(
       to top,
-      hsl(250 45% 6% / 0.9) 0%,
-      hsl(250 45% 6% / 0.55) 38%,
-      hsl(250 45% 6% / 0.1) 68%,
+      hsl(0 0% 3% / 0.88) 0%,
+      hsl(0 0% 3% / 0.52) 38%,
+      hsl(0 0% 3% / 0.1) 68%,
       transparent 100%
     );
   }
 
-  /* Halo d'ambiance derrière l'en-tête du menu : deux teintes proches du
-     violet de marque, très diffuses, pour éviter l'aplat sans jamais
-     concurrencer les photos de plats. */
-  .menu-aurora {
-    background:
-      radial-gradient(
-        60% 55% at 15% 0%,
-        hsl(var(--primary) / 0.16) 0%,
-        transparent 70%
-      ),
-      radial-gradient(
-        50% 50% at 85% 8%,
-        hsl(var(--secondary) / 0.14) 0%,
-        transparent 70%
-      );
+  /* Pastille posée sur une photo (mention AR, prix). Verre sombre plutôt
+     qu'un aplat de marque : une pastille lavande sur chaque vignette
+     rendait la grille bariolée, alors que le noir translucide se pose
+     sur n'importe quel cliché sans lui voler l'attention. */
+  .photo-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/15 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-md;
+    background: hsl(0 0% 3% / 0.55);
+  }
+
+  /* Lumière d'ambiance derrière l'en-tête du menu : un seul dégradé blanc
+     très diffus, en sombre uniquement. La version précédente empilait
+     deux radiales violettes qui coloraient tout le haut de page. */
+  [data-theme="dark"] .menu-aurora {
+    background: radial-gradient(
+      70% 55% at 50% 0%,
+      hsl(0 0% 100% / 0.045) 0%,
+      transparent 70%
+    );
+  }
+
+  /* Bouton d'activation de la réalité augmentée, posé dans le slot
+     `ar-button` de model-viewer. Contraste maximal (encre sur fond, fond
+     sur encre) plutôt qu'un aplat lavande : c'est la seule action de la
+     fiche plat, elle doit se lire d'un coup d'oeil par-dessus un modèle
+     3D dont on ne maîtrise pas les couleurs. */
+  .ar-launch {
+    @apply absolute bottom-4 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg transition-transform;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+  .ar-launch:hover {
+    transform: translate(-50%, -2px);
   }
 
   /* Barre de filtres collée en haut : le convive fait défiler un long
@@ -225,7 +268,7 @@
      libellés illisibles. */
   .menu-sticky-bar {
     @apply sticky top-0 z-30 -mx-4 border-b border-border/60 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6;
-    background: hsl(var(--background) / 0.82);
+    background: hsl(var(--background) / 0.85);
   }
 
   /* Halo diffus derrière un élément (orbe lumineuse). */

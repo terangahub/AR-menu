@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { ArCubeIcon } from "./ar-cube-icon";
 
 type Allergen = { code: string; nameFr: string; nameEn: string };
 
@@ -19,28 +20,6 @@ export type MenuDish = {
   isArReady: boolean;
   allergens: Allergen[];
 };
-
-// Petit cube isométrique, repris du vocabulaire visuel de la landing pour
-// signaler la réalité augmentée. En SVG inline plutôt qu'en dépendance
-// d'icônes : c'est la seule icône dont le menu public a besoin.
-function ArCubeIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden className={className}>
-      <path
-        d="M12 2.8 20.5 7v10L12 21.2 3.5 17V7L12 2.8Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <path
-        d="m3.5 7 8.5 4.4L20.5 7M12 11.4v9.8"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export function MenuClient({
   restaurantSlug,
@@ -135,7 +114,7 @@ export function MenuClient({
               aria-expanded={filtersOpen}
               className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                 excludedAllergens.size > 0
-                  ? "border-primary/50 bg-primary/10 text-primary"
+                  ? "border-foreground/25 bg-foreground/[0.06] text-foreground"
                   : "border-border text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -181,7 +160,7 @@ export function MenuClient({
           <button
             type="button"
             onClick={clearFilters}
-            className="text-sm text-primary underline-offset-4 hover:underline"
+            className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
           >
             {t("clearFilters")}
           </button>
@@ -195,7 +174,7 @@ export function MenuClient({
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-3 text-sm text-primary underline-offset-4 hover:underline"
+              className="mt-3 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
             >
               {t("clearFilters")}
             </button>
@@ -216,7 +195,7 @@ export function MenuClient({
                     ? `/${restaurantSlug}/dishes/${dish.id}?qr=${encodeURIComponent(qr)}`
                     : `/${restaurantSlug}/dishes/${dish.id}`
                 }
-                className="surface-menu group flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="surface-menu surface-menu-interactive group flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
                   {dish.imageUrl ? (
@@ -231,8 +210,8 @@ export function MenuClient({
                     // Un plat sans photo ne doit pas laisser un trou gris :
                     // l'initiale sur un fond de marque reste présentable, et
                     // la carte garde la même hauteur que les autres.
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-secondary/40 to-primary/15">
-                      <span className="font-heading text-5xl text-foreground/25">
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-foreground/[0.07] to-foreground/[0.02]">
+                      <span className="font-heading text-5xl text-foreground/20">
                         {name.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -241,7 +220,7 @@ export function MenuClient({
                   <div className="photo-scrim pointer-events-none absolute inset-x-0 bottom-0 h-2/3" />
 
                   {dish.isArReady && (
-                    <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground shadow-lg">
+                    <span className="photo-chip absolute right-3 top-3">
                       <ArCubeIcon className="h-3.5 w-3.5" />
                       {t("viewInAr")}
                     </span>
@@ -251,7 +230,7 @@ export function MenuClient({
                     <h3 className="font-heading text-lg leading-tight text-white drop-shadow-sm">
                       {name}
                     </h3>
-                    <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-sm font-medium text-white backdrop-blur-sm">
+                    <span className="photo-chip shrink-0 text-sm tabular-nums">
                       {dish.price.toFixed(2)} $
                     </span>
                   </div>
@@ -269,7 +248,7 @@ export function MenuClient({
                         {dish.allergens.map((a) => (
                           <span
                             key={a.code}
-                            className="rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] text-destructive"
+                            className="rounded-full border border-border/60 px-2 py-0.5 text-[11px] text-muted-foreground"
                           >
                             {isEn ? a.nameEn : a.nameFr}
                           </span>
@@ -303,7 +282,7 @@ function CategoryPill({
       aria-pressed={active}
       className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
         active
-          ? "border-primary bg-primary text-primary-foreground"
+          ? "border-foreground bg-foreground text-background"
           : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground"
       }`}
     >
