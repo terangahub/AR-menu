@@ -17,6 +17,8 @@ import { ArCubeIcon } from "./ar-cube-icon";
 // confort mais un filet contre un modèle qui ne se chargerait jamais.
 const LOAD_TIMEOUT_MS = 25000;
 
+type Medium = "model" | "photo";
+
 export function ArViewer({
   glbUrl,
   usdzUrl,
@@ -36,6 +38,7 @@ export function ArViewer({
   const [status, setStatus] = useState<"loading" | "ready" | "fallback">(
     glbUrl ? "loading" : "fallback"
   );
+  const [medium, setMedium] = useState<Medium>("model");
 
   // @google/model-viewer touche `customElements`/`window` - import
   // dynamique côté client uniquement, jamais pendant le rendu serveur.
@@ -76,16 +79,7 @@ export function ArViewer({
   if (status === "fallback" || !glbUrl) {
     return (
       <div className="surface-menu aspect-[4/3] w-full">
-        {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-foreground/[0.07] to-foreground/[0.02]">
-            <span className="font-heading text-6xl text-foreground/20">
-              {alt.charAt(0).toUpperCase()}
-            </span>
-          </div>
-        )}
+        <DishImage imageUrl={imageUrl} alt={alt} />
         {glbUrl && (
           <p className="absolute inset-x-0 bottom-0 bg-background/85 px-4 py-2 text-center text-xs text-muted-foreground backdrop-blur">
             {t("arUnavailable")}
@@ -99,13 +93,26 @@ export function ArViewer({
     return <div className="aspect-[4/3] w-full animate-pulse rounded-card bg-muted" />;
   }
 
+  // La bascule n'a de sens que si les deux médias existent : sans photo,
+  // proposer un onglet Photo vide serait une fausse promesse.
+  const canSwitch = Boolean(imageUrl);
+  const showingPhoto = canSwitch && medium === "photo";
+
   return (
     <div className="flex flex-col gap-3">
       {/* Fond neutre et discret derrière le modèle : une photogrammétrie
           de plat est déjà très colorée, un cadre chargé la desservirait.
           Le ratio 4:3 est celui des cartes du menu, pour que le passage de
-          la liste à la fiche ne provoque pas de saut visuel. */}
-      <div className="surface-menu aspect-[4/3] w-full">
+          la liste à la fiche ne provoque pas de saut visuel.
+
+          Le visualiseur est masqué en CSS et non démonté quand le convive
+          revient à la photo : un modèle issu de photogrammétrie pèse
+          plusieurs dizaines de mégaoctets, le démonter le ferait
+          retélécharger à chaque aller-retour entre les deux onglets. */}
+      <div
+        className={`surface-menu aspect-[4/3] w-full ${showingPhoto ? "hidden" : ""}`}
+        aria-hidden={showingPhoto}
+      >
         <model-viewer
           ref={ref}
           src={glbUrl}
@@ -131,7 +138,80 @@ export function ArViewer({
           </button>
         </model-viewer>
       </div>
-      <p className="text-center text-xs text-muted-foreground">{t("rotateHint")}</p>
+
+      {showingPhoto && (
+        <div className="surface-menu aspect-[4/3] w-full">
+          <DishImage imageUrl={imageUrl} alt={alt} />
+        </div>
+      )}
+
+      {/* La photo du plat est l'image qui donne faim, et c'est elle que le
+          restaurateur a fait faire. Le modèle 3D la remplaçait purement et
+          simplement : un convive qui voulait revoir la photo devait
+          revenir en arrière. Les deux médias sont désormais à un geste
+          l'un de l'autre, le modèle en premier puisque c'est ce que le
+          convive est venu chercher en touchant une carte marquée du cube. */}
+      {canSwitch && (
+        <div
+          role="group"
+          aria-label={t("mediumLabel")}
+          className="mx-auto inline-flex items-center rounded-full border border-border p-0.5"
+        >
+          <MediumButton
+            active={medium === "model"}
+            onClick={() => setMedium("model")}
+            label={t("medium3d")}
+          />
+          <MediumButton
+            active={medium === "photo"}
+            onClick={() => setMedium("photo")}
+            label={t("mediumPhoto")}
+          />
+        </div>
+      )}
+
+      {!showingPhoto && (
+        <p className="text-center text-xs text-muted-foreground">{t("rotateHint")}</p>
+      )}
     </div>
+  );
+}
+
+function DishImage({ imageUrl, alt }: { imageUrl?: string | null; alt: string }) {
+  if (!imageUrl) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-foreground/[0.07] to-foreground/[0.02]">
+        <span className="font-heading text-6xl text-foreground/20">
+          {alt.charAt(0).toUpperCase()}
+        </span>
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
+  );
+}
+
+function MediumButton({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+        active ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {label}
+    </button>
   );
 }

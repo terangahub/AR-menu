@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { redirect } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { recordScan } from "@/lib/scan";
 import { MenuClient, type MenuDish } from "@/components/menu/menu-client";
@@ -52,6 +53,25 @@ export default async function RestaurantMenuPage({
   });
 
   if (!restaurant) {
+    // Un QR code déjà imprimé encode l'ancienne adresse du menu dans son
+    // image : si le restaurateur renomme son établissement, tous les
+    // cartons collés sur les tables pointent vers une page qui n'existe
+    // plus, et il n'y a aucun moyen de les corriger à distance. Le `?qr=`
+    // qu'ils portent, lui, identifie le QR code de façon stable. On s'en
+    // sert pour retrouver le restaurant et rediriger vers son adresse
+    // actuelle, plutôt que de laisser un convive attablé sur un 404.
+    if (qr) {
+      const qrCode = await prisma.qrCode.findUnique({
+        where: { id: qr },
+        select: { restaurant: { select: { slug: true } } },
+      });
+      if (qrCode) {
+        redirect({
+          href: `/${qrCode.restaurant.slug}?qr=${encodeURIComponent(qr)}`,
+          locale,
+        });
+      }
+    }
     notFound();
   }
 
@@ -122,8 +142,25 @@ export default async function RestaurantMenuPage({
           qr={qr}
         />
 
+        {/* La mention de marque est aussi le seul lien commercial de tout
+            le menu : un convive qui la remarque est un prospect, et il
+            n'avait jusqu'ici aucun moyen d'aller voir ce qu'est Vorae.
+            Nouvel onglet volontaire : le convive est au milieu de son
+            repas, quitter le menu lui ferait perdre sa place et le
+            rattachement de sa visite à sa table. */}
         <footer className="mt-16 border-t border-border/60 pt-6 text-center text-xs text-muted-foreground">
-          {t("poweredBy")}
+          {t.rich("poweredBy", {
+            vorae: (chunks) => (
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener"
+                className="font-medium text-foreground underline underline-offset-4 transition-opacity hover:opacity-70"
+              >
+                {chunks}
+              </a>
+            ),
+          })}
         </footer>
       </main>
     </div>

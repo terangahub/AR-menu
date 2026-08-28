@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { absoluteMenuUrl, generateQrPngDataUrl } from "@/lib/qrcode";
+import { qrTargetPath } from "@/lib/qr-target";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,11 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const targetUrl = `/fr/${restaurantUser.restaurant.slug}?qr=${qrCode.id}`;
+  const targetUrl = qrTargetPath(
+    restaurantUser.restaurant.defaultLocale,
+    restaurantUser.restaurant.slug,
+    qrCode.id
+  );
   const updated = await prisma.qrCode.update({
     where: { id: qrCode.id },
     data: { targetUrl },

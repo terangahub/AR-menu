@@ -191,16 +191,21 @@
   "Menu": {
     "categoryAll": "All",
     "unavailable": "Unavailable",
-    "allergenFilter": "Filter by allergen",
+    "allergenFilter": "Allergens",
     "regimeFilter": "Filter by diet",
     "viewInAr": "View in AR",
     "empty": "No dishes yet.",
     "allergenFilterActive": "Allergens ({count})",
-    "allergenHint": "Select the allergens to rule out. Dishes containing them will be hidden.",
+    "allergenHint": "Rule out the allergens that concern you: dishes containing them will be hidden.",
     "dishCount": "{count, plural, =0 {No dishes} one {# dish} other {# dishes}}",
     "clearFilters": "Show all",
     "arIntro": "{count, plural, one {# dish on this menu can be viewed} other {# dishes on this menu can be viewed}} at full size on your table. Tap a card marked with the cube, then open the 3D view.",
-    "poweredBy": "Menu powered by Vorae"
+    "poweredBy": "Menu powered by <vorae>Vorae</vorae>",
+    "allergenReset": "Show all again",
+    "hiddenCount": "({count, plural, one {# hidden} other {# hidden}})",
+    "viewLabel": "Layout",
+    "viewGrid": "Grid view, with photos",
+    "viewList": "List view, compact"
   },
   "Dish": {
     "ingredients": "Ingredients",
@@ -211,7 +216,10 @@
     "rotateHint": "Rotate and zoom before activating AR",
     "arUnavailable": "3D model unavailable right now: showing the photo",
     "back": "Back to menu",
-    "backToMenu": "Back to {restaurant}'s menu"
+    "backToMenu": "Back to {restaurant}'s menu",
+    "mediumLabel": "Dish display",
+    "medium3d": "3D model",
+    "mediumPhoto": "Photo"
   },
   "Dashboard": {
     "noRestaurant": "No restaurant linked to this account.",
@@ -220,7 +228,8 @@
       "dishes": "Dishes",
       "qrcodes": "QR codes",
       "analytics": "Analytics",
-      "billing": "Billing"
+      "billing": "Billing",
+      "settings": "Settings"
     },
     "overview": {
       "title": "Overview",
@@ -386,6 +395,41 @@
       "noAllergens": "No allergens declared.",
       "analytics": "Analytics",
       "publicPage": "View on public menu"
+    },
+    "settings": {
+      "title": "Restaurant settings",
+      "subtitle": "What your guests see when they scan a QR code.",
+      "viewMenu": "View the public menu",
+      "identity": "Identity",
+      "identityHint": "The name and city appear at the top of the public menu.",
+      "name": "Restaurant name",
+      "city": "City",
+      "email": "Contact email",
+      "emailHint": "Used for billing and important notices. Never shown on the menu.",
+      "defaultLocale": "Welcome language",
+      "defaultLocaleHint": "The language the menu opens in after a scan. Guests can always switch.",
+      "localeFr": "French",
+      "localeEn": "English",
+      "logo": "Logo",
+      "logoHint": "Shown next to the name at the top of the menu. JPG, PNG or WebP, 4 MB maximum.",
+      "logoUpload": "Add a logo",
+      "logoReplace": "Replace",
+      "logoRemove": "Remove",
+      "logoUploading": "Uploading...",
+      "logoImmediate": "The logo is saved as soon as you pick the file, without going through the Save button.",
+      "logoError": "The logo could not be uploaded. Check its format and size, then try again.",
+      "address": "Menu address",
+      "addressHint": "The web address of your menu, the one your QR codes encode.",
+      "slug": "Address",
+      "slugInvalid": "Only unaccented letters, digits and hyphens.",
+      "slugTaken": "That address is already taken by another restaurant. Pick a different one.",
+      "slugWarningTitle": "Your printed QR codes will point to a new address",
+      "slugWarningBody": "QR codes you reprint will point to the new address. The ones already on your tables will keep working: they are redirected automatically. Reprint them when you can.",
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Changes saved.",
+      "reset": "Discard changes",
+      "error": "Your changes could not be saved. Please try again."
     }
   },
   "Legal": {

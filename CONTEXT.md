@@ -509,6 +509,26 @@ concerné - cette liste est un résumé, pas la seule source.
   `menu-aurora` et `menu-sticky-bar`, bâtis sur les tokens sémantiques.
   **Ne pas réutiliser une classe de la landing sur un écran qui peut
   s'afficher en clair sans vérifier ce qu'elle contient.**
+- **L'adresse du menu (`Restaurant.slug`) est gravée dans du carton.**
+  `QrCode.targetUrl` stocke `/{locale}/{slug}?qr={id}`, et l'image PNG du
+  QR code encode cette chaîne : une fois imprimée et collée sur une table,
+  elle ne peut plus être corrigée à distance. Changer le slug demande donc
+  trois choses à la fois, et pas une seule : réécrire les `targetUrl` en
+  base dans la même transaction (pour les réimpressions), avertir
+  explicitement le restaurateur, et rattraper les anciens QR codes à
+  l'exécution. Le rattrapage passe par le `?qr=` : il identifie le QR code
+  de façon stable, donc la page de menu retrouve le restaurant et redirige
+  vers son adresse actuelle au lieu d'afficher un 404 à un convive
+  attablé. `lib/qr-target.ts` détient la forme du chemin, y compris pour
+  la mise à jour SQL en masse (préfixe construit avec un id vide), pour
+  que génération et migration ne puissent pas diverger.
+- **Un réglage qui n'a aucun effet ne doit pas apparaître dans l'écran de
+  paramètres.** `Restaurant.defaultLocale` et `Restaurant.primaryColor`
+  existaient tous deux en base sans être lus nulle part. Le premier a été
+  branché pour de bon (il pilote la locale encodée dans les QR codes), le
+  second est resté hors de l'écran de paramètres et attend son ticket
+  (`S8-10`) : offrir un sélecteur de couleur qui ne change rien serait
+  plus dommageable que de ne rien offrir.
 - **Discipline chromatique du menu public : neutre partout, le violet
   réservé à la seule réalité augmentée, le rouge aux seuls allergènes.**
   La première version du Sprint 6 laissait cohabiter trois violets sur un

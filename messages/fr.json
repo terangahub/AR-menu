@@ -191,16 +191,21 @@
   "Menu": {
     "categoryAll": "Tout",
     "unavailable": "Indisponible",
-    "allergenFilter": "Filtrer par allergène",
+    "allergenFilter": "Allergènes",
     "regimeFilter": "Filtrer par régime",
     "viewInAr": "Voir en AR",
     "empty": "Aucun plat pour l'instant.",
     "allergenFilterActive": "Allergènes ({count})",
-    "allergenHint": "Sélectionnez les allergènes à écarter. Les plats qui en contiennent seront masqués.",
+    "allergenHint": "Écartez les allergènes qui vous concernent : les plats qui en contiennent seront masqués.",
     "dishCount": "{count, plural, =0 {Aucun plat} one {# plat} other {# plats}}",
     "clearFilters": "Tout afficher",
     "arIntro": "{count, plural, one {# plat de ce menu se visualise} other {# plats de ce menu se visualisent}} en taille réelle sur votre table. Touchez une carte marquée du cube, puis lancez la vue 3D.",
-    "poweredBy": "Menu propulsé par Vorae"
+    "poweredBy": "Menu propulsé par <vorae>Vorae</vorae>",
+    "allergenReset": "Tout réafficher",
+    "hiddenCount": "({count, plural, one {# masqué} other {# masqués}})",
+    "viewLabel": "Affichage",
+    "viewGrid": "Vue en grille, avec photos",
+    "viewList": "Vue en liste, compacte"
   },
   "Dish": {
     "ingredients": "Ingrédients",
@@ -211,7 +216,10 @@
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
     "arUnavailable": "Modèle 3D indisponible pour l'instant : photo affichée",
     "back": "Retour au menu",
-    "backToMenu": "Retour au menu de {restaurant}"
+    "backToMenu": "Retour au menu de {restaurant}",
+    "mediumLabel": "Affichage du plat",
+    "medium3d": "Modèle 3D",
+    "mediumPhoto": "Photo"
   },
   "Dashboard": {
     "noRestaurant": "Aucun restaurant associé à ce compte.",
@@ -220,7 +228,8 @@
       "dishes": "Plats",
       "qrcodes": "QR codes",
       "analytics": "Analytics",
-      "billing": "Facturation"
+      "billing": "Facturation",
+      "settings": "Paramètres"
     },
     "overview": {
       "title": "Vue d'ensemble",
@@ -386,6 +395,41 @@
       "noAllergens": "Aucun allergène déclaré.",
       "analytics": "Statistiques",
       "publicPage": "Voir sur le menu public"
+    },
+    "settings": {
+      "title": "Paramètres du restaurant",
+      "subtitle": "Ce que voient vos convives quand ils scannent un QR code.",
+      "viewMenu": "Voir le menu public",
+      "identity": "Identité",
+      "identityHint": "Le nom et la ville s'affichent en tête du menu public.",
+      "name": "Nom du restaurant",
+      "city": "Ville",
+      "email": "Courriel de contact",
+      "emailHint": "Sert à la facturation et aux avis importants. Jamais affiché sur le menu.",
+      "defaultLocale": "Langue d'accueil",
+      "defaultLocaleHint": "Langue dans laquelle s'ouvre le menu après un scan. Le convive peut toujours basculer.",
+      "localeFr": "Français",
+      "localeEn": "Anglais",
+      "logo": "Logo",
+      "logoHint": "Affiché à côté du nom, en tête du menu. JPG, PNG ou WebP, 4 Mo maximum.",
+      "logoUpload": "Ajouter un logo",
+      "logoReplace": "Remplacer",
+      "logoRemove": "Retirer",
+      "logoUploading": "Envoi...",
+      "logoImmediate": "Le logo est enregistré dès que vous choisissez le fichier, sans passer par le bouton Enregistrer.",
+      "logoError": "Le logo n'a pas pu être envoyé. Vérifiez le format et la taille, puis réessayez.",
+      "address": "Adresse du menu",
+      "addressHint": "L'adresse web de votre menu, celle qu'encodent vos QR codes.",
+      "slug": "Adresse",
+      "slugInvalid": "Uniquement des lettres sans accent, des chiffres et des tirets.",
+      "slugTaken": "Cette adresse est déjà prise par un autre restaurant. Choisissez-en une autre.",
+      "slugWarningTitle": "Vos QR codes déjà imprimés vont changer d'adresse",
+      "slugWarningBody": "Les QR codes que vous réimprimerez pointeront vers la nouvelle adresse. Ceux déjà collés sur vos tables continueront de fonctionner : ils seront redirigés automatiquement. Réimprimez-les quand vous le pourrez.",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "saved": "Modifications enregistrées.",
+      "reset": "Annuler les modifications",
+      "error": "Les modifications n'ont pas pu être enregistrées. Réessayez."
     }
   },
   "Legal": {
