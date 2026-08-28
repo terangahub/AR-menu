@@ -252,17 +252,30 @@ export function RestaurantSettings({
       <section className="surface-panel flex flex-col gap-4 p-5">
         <SectionTitle title={t("address")} hint={t("addressHint")} />
 
+        {/* Le domaine était collé devant le champ, en `shrink-0` : sur une
+            adresse de preview Vercel (une soixantaine de caractères), il
+            poussait la saisie hors de l'écran et le restaurateur ne voyait
+            plus ce qu'il tapait. Le champ est donc seul, et l'adresse
+            complète s'affiche dessous, où elle peut revenir à la ligne
+            quel que soit le domaine. */}
         <Field label={t("slug")} required>
-          <div className="flex items-center gap-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm focus-within:ring-1 focus-within:ring-ring">
-            <span className="shrink-0 text-muted-foreground">{menuBaseUrl}/</span>
-            <input
-              required
-              value={values.slug}
-              onChange={(e) => set("slug", slugify(e.target.value))}
-              className="min-w-0 flex-1 bg-transparent outline-none"
-            />
-          </div>
+          <input
+            required
+            value={values.slug}
+            onChange={(e) => set("slug", slugify(e.target.value))}
+            className="input"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
         </Field>
+
+        <p className="-mt-2 text-xs text-muted-foreground">
+          {t("slugPreview")}{" "}
+          <span className="break-all font-medium text-foreground">
+            {menuBaseUrl}/{values.slug}
+          </span>
+        </p>
 
         {!slugIsValid && values.slug.length > 0 && (
           <p className="text-sm text-destructive">{t("slugInvalid")}</p>

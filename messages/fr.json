@@ -473,7 +473,8 @@
       "saving": "Enregistrement...",
       "saved": "Modifications enregistrées.",
       "reset": "Annuler les modifications",
-      "error": "Les modifications n'ont pas pu être enregistrées. Réessayez."
+      "error": "Les modifications n'ont pas pu être enregistrées. Réessayez.",
+      "slugPreview": "Votre menu sera à cette adresse :"
     }
   },
   "Legal": {

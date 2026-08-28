@@ -545,6 +545,14 @@ concerné - cette liste est un résumé, pas la seule source.
   **un graphique se peint en tokens sémantiques**, jamais aux valeurs par
   défaut de la librairie, dont l'infobulle est une boîte blanche à texte
   noir qui disparaît en mode sombre.
+- **Forcer une carte en blanc ne rend pas une page imprimable.** Le `body`
+  porte `bg-background`, qui vaut #030014 en mode sombre : une page
+  imprimée depuis le thème sombre sort en feuille noire, même si le
+  gabarit qu'elle contient est blanc. Toute vue destinée à l'impression a
+  besoin du bloc `@media print` global de `globals.css`, qui neutralise
+  `html` et `body`, et de `print-color-adjust: exact`, sans lequel
+  certains navigateurs suppriment justement l'aplat blanc imposé. Vérifier
+  une page imprimable veut dire l'imprimer **depuis le mode sombre**.
 - **Discipline chromatique du menu public : neutre partout, le violet
   réservé à la seule réalité augmentée, le rouge aux seuls allergènes.**
   La première version du Sprint 6 laissait cohabiter trois violets sur un

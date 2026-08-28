@@ -9,10 +9,11 @@ import { AutoPrint } from "@/components/dashboard/auto-print";
 // navigateur native ("Enregistrer en PDF") plutôt qu'une librairie PDF
 // dédiée, pas de nouvelle dépendance pour un simple gabarit une page.
 //
-// Cette page ne suit pas le thème du dashboard : elle est **toujours noire
-// sur blanc**. Un carton imprimé depuis le mode sombre sortait en blanc sur
-// fond sombre, c'est-à-dire une page entière d'encre, et un QR code doit de
-// toute façon être foncé sur clair pour rester lisible par un téléphone.
+// Le carton est toujours noir sur blanc, quel que soit le thème : un QR
+// code doit être foncé sur clair pour rester lisible par un téléphone, et
+// une page imprimée depuis le mode sombre sortait en pleine encre. La
+// neutralisation de la page elle-même vit dans `globals.css` (@media
+// print) ; ici on ne s'occupe que du gabarit.
 export default async function PrintQrCodePage({
   params,
 }: {
@@ -24,7 +25,7 @@ export default async function PrintQrCodePage({
 
   const qrCode = await prisma.qrCode.findUnique({
     where: { id: qrId },
-    include: { restaurant: { select: { name: true, city: true, logoUrl: true } } },
+    include: { restaurant: { select: { name: true, logoUrl: true } } },
   });
 
   if (!qrCode || !restaurantUser || qrCode.restaurantId !== restaurantUser.restaurantId) {
@@ -34,44 +35,56 @@ export default async function PrintQrCodePage({
   const png = await generateQrPngDataUrl(absoluteMenuUrl(qrCode.targetUrl));
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center py-8 print:min-h-screen print:py-0">
+    <div className="flex min-h-screen items-center justify-center bg-white px-6 py-10 text-neutral-900 print:min-h-0 print:p-0">
       <AutoPrint />
 
-      {/* Le carton lui-même, aux proportions d'un chevalet de table.
-          `border` visible à l'écran pour montrer ce qui sera découpé,
-          conservée à l'impression comme trait de coupe. */}
-      <div className="flex w-[340px] flex-col items-center gap-5 rounded-3xl border border-neutral-300 bg-white px-8 py-10 text-center text-neutral-900 print:rounded-none print:border-neutral-400 print:shadow-none">
-        {qrCode.restaurant.logoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={qrCode.restaurant.logoUrl}
-            alt=""
-            className="h-14 w-14 rounded-2xl border border-neutral-200 object-cover"
-          />
-        )}
+      {/* Le carton occupe la feuille au lieu de flotter au milieu : à
+          l'impression il faisait un timbre entouré de vide. Les
+          proportions sont celles d'un chevalet de table A5, et le QR code
+          est dimensionné en millimètres, pas en pixels, pour qu'il sorte
+          à une taille scannable quelle que soit la résolution.
 
-        <div className="flex flex-col gap-1">
-          <p className="font-heading text-2xl leading-tight">{qrCode.restaurant.name}</p>
-          <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
-            {t("table")} {qrCode.tableNumber}
-          </p>
+          Bordure en pointillé : c'est un trait de coupe, il annonce ce
+          qu'on découpe. Un cadre plein se lirait comme une décoration. */}
+      <div className="flex w-full max-w-[420px] flex-col items-center gap-7 rounded-[28px] border border-dashed border-neutral-300 px-10 py-12 text-center print:max-w-none print:rounded-none">
+        <div className="flex flex-col items-center gap-4">
+          {qrCode.restaurant.logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={qrCode.restaurant.logoUrl}
+              alt=""
+              className="h-16 w-16 rounded-2xl object-cover"
+            />
+          )}
+          <p className="font-heading text-[28px] leading-tight">{qrCode.restaurant.name}</p>
         </div>
 
-        {/* Marge blanche autour du code : sans elle, un lecteur peine à
-            détecter les repères quand le carton est posé sur une nappe
-            foncée. C'est la "quiet zone" du standard QR. */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={png} alt="" className="h-56 w-56" />
-        </div>
-
-        <p className="text-balance text-sm leading-relaxed text-neutral-700">
+        {/* La consigne passe AVANT le code : on dit au convive quoi faire,
+            puis on lui donne la cible. L'inverse le laissait deviner. */}
+        <p className="text-balance text-[15px] leading-relaxed text-neutral-600">
           {t("printInstruction")}
         </p>
 
-        <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-neutral-400">
-          {t("printFooter")}
-        </p>
+        {/* Marge blanche autour du code, la "quiet zone" du standard QR :
+            sans elle, un lecteur peine à détecter les repères quand le
+            carton est posé sur une nappe foncée. */}
+        <div className="bg-white p-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={png} alt="" className="h-[62mm] w-[62mm] print:h-[62mm] print:w-[62mm]" />
+        </div>
+
+        <div className="flex w-full flex-col items-center gap-3">
+          <div className="flex w-full items-center gap-3">
+            <span className="h-px flex-1 bg-neutral-200" />
+            <span className="text-[13px] font-medium uppercase tracking-[0.22em] text-neutral-500">
+              {t("table")} {qrCode.tableNumber}
+            </span>
+            <span className="h-px flex-1 bg-neutral-200" />
+          </div>
+          <p className="text-[10px] uppercase tracking-[0.24em] text-neutral-400">
+            {t("printFooter")}
+          </p>
+        </div>
       </div>
     </div>
   );

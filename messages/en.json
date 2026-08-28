@@ -473,7 +473,8 @@
       "saving": "Saving...",
       "saved": "Changes saved.",
       "reset": "Discard changes",
-      "error": "Your changes could not be saved. Please try again."
+      "error": "Your changes could not be saved. Please try again.",
+      "slugPreview": "Your menu will live at:"
     }
   },
   "Legal": {

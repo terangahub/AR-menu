@@ -92,6 +92,31 @@
   }
 }
 
+/* --- Impression ---
+   Le `body` porte `bg-background`, qui vaut #030014 en mode sombre : une
+   page imprimée depuis le thème sombre sortait donc en carton blanc posé
+   sur une feuille entièrement noire. Forcer la seule carte en blanc ne
+   suffisait pas, c'est la page qu'il faut neutraliser.
+
+   `print-color-adjust: exact` est nécessaire dans l'autre sens : sans
+   lui, certains navigateurs suppriment les aplats à l'impression, y
+   compris le fond blanc que l'on impose ici.
+
+   Aucune marge de page : le gabarit gère lui-même son cadrage, et une
+   marge de navigateur par-dessus décentrait le carton. */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  @page {
+    margin: 12mm;
+  }
+}
+
 @layer components {
   /* Champ de formulaire. Le rayon suit celui des panneaux (12 px contre
      16 px, un cran en dessous, comme un objet posé dedans) et non plus le
