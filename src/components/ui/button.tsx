@@ -15,8 +15,14 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:brightness-110",
         destructive: "bg-destructive text-destructive-foreground hover:brightness-110",
+        // `border-white/25` venait de la landing, qui force le mode sombre :
+        // sur le fond clair du dashboard, une bordure blanche à 25 % est
+        // purement et simplement invisible, et le bouton disparaissait. Les
+        // tokens sémantiques donnent le même rendu en sombre (--border vaut
+        // #484860, très proche de blanc 25 % sur ce fond) et un contour réel
+        // en clair.
         outline:
-          "border border-white/25 bg-transparent text-foreground hover:bg-white/5",
+          "border border-border bg-transparent text-foreground hover:border-foreground/40 hover:bg-foreground/[0.04]",
         secondary: "bg-secondary text-secondary-foreground hover:brightness-110",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",

@@ -229,7 +229,8 @@
       "qrcodes": "QR codes",
       "analytics": "Analytics",
       "billing": "Billing",
-      "settings": "Settings"
+      "settings": "Settings",
+      "publicMenu": "View the public menu"
     },
     "overview": {
       "title": "Overview",
@@ -243,7 +244,11 @@
       "noArData": "No data yet.",
       "missingModelTitle": "Dishes without a 3D model",
       "missingModelEmpty": "Every available dish has a 3D model.",
-      "viewAnalytics": "View detailed analytics"
+      "viewAnalytics": "View detailed analytics",
+      "subtitle": "Activity at {restaurant} coming from your table QR codes.",
+      "scansCount": "{count, plural, one {# scan} other {# scans}}",
+      "missingModelHint": "These dishes show as a photo only on the menu. Run a 3D capture to bring them into augmented reality.",
+      "missingModelAction": "Open the dish"
     },
     "analytics": {
       "title": "Analytics",
@@ -262,7 +267,10 @@
       "busiestHour": "Busiest hour",
       "busiestHourValue": "{hour}:00",
       "noBusiestHour": "No data yet.",
-      "noData": "No scans recorded yet."
+      "noData": "No scans recorded yet.",
+      "subtitle": "Which dishes your guests look at, and which ones they bring onto their table.",
+      "noDataHint": "Statistics start filling in as soon as a guest scans a QR code in your room.",
+      "goToQrCodes": "Manage my QR codes"
     },
     "dishes": {
       "title": "Dishes",
@@ -276,7 +284,12 @@
       "delete": "Delete",
       "confirmDelete": "Delete this dish permanently?",
       "arReady": "AR ready",
-      "noModel": "No 3D model"
+      "noModel": "No 3D model",
+      "subtitle": "What your guests see, in the order they see it.",
+      "emptyFirst": "Your menu is still empty",
+      "emptyFirstHint": "Add a first dish: name, price, photo. The 3D capture comes later, from its page.",
+      "emptyFiltered": "No dish matches",
+      "emptyFilteredHint": "Widen your search or change category."
     },
     "dishForm": {
       "newTitle": "New dish",
@@ -306,7 +319,9 @@
       "savePhoto": "Save photo",
       "saveModel": "Save model",
       "noPhotoSelected": "Choose a photo first.",
-      "noGlbSelected": "This button saves the 3D model. Choose a .glb file, or use the button in the Photo section to save a photo."
+      "noGlbSelected": "This button saves the 3D model. Choose a .glb file, or use the button in the Photo section to save a photo.",
+      "newSubtitle": "A name and a price are enough to start. The photo and 3D capture come later, from the dish page.",
+      "editSubtitle": "This page only edits fields. The photo, 3D model and capture live on the dish page."
     },
     "dishScan": {
       "title": "Automated 3D scan",
@@ -350,7 +365,14 @@
       "confirmDelete": "Delete this QR code permanently?",
       "scans": "{count} scans",
       "empty": "No QR codes yet.",
-      "error": "Something went wrong. Try again."
+      "error": "Something went wrong. Try again.",
+      "subtitle": "One QR code per table: it is what ties each visit to a precise spot in your room.",
+      "createTitle": "Generate a QR code",
+      "createHint": "The table number appears on the printed card and in your statistics.",
+      "tableNumberPlaceholder": "12, Terrace 3, Bar...",
+      "generating": "Generating...",
+      "emptyTitle": "No QR codes yet",
+      "emptyHint": "Generate one per table. Without a QR code your menu exists, but nobody in the room can open it."
     },
     "billing": {
       "title": "Billing",
@@ -375,7 +397,8 @@
         "active": "Active",
         "past_due": "Payment overdue",
         "canceled": "Canceled"
-      }
+      },
+      "subtitle": "Your subscription, your invoices, and the plan that matches your menu."
     },
     "dishDetail": {
       "backToList": "Back to dishes",

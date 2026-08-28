@@ -30,10 +30,13 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
   });
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full text-sm">
+    // `overflow-x-auto` sur le conteneur et non sur la page : sur un
+    // téléphone, quatre colonnes de chiffres ne tiennent pas, et c'est le
+    // tableau qui doit défiler latéralement, pas l'écran entier.
+    <div className="surface-panel overflow-x-auto">
+      <table className="w-full min-w-[520px] text-sm">
         <thead>
-          <tr className="border-b border-border text-left text-muted-foreground">
+          <tr className="border-b border-border/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <Th label={t("dish")} active={sortKey === "name"} desc={sortDesc} onClick={() => toggleSort("name")} />
             <Th
               label={t("scans30d")}
@@ -52,18 +55,23 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
         </thead>
         <tbody>
           {sorted.map((row) => (
-            <tr key={row.id} className="border-b border-border last:border-0">
+            <tr
+              key={row.id}
+              className="border-b border-border/60 transition-colors last:border-0 hover:bg-foreground/[0.03]"
+            >
               <td className="p-3">
                 <Link
                   href={`/dashboard/analytics/${row.id}`}
-                  className="hover:underline"
+                  className="font-medium underline-offset-4 hover:underline"
                 >
                   {row.name}
                 </Link>
               </td>
-              <td className="p-3">{row.scans30d}</td>
-              <td className="p-3">{row.arRate != null ? `${row.arRate}%` : "-"}</td>
-              <td className="p-3">
+              <td className="p-3 tabular-nums">{row.scans30d}</td>
+              <td className="p-3 tabular-nums">
+                {row.arRate != null ? `${row.arRate}%` : "-"}
+              </td>
+              <td className="p-3 tabular-nums">
                 {row.trend7dPct != null ? (
                   <span className={row.trend7dPct >= 0 ? "text-success" : "text-destructive"}>
                     {row.trend7dPct >= 0 ? "↑" : "↓"} {Math.abs(row.trend7dPct)}%
@@ -92,10 +100,17 @@ function Th({
   onClick: () => void;
 }) {
   return (
-    <th className="p-3 font-medium">
-      <button onClick={onClick} className="flex items-center gap-1 hover:text-foreground">
+    <th className="p-3 font-medium" aria-sort={active ? (desc ? "descending" : "ascending") : "none"}>
+      <button
+        onClick={onClick}
+        className={`flex items-center gap-1 whitespace-nowrap transition-colors hover:text-foreground ${
+          active ? "text-foreground" : ""
+        }`}
+      >
         {label}
-        {active && <span className="text-xs">{desc ? "↓" : "↑"}</span>}
+        <span aria-hidden className={`text-[10px] ${active ? "" : "opacity-0"}`}>
+          {desc ? "↓" : "↑"}
+        </span>
       </button>
     </th>
   );

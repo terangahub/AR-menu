@@ -271,6 +271,41 @@
     background: hsl(var(--background) / 0.85);
   }
 
+  /* --- Surfaces du dashboard (Sprint 6, S6-04) ---
+     Même discipline que le menu public : en sombre, un panneau est un
+     voile blanc très faible sur le fond quasi noir, pas l'aplat indigo
+     de `--card` (#181848). Séparé de `surface-menu` malgré la parenté :
+     un panneau de dashboard ne se soulève jamais, ne contient pas de
+     photo, et son rayon est plus sobre que celui des cartes du menu, qui
+     est calibré pour encadrer un cliché de plat. */
+  .surface-panel {
+    @apply rounded-2xl border border-border/60 bg-card;
+  }
+  [data-theme="dark"] .surface-panel {
+    background-color: hsl(var(--background));
+    background-image: linear-gradient(
+      to bottom,
+      hsl(0 0% 100% / 0.045),
+      hsl(0 0% 100% / 0.015)
+    );
+    border-color: hsl(0 0% 100% / 0.08);
+  }
+
+  /* Entrée de navigation du dashboard. L'état actif est en encre pleine,
+     comme les états actifs du menu public : c'est la même règle appliquée
+     des deux côtés du produit, et elle survit au mode clair comme au mode
+     sombre, ce qu'un aplat de marque ne faisait pas. */
+  .nav-item {
+    @apply flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors;
+  }
+  .nav-item:hover {
+    @apply bg-foreground/[0.06] text-foreground;
+  }
+  .nav-item-active,
+  .nav-item-active:hover {
+    @apply bg-foreground text-background;
+  }
+
   /* Halo diffus derrière un élément (orbe lumineuse). */
   .glow-primary {
     box-shadow: 0 0 60px -12px hsl(var(--primary) / 0.5);

@@ -300,7 +300,7 @@ export function DishScan({ dishId }: { dishId: string }) {
       : "failed";
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+    <div className="surface-panel flex flex-col gap-3 p-5">
       <span className="text-sm font-medium">{t("title")}</span>
       <p className="text-xs text-muted-foreground">{t("help")}</p>
       <input ref={videoInput} type="file" accept="video/*" disabled={busy || blocked} />
@@ -328,7 +328,7 @@ export function DishScan({ dishId }: { dishId: string }) {
       )}
 
       {job && (
-        <div className="rounded-lg border border-border bg-muted/30 p-3">
+        <div className="rounded-xl border border-border/60 bg-foreground/[0.03] p-3">
           <div className="flex items-center gap-2">
             <span
               aria-hidden
@@ -409,7 +409,7 @@ export function DishScan({ dishId }: { dishId: string }) {
               </p>
             )}
 
-            <p className="mt-5 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+            <p className="mt-5 rounded-xl border border-border/60 bg-foreground/[0.03] p-3 text-xs text-muted-foreground">
               {t("modalWarning")}
             </p>
           </div>

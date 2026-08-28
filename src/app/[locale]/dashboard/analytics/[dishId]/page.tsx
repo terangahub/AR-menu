@@ -6,6 +6,7 @@ import { getDishAnalytics } from "@/lib/analytics";
 import { localizedDishName } from "@/lib/dish-locale";
 import { Link } from "@/i18n/navigation";
 import { DishTrendChart } from "@/components/dashboard/dish-trend-chart";
+import { PageHeader, Panel, StatTile } from "@/components/dashboard/ui";
 
 // Analytics par plat, individuellement (section 10.3) : scans par période,
 // taux d'activation AR, tendance, heure la plus consultée.
@@ -33,55 +34,47 @@ export default async function DishAnalyticsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <Link href="/dashboard/analytics" className="text-sm text-muted-foreground hover:underline">
-        ← {t("backToOverview")}
+      <Link
+        href="/dashboard/analytics"
+        className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <span aria-hidden>&larr;</span>
+        {t("backToOverview")}
       </Link>
 
-      <h1 className="text-2xl font-semibold tracking-tight">
-        {localizedDishName(dish.name, dish.nameEn, locale)}
-      </h1>
+      <PageHeader title={localizedDishName(dish.name, dish.nameEn, locale)} />
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label={t("today")} value={analytics.counts.today} />
-        <Stat label={t("last7d")} value={analytics.counts.last7d} />
-        <Stat label={t("last30d")} value={analytics.counts.last30d} />
-        <Stat label={t("last90d")} value={analytics.counts.last90d} />
+        <StatTile label={t("today")} value={analytics.counts.today} />
+        <StatTile label={t("last7d")} value={analytics.counts.last7d} />
+        <StatTile label={t("last30d")} value={analytics.counts.last30d} />
+        <StatTile label={t("last90d")} value={analytics.counts.last90d} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-border p-4">
-          <h2 className="text-sm font-medium text-muted-foreground">{t("arRate")}</h2>
-          <p className="mt-2 text-2xl font-semibold">
+        <Panel title={t("arRate")}>
+          <p className="font-heading text-3xl leading-none tabular-nums">
             {analytics.arActivationRate != null ? `${analytics.arActivationRate}%` : "-"}
           </p>
-        </div>
-        <div className="rounded-lg border border-border p-4">
-          <h2 className="text-sm font-medium text-muted-foreground">{t("busiestHour")}</h2>
-          <p className="mt-2 text-2xl font-semibold">
-            {analytics.busiestHour != null
-              ? t("busiestHourValue", { hour: analytics.busiestHour })
-              : t("noBusiestHour")}
-          </p>
-        </div>
+        </Panel>
+        <Panel title={t("busiestHour")}>
+          {analytics.busiestHour != null ? (
+            <p className="font-heading text-3xl leading-none tabular-nums">
+              {t("busiestHourValue", { hour: analytics.busiestHour })}
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">{t("noBusiestHour")}</p>
+          )}
+        </Panel>
       </div>
 
-      <div className="rounded-lg border border-border p-4">
-        <h2 className="mb-2 text-sm font-medium text-muted-foreground">{t("trendChart")}</h2>
+      <Panel title={t("trendChart")}>
         {analytics.trend.length === 0 ? (
-          <p className="text-muted-foreground">{t("noData")}</p>
+          <p className="text-sm text-muted-foreground">{t("noData")}</p>
         ) : (
           <DishTrendChart data={analytics.trend} />
         )}
-      </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border border-border p-4">
-      <h2 className="text-xs font-medium text-muted-foreground">{label}</h2>
-      <p className="mt-1 text-xl font-semibold">{value}</p>
+      </Panel>
     </div>
   );
 }

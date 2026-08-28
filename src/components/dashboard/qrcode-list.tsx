@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { EmptyState, Panel } from "@/components/dashboard/ui";
 
 export type QrCodeItem = {
   id: string;
@@ -63,50 +64,61 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <form onSubmit={handleCreate} className="flex items-end gap-2">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">{t("tableNumber")}</span>
-          <input
-            value={tableNumber}
-            onChange={(e) => setTableNumber(e.target.value)}
-            className="input"
-          />
-        </label>
-        <Button type="submit" disabled={creating}>
-          {t("generate")}
-        </Button>
-      </form>
+      <Panel title={t("createTitle")} description={t("createHint")}>
+        <form onSubmit={handleCreate} className="flex flex-wrap items-end gap-2">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="font-medium">{t("tableNumber")}</span>
+            <input
+              value={tableNumber}
+              onChange={(e) => setTableNumber(e.target.value)}
+              placeholder={t("tableNumberPlaceholder")}
+              className="input"
+            />
+          </label>
+          <Button type="submit" disabled={creating}>
+            {creating ? t("generating") : t("generate")}
+          </Button>
+        </form>
+      </Panel>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {qrCodes.length === 0 ? (
-        <p className="text-muted-foreground">{t("empty")}</p>
+        <EmptyState title={t("emptyTitle")} description={t("emptyHint")} />
       ) : (
-        <div className="flex flex-col divide-y divide-border rounded-lg border border-border">
+        <ul className="surface-panel divide-y divide-border/60">
           {qrCodes.map((qr) => (
-            <div key={qr.id} className="flex items-center justify-between gap-4 p-4">
-              <div className="flex flex-col gap-0.5">
+            <li
+              key={qr.id}
+              className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4"
+            >
+              <div className="flex min-w-0 flex-col gap-0.5">
                 <span className="font-medium">
                   {t("table")} {qr.tableNumber}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs tabular-nums text-muted-foreground">
                   {t("scans", { count: qr.scansCount })}
                 </span>
               </div>
-              <div className="flex gap-2">
+              <div className="flex shrink-0 flex-wrap gap-2">
                 <Button asChild variant="outline" size="sm">
                   <a href={`/api/qrcodes/${qr.id}/png`}>{t("download")}</a>
                 </Button>
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/dashboard/qrcodes/${qr.id}/print`}>{t("print")}</Link>
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => handleDelete(qr)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(qr)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
                   {t("delete")}
                 </Button>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

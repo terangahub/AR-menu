@@ -229,7 +229,8 @@
       "qrcodes": "QR codes",
       "analytics": "Analytics",
       "billing": "Facturation",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "publicMenu": "Voir le menu public"
     },
     "overview": {
       "title": "Vue d'ensemble",
@@ -243,7 +244,11 @@
       "noArData": "Pas encore de données.",
       "missingModelTitle": "Plats sans modèle 3D",
       "missingModelEmpty": "Tous les plats disponibles ont un modèle 3D.",
-      "viewAnalytics": "Voir les analytics détaillées"
+      "viewAnalytics": "Voir les analytics détaillées",
+      "subtitle": "L'activité de {restaurant} depuis les QR codes de vos tables.",
+      "scansCount": "{count, plural, one {# scan} other {# scans}}",
+      "missingModelHint": "Ces plats s'affichent en photo seule sur le menu. Lancez une capture 3D pour qu'ils passent en réalité augmentée.",
+      "missingModelAction": "Ouvrir la fiche"
     },
     "analytics": {
       "title": "Analytics",
@@ -262,7 +267,10 @@
       "busiestHour": "Heure la plus consultée",
       "busiestHourValue": "{hour}h",
       "noBusiestHour": "Pas encore de données.",
-      "noData": "Aucun scan enregistré pour l'instant."
+      "noData": "Aucun scan enregistré pour l'instant.",
+      "subtitle": "Quels plats vos convives regardent, et lesquels ils font apparaître sur leur table.",
+      "noDataHint": "Les statistiques se remplissent dès qu'un convive scanne un QR code de votre salle.",
+      "goToQrCodes": "Gérer mes QR codes"
     },
     "dishes": {
       "title": "Plats",
@@ -276,7 +284,12 @@
       "delete": "Supprimer",
       "confirmDelete": "Supprimer ce plat définitivement ?",
       "arReady": "AR prêt",
-      "noModel": "Pas de modèle 3D"
+      "noModel": "Pas de modèle 3D",
+      "subtitle": "Ce que voient vos convives, dans l'ordre où ils le voient.",
+      "emptyFirst": "Votre carte est encore vide",
+      "emptyFirstHint": "Ajoutez un premier plat : nom, prix, photo. La capture 3D viendra ensuite, depuis sa fiche.",
+      "emptyFiltered": "Aucun plat ne correspond",
+      "emptyFilteredHint": "Élargissez votre recherche ou changez de catégorie."
     },
     "dishForm": {
       "newTitle": "Nouveau plat",
@@ -306,7 +319,9 @@
       "savePhoto": "Enregistrer la photo",
       "saveModel": "Enregistrer le modèle",
       "noPhotoSelected": "Choisissez d'abord une photo.",
-      "noGlbSelected": "Ce bouton enregistre le modèle 3D. Choisissez un fichier .glb, ou utilisez le bouton de la section Photo pour enregistrer une photo."
+      "noGlbSelected": "Ce bouton enregistre le modèle 3D. Choisissez un fichier .glb, ou utilisez le bouton de la section Photo pour enregistrer une photo.",
+      "newSubtitle": "Le nom et le prix suffisent pour commencer. La photo et la capture 3D s'ajoutent ensuite depuis la fiche du plat.",
+      "editSubtitle": "Cette page ne modifie que les champs. La photo, le modèle 3D et la capture vivent sur la fiche du plat."
     },
     "dishScan": {
       "title": "Scan 3D automatisé",
@@ -350,7 +365,14 @@
       "confirmDelete": "Supprimer ce QR code définitivement ?",
       "scans": "{count} scans",
       "empty": "Aucun QR code pour l'instant.",
-      "error": "Une erreur est survenue. Réessayez."
+      "error": "Une erreur est survenue. Réessayez.",
+      "subtitle": "Un QR code par table : c'est lui qui rattache chaque visite à un endroit précis de votre salle.",
+      "createTitle": "Générer un QR code",
+      "createHint": "Le numéro de table apparaît sur le carton imprimé et dans vos statistiques.",
+      "tableNumberPlaceholder": "12, Terrasse 3, Bar...",
+      "generating": "Génération...",
+      "emptyTitle": "Aucun QR code pour l'instant",
+      "emptyHint": "Générez-en un par table. Sans QR code, votre menu existe mais personne ne peut l'ouvrir depuis la salle."
     },
     "billing": {
       "title": "Facturation",
@@ -375,7 +397,8 @@
         "active": "Actif",
         "past_due": "Paiement en retard",
         "canceled": "Annulé"
-      }
+      },
+      "subtitle": "Votre abonnement, vos factures, et le palier qui correspond à votre carte."
     },
     "dishDetail": {
       "backToList": "Retour aux plats",

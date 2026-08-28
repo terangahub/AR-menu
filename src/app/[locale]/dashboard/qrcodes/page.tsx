@@ -3,6 +3,7 @@ import { redirect } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { QrCodeList } from "@/components/dashboard/qrcode-list";
+import { PageHeader } from "@/components/dashboard/ui";
 
 // Génération de QR codes par table (section 10.4).
 export default async function DashboardQrCodesPage({
@@ -27,7 +28,7 @@ export default async function DashboardQrCodesPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+      <PageHeader title={t("title")} description={t("subtitle")} />
       <QrCodeList qrCodes={qrCodes} />
     </div>
   );

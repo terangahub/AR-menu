@@ -504,9 +504,14 @@ concerné - cette liste est un résumé, pas la seule source.
   sombre.** `surface-card`, et plus généralement tout ce qui est bâti sur
   `white/[0.06]`, suppose le mode sombre que la landing force
   (`[locale]/page.tsx`). Le menu public et le dashboard doivent tenir dans
-  les deux thèmes : ils utilisent `surface-menu`,
+  les deux thèmes : le menu public utilise `surface-menu`,
   `surface-menu-interactive`, `photo-scrim`, `photo-chip`, `ar-launch`,
-  `menu-aurora` et `menu-sticky-bar`, bâtis sur les tokens sémantiques.
+  `menu-aurora` et `menu-sticky-bar` ; le dashboard utilise
+  `surface-panel` et `nav-item`. Tous sont bâtis sur les tokens
+  sémantiques. Le piège s'était refermé une deuxième fois sur le variant
+  `outline` du bouton, en `border-white/25` : il passait le lint, s'affichait
+  correctement sur la landing, et devenait purement invisible sur le fond
+  clair du dashboard.
   **Ne pas réutiliser une classe de la landing sur un écran qui peut
   s'afficher en clair sans vérifier ce qu'elle contient.**
 - **L'adresse du menu (`Restaurant.slug`) est gravée dans du carton.**

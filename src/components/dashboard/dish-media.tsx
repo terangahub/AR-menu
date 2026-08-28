@@ -81,7 +81,7 @@ export function DishMedia({
   }
 
   return (
-    <div className="flex flex-col gap-6 rounded-lg border border-border p-4">
+    <div className="surface-panel flex flex-col gap-6 p-5">
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t("photo")}</span>
         {imageUrl && (

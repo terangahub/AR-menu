@@ -147,7 +147,7 @@ export function RestaurantSettings({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-      <section className="flex flex-col gap-4">
+      <section className="surface-panel flex flex-col gap-4 p-5">
         <SectionTitle title={t("identity")} hint={t("identityHint")} />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -195,7 +195,7 @@ export function RestaurantSettings({
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="surface-panel flex flex-col gap-4 p-5">
         <SectionTitle title={t("logo")} hint={t("logoHint")} />
 
         <div className="flex flex-wrap items-center gap-4">
@@ -249,7 +249,7 @@ export function RestaurantSettings({
         {logoError && <p className="text-sm text-destructive">{logoError}</p>}
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="surface-panel flex flex-col gap-4 p-5">
         <SectionTitle title={t("address")} hint={t("addressHint")} />
 
         <Field label={t("slug")} required>
