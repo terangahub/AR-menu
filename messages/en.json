@@ -327,7 +327,20 @@
       "noPhotoSelected": "Choose a photo first.",
       "noGlbSelected": "This button saves the 3D model. Choose a .glb file, or use the button in the Photo section to save a photo.",
       "newSubtitle": "A name and a price are enough to start. The photo and 3D capture come later, from the dish page.",
-      "editSubtitle": "This page only edits fields. The photo, 3D model and capture live on the dish page."
+      "editSubtitle": "This page only edits fields. The photo, 3D model and capture live on the dish page.",
+      "mediaTitle": "Photo and 3D model",
+      "mediaHint": "Manual upload stays available if you already have the files. Otherwise use the 3D capture below: it produces both formats from a single video.",
+      "chooseFile": "Choose a file",
+      "noFileChosen": "No file chosen",
+      "mediaPresent": "In place",
+      "mediaMissing": "Missing",
+      "usdzHint": "USDZ is the format iPhone requires. Without it, the augmented reality button does not appear on iOS.",
+      "sectionEssentials": "The essentials",
+      "sectionEssentialsHint": "Without a name and a price, a dish cannot appear on the menu.",
+      "sectionDetails": "Description",
+      "sectionDetailsHint": "Optional, and editable at any time. English can wait: the menu falls back to French when it is missing.",
+      "allergensHint": "Select what the dish contains. Your guests filter the menu on this, it is health information.",
+      "availableHint": "An unavailable dish disappears from the public menu without being deleted. Handy for a daily special or a shortage."
     },
     "dishScan": {
       "title": "Automated 3D scan",
@@ -378,7 +391,9 @@
       "tableNumberPlaceholder": "12, Terrace 3, Bar...",
       "generating": "Generating...",
       "emptyTitle": "No QR codes yet",
-      "emptyHint": "Generate one per table. Without a QR code your menu exists, but nobody in the room can open it."
+      "emptyHint": "Generate one per table. Without a QR code your menu exists, but nobody in the room can open it.",
+      "printInstruction": "Point your phone camera at this code to see the menu, and some dishes at real size on your table.",
+      "printFooter": "Powered by Vorae"
     },
     "billing": {
       "title": "Billing",

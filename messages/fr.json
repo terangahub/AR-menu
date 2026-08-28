@@ -327,7 +327,20 @@
       "noPhotoSelected": "Choisissez d'abord une photo.",
       "noGlbSelected": "Ce bouton enregistre le modèle 3D. Choisissez un fichier .glb, ou utilisez le bouton de la section Photo pour enregistrer une photo.",
       "newSubtitle": "Le nom et le prix suffisent pour commencer. La photo et la capture 3D s'ajoutent ensuite depuis la fiche du plat.",
-      "editSubtitle": "Cette page ne modifie que les champs. La photo, le modèle 3D et la capture vivent sur la fiche du plat."
+      "editSubtitle": "Cette page ne modifie que les champs. La photo, le modèle 3D et la capture vivent sur la fiche du plat.",
+      "mediaTitle": "Photo et modèle 3D",
+      "mediaHint": "L'envoi manuel reste disponible si vous avez déjà vos fichiers. Sinon, utilisez la capture 3D plus bas : elle produit les deux formats à partir d'une simple vidéo.",
+      "chooseFile": "Choisir un fichier",
+      "noFileChosen": "Aucun fichier choisi",
+      "mediaPresent": "En place",
+      "mediaMissing": "Manquant",
+      "usdzHint": "Le format USDZ est celui qu'exige iPhone. Sans lui, le bouton de réalité augmentée n'apparaît pas sur iOS.",
+      "sectionEssentials": "L'essentiel",
+      "sectionEssentialsHint": "Sans nom ni prix, un plat ne peut pas s'afficher sur le menu.",
+      "sectionDetails": "Description",
+      "sectionDetailsHint": "Facultatif, et modifiable à tout moment. L'anglais peut attendre : le menu retombe sur le français quand il manque.",
+      "allergensHint": "Sélectionnez ce que contient le plat. Vos convives filtrent le menu là-dessus, c'est une information de santé.",
+      "availableHint": "Un plat indisponible disparaît du menu public sans être supprimé. Pratique pour un plat du jour ou une rupture."
     },
     "dishScan": {
       "title": "Scan 3D automatisé",
@@ -378,7 +391,9 @@
       "tableNumberPlaceholder": "12, Terrasse 3, Bar...",
       "generating": "Génération...",
       "emptyTitle": "Aucun QR code pour l'instant",
-      "emptyHint": "Générez-en un par table. Sans QR code, votre menu existe mais personne ne peut l'ouvrir depuis la salle."
+      "emptyHint": "Générez-en un par table. Sans QR code, votre menu existe mais personne ne peut l'ouvrir depuis la salle.",
+      "printInstruction": "Pointez l'appareil photo de votre téléphone vers ce code pour voir le menu, et certains plats en taille réelle sur votre table.",
+      "printFooter": "Propulsé par Vorae"
     },
     "billing": {
       "title": "Facturation",
