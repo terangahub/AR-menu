@@ -13,7 +13,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:brightness-110",
+        // Encre pleine et non l'aplat lavande de `--primary` : c'est la
+        // règle appliquée au menu public (états actifs en `bg-foreground`),
+        // et elle vaut des deux côtés du produit. En sombre les deux
+        // valeurs sont de toute façon quasi identiques (#efedfd contre
+        // #f0d8f0), la différence se voit surtout en clair, où la lavande
+        // pâle donnait un bouton délavé.
+        default: "bg-foreground text-background hover:opacity-90",
         destructive: "bg-destructive text-destructive-foreground hover:brightness-110",
         // `border-white/25` venait de la landing, qui force le mode sombre :
         // sur le fond clair du dashboard, une bordure blanche à 25 % est

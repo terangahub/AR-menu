@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { recordScan } from "@/lib/scan";
 import { Link } from "@/i18n/navigation";
 import { DishArSection } from "@/components/menu/dish-ar-section";
-import { LocaleSwitch } from "@/components/menu/locale-switch";
+import { LocaleSwitch } from "@/components/locale-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 // Fiche plat (F05) : prix, ingrédients, allergènes, temps de préparation,

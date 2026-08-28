@@ -534,6 +534,17 @@ concerné - cette liste est un résumé, pas la seule source.
   second est resté hors de l'écran de paramètres et attend son ticket
   (`S8-10`) : offrir un sélecteur de couleur qui ne change rien serait
   plus dommageable que de ne rien offrir.
+- **Une grandeur relative se lit à une longueur, pas à un nombre.** L'écran
+  analytics alignait quatre colonnes de chiffres : pour répondre à "quel
+  plat marche", le restaurateur devait lire chaque ligne et comparer de
+  tête. Barres proportionnelles au plat le plus vu, jauge sur piste pour un
+  taux (la piste rappelle que 100 % existe). Deux règles à ne pas
+  transgresser en y retouchant : **toutes les barres gardent la même
+  couleur**, les foncer à mesure qu'elles s'allongent doublerait l'encodage
+  de la longueur par la teinte sur des catégories sans ordre naturel ; et
+  **un graphique se peint en tokens sémantiques**, jamais aux valeurs par
+  défaut de la librairie, dont l'infobulle est une boîte blanche à texte
+  noir qui disparaît en mode sombre.
 - **Discipline chromatique du menu public : neutre partout, le violet
   réservé à la seule réalité augmentée, le rouge aux seuls allergènes.**
   La première version du Sprint 6 laissait cohabiter trois violets sur un

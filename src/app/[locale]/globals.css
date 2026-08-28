@@ -93,8 +93,20 @@
 }
 
 @layer components {
+  /* Champ de formulaire. Le rayon suit celui des panneaux (12 px contre
+     16 px, un cran en dessous, comme un objet posé dedans) et non plus le
+     `--radius` de 7 px hérité des boutons. L'anneau de focus est
+     obligatoire : sans lui, un restaurateur qui navigue au clavier ne sait
+     jamais où il est. */
   .input {
-    @apply rounded-md border border-input bg-background px-3 py-1.5 text-sm;
+    @apply rounded-xl border border-input bg-background px-3 py-2 text-sm transition-colors;
+  }
+  .input:hover {
+    @apply border-foreground/30;
+  }
+  .input:focus,
+  .input:focus-visible {
+    @apply border-foreground/40 outline-none ring-2 ring-ring/40;
   }
 
   /* Zone qui défile sans montrer sa barre de défilement : utilisé à

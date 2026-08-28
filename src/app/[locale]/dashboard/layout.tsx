@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LocaleSwitch } from "@/components/locale-switch";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { ExternalIcon } from "@/components/dashboard/nav-icons";
 
@@ -90,9 +91,15 @@ export default async function DashboardLayout({
             <ExternalIcon className="h-[18px] w-[18px] shrink-0" />
             {t("nav.publicMenu")}
           </a>
-          <div className="flex items-center justify-between gap-2 border-t border-border/70 px-2 pt-3">
-            <UserButton />
-            <ThemeToggle />
+          {/* Le restaurateur n'avait aucun moyen de changer la langue du
+              dashboard : il devait réécrire /fr en /en dans la barre
+              d'adresse. La même bascule que le menu public sert ici. */}
+          <div className="flex flex-col gap-3 border-t border-border/70 px-2 pt-3">
+            <LocaleSwitch className="self-start" />
+            <div className="flex items-center justify-between gap-2">
+              <UserButton />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </aside>
@@ -101,6 +108,7 @@ export default async function DashboardLayout({
         <div className="flex items-center justify-between gap-3 pb-3">
           {identity}
           <div className="flex shrink-0 items-center gap-2">
+            <LocaleSwitch />
             <ThemeToggle />
             <UserButton />
           </div>

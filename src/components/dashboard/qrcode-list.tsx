@@ -6,6 +6,7 @@ import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { EmptyState, Panel } from "@/components/dashboard/ui";
+import { DeleteButton } from "@/components/dashboard/delete-button";
 
 export type QrCodeItem = {
   id: string;
@@ -107,14 +108,7 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/dashboard/qrcodes/${qr.id}/print`}>{t("print")}</Link>
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(qr)}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  {t("delete")}
-                </Button>
+                <DeleteButton label={t("delete")} onClick={() => handleDelete(qr)} />
               </div>
             </li>
           ))}

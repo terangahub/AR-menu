@@ -270,7 +270,10 @@
       "noData": "Aucun scan enregistré pour l'instant.",
       "subtitle": "Quels plats vos convives regardent, et lesquels ils font apparaître sur leur table.",
       "noDataHint": "Les statistiques se remplissent dès qu'un convive scanne un QR code de votre salle.",
-      "goToQrCodes": "Gérer mes QR codes"
+      "goToQrCodes": "Gérer mes QR codes",
+      "sortBy": "Trier par",
+      "noValue": "pas de donnée",
+      "scansLabel": "scans"
     },
     "dishes": {
       "title": "Plats",
@@ -289,7 +292,10 @@
       "emptyFirst": "Votre carte est encore vide",
       "emptyFirstHint": "Ajoutez un premier plat : nom, prix, photo. La capture 3D viendra ensuite, depuis sa fiche.",
       "emptyFiltered": "Aucun plat ne correspond",
-      "emptyFilteredHint": "Élargissez votre recherche ou changez de catégorie."
+      "emptyFilteredHint": "Élargissez votre recherche ou changez de catégorie.",
+      "viewLabel": "Affichage",
+      "viewGrid": "Vue en grille, avec photos",
+      "viewList": "Vue en liste, compacte"
     },
     "dishForm": {
       "newTitle": "Nouveau plat",
