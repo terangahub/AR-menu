@@ -500,6 +500,58 @@ concerné - cette liste est un résumé, pas la seule source.
   finalise lui-même si le modèle est prêt. Le traitement du résultat vit
   dans `lib/scan-finalize.ts`, appelé par les deux chemins, pour qu'il
   n'existe qu'une seule façon d'extraire les fichiers du zip.
+- **Les utilitaires visuels de la landing ne fonctionnent que sur fond
+  sombre.** `surface-card`, et plus généralement tout ce qui est bâti sur
+  `white/[0.06]`, suppose le mode sombre que la landing force
+  (`[locale]/page.tsx`). Le menu public et le dashboard doivent tenir dans
+  les deux thèmes : ils utilisent `surface-menu`,
+  `surface-menu-interactive`, `photo-scrim`, `photo-chip`, `ar-launch`,
+  `menu-aurora` et `menu-sticky-bar`, bâtis sur les tokens sémantiques.
+  **Ne pas réutiliser une classe de la landing sur un écran qui peut
+  s'afficher en clair sans vérifier ce qu'elle contient.**
+- **L'adresse du menu (`Restaurant.slug`) est gravée dans du carton.**
+  `QrCode.targetUrl` stocke `/{locale}/{slug}?qr={id}`, et l'image PNG du
+  QR code encode cette chaîne : une fois imprimée et collée sur une table,
+  elle ne peut plus être corrigée à distance. Changer le slug demande donc
+  trois choses à la fois, et pas une seule : réécrire les `targetUrl` en
+  base dans la même transaction (pour les réimpressions), avertir
+  explicitement le restaurateur, et rattraper les anciens QR codes à
+  l'exécution. Le rattrapage passe par le `?qr=` : il identifie le QR code
+  de façon stable, donc la page de menu retrouve le restaurant et redirige
+  vers son adresse actuelle au lieu d'afficher un 404 à un convive
+  attablé. `lib/qr-target.ts` détient la forme du chemin, y compris pour
+  la mise à jour SQL en masse (préfixe construit avec un id vide), pour
+  que génération et migration ne puissent pas diverger.
+- **Un réglage qui n'a aucun effet ne doit pas apparaître dans l'écran de
+  paramètres.** `Restaurant.defaultLocale` et `Restaurant.primaryColor`
+  existaient tous deux en base sans être lus nulle part. Le premier a été
+  branché pour de bon (il pilote la locale encodée dans les QR codes), le
+  second est resté hors de l'écran de paramètres et attend son ticket
+  (`S8-10`) : offrir un sélecteur de couleur qui ne change rien serait
+  plus dommageable que de ne rien offrir.
+- **Discipline chromatique du menu public : neutre partout, le violet
+  réservé à la seule réalité augmentée, le rouge aux seuls allergènes.**
+  La première version du Sprint 6 laissait cohabiter trois violets sur un
+  même écran, sans qu'aucun ait été choisi contre les autres : la pastille
+  lavande `--primary` (#f0d8f0 en sombre) servait à la fois au badge AR,
+  au prix, à la catégorie active et à la bascule de langue ; `--card`
+  (#181848 en sombre) posait un aplat indigo sous chaque photo ; et le
+  halo d'en-tête empilait deux radiales violettes. Mouhamed l'a renvoyée
+  ("trop de couleurs, trop de violets différents, je veux vibe dark, plus
+  pro, plus brandé, épuré"). La contrainte utile n'est pas "moins de
+  violet" mais **une couleur, un sens** : ce qui est fonctionnel passe en
+  encre pleine (`bg-foreground` / `text-background`), ce qui se pose sur
+  une photo passe en verre sombre neutre (`photo-chip`), et les surfaces
+  en sombre sont un voile blanc à 5 % sur le fond quasi noir, pas un aplat
+  de marque. Corollaire pratique : **en sombre, `--card` et `--muted` sont
+  le même indigo saturé** ; un `bg-card` ou un `bg-muted/30` posé sur un
+  écran du menu réintroduit exactement la teinte que cette règle bannit.
+  Utiliser `surface-menu`, qui l'écrase explicitement.
+- **Le sélecteur du mode sombre de ce projet est `[data-theme="dark"]`,
+  pas `.dark`.** Fixé par `tailwind.config.ts`
+  (`darkMode: ["selector", '[data-theme="dark"]']`) et posé par
+  next-themes via `attribute="data-theme"`. Une règle CSS écrite avec
+  `.dark` passe la compilation et le lint sans jamais s'appliquer.
 - **Un plafond de taille de fichier annoncé "par requête" peut en réalité
   porter sur le fichier total reconstitué.** Le premier modèle 3D réel
   produit par KIRI pèse environ 86 Mo, refusé par Cloudinary
