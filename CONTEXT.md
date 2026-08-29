@@ -545,6 +545,17 @@ concerné - cette liste est un résumé, pas la seule source.
   **un graphique se peint en tokens sémantiques**, jamais aux valeurs par
   défaut de la librairie, dont l'infobulle est une boîte blanche à texte
   noir qui disparaît en mode sombre.
+- **`VERCEL_URL` est l'adresse d'un déploiement, pas celle du produit.**
+  Elle change à chaque `git push`. C'est acceptable pour un lien qu'on
+  clique, jamais pour une valeur **gravée dans une image imprimée** : le
+  chemin stocké dans `QrCode.targetUrl` est relatif, donc portable, mais
+  l'URL absolue est figée dans le PNG au moment de la génération, et un
+  carton collé sur une table ne se corrige pas à distance. L'ordre de
+  résolution est donc `NEXT_PUBLIC_APP_URL`, puis
+  `VERCEL_PROJECT_PRODUCTION_URL` **en production seulement** (l'alias
+  stable du domaine, celui dont Next.js se sert pour `metadataBase`), puis
+  `VERCEL_URL` en preview, pour qu'un QR généré pendant un test ne renvoie
+  pas le testeur vers la production.
 - **Forcer une carte en blanc ne rend pas une page imprimable.** Le `body`
   porte `bg-background`, qui vaut #030014 en mode sombre : une page
   imprimée depuis le thème sombre sort en feuille noire, même si le
