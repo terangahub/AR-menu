@@ -534,6 +534,16 @@ concerné - cette liste est un résumé, pas la seule source.
   second est resté hors de l'écran de paramètres et attend son ticket
   (`S8-10`) : offrir un sélecteur de couleur qui ne change rien serait
   plus dommageable que de ne rien offrir.
+- **Une barre de données doit se distinguer d'un filet de séparation.**
+  Trois choses l'y aident, et leur absence a fait lire une barre de scans
+  comme un trait de séparation : elle ne doit jamais s'étaler d'un bord à
+  l'autre (la borner par sa valeur chiffrée suffit), son remplissage doit
+  trancher franchement sur sa piste, et son extrémité doit être arrondie
+  côté valeur et carrée côté origine, parce qu'une barre pousse depuis une
+  ligne de départ alors qu'un filet n'a pas d'origine. Corollaire : **pas
+  de largeur minimale**. Un moignon de 2 % sur une valeur nulle laisse
+  croire à quelques vues, et un jeu de données encore vide ne mérite aucune
+  barre du tout, seulement ses nombres.
 - **Une grandeur relative se lit à une longueur, pas à un nombre.** L'écran
   analytics alignait quatre colonnes de chiffres : pour répondre à "quel
   plat marche", le restaurateur devait lire chaque ligne et comparer de

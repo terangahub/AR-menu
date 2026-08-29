@@ -91,7 +91,7 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
           {qrCodes.map((qr) => (
             <li
               key={qr.id}
-              className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4"
+              className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 sm:px-4 sm:py-3"
             >
               <div className="flex min-w-0 flex-col gap-0.5">
                 <span className="font-medium">

@@ -41,9 +41,13 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
 
   // L'échelle est celle du plat le plus vu, pas un maximum arbitraire : une
   // barre pleine veut dire "c'est le plat vedette", ce qui est exactement
-  // la lecture attendue. Le garde-fou à 1 évite une division par zéro le
-  // jour de l'installation, quand aucun plat n'a encore été scanné.
-  const maxScans = Math.max(1, ...rows.map((r) => r.scans30d));
+  // la lecture attendue.
+  const maxScans = Math.max(0, ...rows.map((r) => r.scans30d));
+
+  // Tant qu'aucun plat n'a été vu, il n'y a rien à comparer : des barres
+  // toutes vides n'apprennent rien et se lisent comme des filets de
+  // séparation. Les nombres suffisent, et l'écran le dit.
+  const showBars = maxScans > 0;
 
   return (
     <div className="flex flex-col gap-4">
@@ -64,21 +68,39 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
               href={`/dashboard/analytics/${row.id}`}
               className="flex flex-col gap-2.5 p-4 transition-colors hover:bg-foreground/[0.03]"
             >
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="truncate font-medium">{row.name}</span>
-                <span className="shrink-0 font-heading text-lg leading-none tabular-nums">
+              <span className="truncate font-medium">{row.name}</span>
+
+              {/* La barre et son nombre sur la même ligne. Isolée sur sa
+                  propre ligne et étalée sur toute la largeur, elle se
+                  lisait comme un filet de séparation, d'autant que le plat
+                  de tête, par définition à 100 %, produisait un trait
+                  plein d'un bord à l'autre. Bornée par le nombre à sa
+                  droite, elle se termine toujours avant le bord, donc elle
+                  se lit comme une mesure.
+
+                  Extrémité arrondie côté valeur, carrée côté origine : une
+                  barre pousse depuis une ligne de départ, un filet n'a pas
+                  d'origine. Et aucune largeur minimale : un plat jamais vu
+                  mérite une barre vide, pas un moignon qui laisserait
+                  croire à quelques vues. */}
+              <div className="flex items-center gap-3">
+                {showBars && (
+                  <div className="h-2 flex-1 overflow-hidden rounded-r-[4px] bg-foreground/[0.06]">
+                    {row.scans30d > 0 && (
+                      <div
+                        className="h-full rounded-r-[4px] bg-foreground/70"
+                        style={{ width: `${(row.scans30d / maxScans) * 100}%` }}
+                      />
+                    )}
+                  </div>
+                )}
+                <span
+                  className={`font-heading text-lg leading-none tabular-nums ${
+                    showBars ? "w-10 shrink-0 text-right" : "ml-auto"
+                  }`}
+                >
                   {row.scans30d}
                 </span>
-              </div>
-
-              {/* Extrémité arrondie côté valeur, carrée côté ligne de
-                  départ : la barre garde une origine nette, ce qui permet
-                  de comparer les longueurs à l'oeil. */}
-              <div className="h-1.5 w-full overflow-hidden rounded-r-[4px] bg-foreground/[0.07]">
-                <div
-                  className="h-full rounded-r-[4px] bg-foreground/45"
-                  style={{ width: `${Math.max(2, (row.scans30d / maxScans) * 100)}%` }}
-                />
               </div>
 
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
@@ -112,11 +134,13 @@ function ArMeter({
         <span className="text-muted-foreground/70">{noneLabel}</span>
       ) : (
         <>
-          <span className="h-1.5 w-16 overflow-hidden rounded-full bg-foreground/[0.07]">
-            <span
-              className="block h-full rounded-full bg-foreground/45"
-              style={{ width: `${Math.min(100, Math.max(2, rate))}%` }}
-            />
+          <span className="h-1.5 w-16 overflow-hidden rounded-full bg-foreground/[0.06]">
+            {rate > 0 && (
+              <span
+                className="block h-full rounded-full bg-foreground/70"
+                style={{ width: `${Math.min(100, rate)}%` }}
+              />
+            )}
           </span>
           <span className="font-medium tabular-nums text-foreground">{rate}%</span>
         </>

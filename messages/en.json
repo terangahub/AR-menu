@@ -295,7 +295,8 @@
       "emptyFilteredHint": "Widen your search or change category.",
       "viewLabel": "Layout",
       "viewGrid": "Grid view, with photos",
-      "viewList": "List view, compact"
+      "viewList": "List view, compact",
+      "rowActions": "Actions for this dish"
     },
     "dishForm": {
       "newTitle": "New dish",

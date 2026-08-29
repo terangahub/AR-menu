@@ -295,7 +295,8 @@
       "emptyFilteredHint": "Élargissez votre recherche ou changez de catégorie.",
       "viewLabel": "Affichage",
       "viewGrid": "Vue en grille, avec photos",
-      "viewList": "Vue en liste, compacte"
+      "viewList": "Vue en liste, compacte",
+      "rowActions": "Actions sur ce plat"
     },
     "dishForm": {
       "newTitle": "Nouveau plat",

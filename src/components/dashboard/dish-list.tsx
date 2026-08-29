@@ -9,6 +9,8 @@ import { EmptyState } from "@/components/dashboard/ui";
 import { ArCubeIcon } from "@/components/menu/ar-cube-icon";
 import { GridViewIcon, ListViewIcon } from "@/components/menu/menu-icons";
 import { DeleteButton } from "@/components/dashboard/delete-button";
+import { RowMenu, RowMenuItem } from "@/components/dashboard/row-menu";
+import { EditIcon, TrashIcon } from "@/components/dashboard/nav-icons";
 
 export type DashboardDish = {
   id: string;
@@ -130,48 +132,57 @@ export function DishList({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("search")}
-          className="input min-w-[160px] flex-1 sm:max-w-xs"
-        />
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="input shrink-0"
-        >
-          <option value="all">{t("allCategories")}</option>
-          {categories.map(([key, label]) => (
-            <option key={key} value={key}>
-              {label}
-            </option>
-          ))}
-        </select>
-
-        <div
-          role="group"
-          aria-label={t("viewLabel")}
-          className="ml-auto inline-flex shrink-0 items-center rounded-full border border-border p-0.5"
-        >
-          <ViewButton
-            active={view === "list"}
-            onClick={() => chooseView("list")}
-            label={t("viewList")}
-            icon={<ListViewIcon className="h-4 w-4" />}
+      {/* Deux lignes claires plutôt qu'un enroulement au hasard : la
+          recherche et le filtre d'un côté, les commandes d'affichage et
+          l'action principale de l'autre. La bascule de vue flottait
+          auparavant seule au milieu d'une ligne, sans rien à quoi se
+          rattacher. */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex flex-1 gap-2">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("search")}
+            className="input min-w-0 flex-1 sm:max-w-xs"
           />
-          <ViewButton
-            active={view === "grid"}
-            onClick={() => chooseView("grid")}
-            label={t("viewGrid")}
-            icon={<GridViewIcon className="h-4 w-4" />}
-          />
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="input shrink-0"
+          >
+            <option value="all">{t("allCategories")}</option>
+            {categories.map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <Button asChild className="shrink-0">
-          <Link href="/dashboard/dishes/new">{t("addDish")}</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <div
+            role="group"
+            aria-label={t("viewLabel")}
+            className="inline-flex shrink-0 items-center rounded-full border border-border p-0.5"
+          >
+            <ViewButton
+              active={view === "list"}
+              onClick={() => chooseView("list")}
+              label={t("viewList")}
+              icon={<ListViewIcon className="h-4 w-4" />}
+            />
+            <ViewButton
+              active={view === "grid"}
+              onClick={() => chooseView("grid")}
+              label={t("viewGrid")}
+              icon={<GridViewIcon className="h-4 w-4" />}
+            />
+          </div>
+
+          <Button asChild className="ml-auto shrink-0 sm:ml-0">
+            <Link href="/dashboard/dishes/new">{t("addDish")}</Link>
+          </Button>
+        </div>
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
@@ -194,7 +205,7 @@ export function DishList({
       ) : view === "list" ? (
         <ul className="surface-panel divide-y divide-border/60">
           {filtered.map((dish) => (
-            <li key={dish.id} className="p-3 sm:p-4">
+            <li key={dish.id} className="px-3 py-2.5 sm:px-4">
               <DishRow
                 dish={dish}
                 {...labelsFor(dish)}
@@ -233,45 +244,95 @@ type ItemProps = {
   deleting: boolean;
 };
 
-// Sur un téléphone, le nom, l'interrupteur, Modifier et Supprimer tenaient
-// sur une seule ligne : les actions étant `shrink-0`, elles prenaient toute
-// la largeur et le nom du plat se réduisait à sa première lettre, tandis
-// que la pastille "Indisponible" débordait par-dessus l'interrupteur. Les
-// actions passent donc sous le nom tant que la largeur ne suffit pas.
+// Une vue liste n'a d'intérêt que si elle est dense : c'est la raison pour
+// laquelle elle existe à côté de la grille. La première version empilait le
+// nom, puis une ligne d'actions en dessous, soit près de 200 px par plat et
+// trois plats et demi visibles sur un téléphone, à peine mieux que la
+// grille qu'elle est censée compléter.
+//
+// Tout tient donc sur une ligne. L'arbitrage est fait sur la fréquence
+// réelle des gestes : basculer la disponibilité se fait tous les jours (un
+// plat du jour, une rupture) et reste visible ; modifier est occasionnel et
+// supprimer est rare, les deux passent derrière un menu sur téléphone, et
+// redeviennent des boutons dès qu'il y a la place.
 function DishRow({ dish, name, category, onToggle, onDelete, deleting }: ItemProps) {
   const t = useTranslations("Dashboard.dishes");
+  const router = useRouter();
+
+  const meta = [category, `${dish.price.toFixed(2)} $`].filter(Boolean).join(" · ");
 
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+    <div
+      className={`flex items-center gap-3 transition-opacity ${
+        dish.isAvailable ? "" : "opacity-55"
+      }`}
+    >
       <Link
         href={`/dashboard/dishes/${dish.id}`}
         className="flex min-w-0 flex-1 items-center gap-3 transition-opacity hover:opacity-75"
       >
-        <Thumbnail imageUrl={dish.imageUrl} name={name} className="h-12 w-12" />
-        <div className="flex min-w-0 flex-col gap-1">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="truncate font-medium">{name}</span>
-            {dish.isArReady && <ArBadge label={t("arReady")} />}
-          </div>
-          <span className="truncate text-xs text-muted-foreground">
-            {[category, `${dish.price.toFixed(2)} $`, dish.isArReady ? null : t("noModel")]
-              .filter(Boolean)
-              .join(" · ")}
+        <Thumbnail imageUrl={dish.imageUrl} name={name} className="h-11 w-11" />
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate text-[15px] font-medium leading-tight">{name}</span>
+          <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="truncate">{meta}</span>
+            {dish.isArReady && (
+              <>
+                <span aria-hidden>·</span>
+                <ArCubeIcon className="h-3 w-3 shrink-0" />
+                <span className="shrink-0">3D</span>
+              </>
+            )}
+            {!dish.isAvailable && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="shrink-0">{t("unavailable")}</span>
+              </>
+            )}
           </span>
         </div>
       </Link>
 
-      <div className="flex shrink-0 items-center gap-2 pl-[60px] md:pl-0">
-        <AvailabilityToggle
-          checked={dish.isAvailable}
-          onLabel={t("available")}
-          offLabel={t("unavailable")}
-          onChange={onToggle}
-        />
+      <AvailabilityToggle
+        checked={dish.isAvailable}
+        onLabel={t("available")}
+        offLabel={t("unavailable")}
+        onChange={onToggle}
+      />
+
+      <div className="hidden shrink-0 items-center gap-2 md:flex">
         <Button asChild variant="outline" size="sm">
           <Link href={`/dashboard/dishes/${dish.id}/edit`}>{t("edit")}</Link>
         </Button>
         <DeleteButton label={t("delete")} onClick={onDelete} disabled={deleting} />
+      </div>
+
+      <div className="md:hidden">
+        <RowMenu label={t("rowActions")}>
+          {(close) => (
+            <>
+              <RowMenuItem
+                onClick={() => {
+                  close();
+                  router.push(`/dashboard/dishes/${dish.id}/edit`);
+                }}
+              >
+                <EditIcon className="h-4 w-4 shrink-0" />
+                {t("edit")}
+              </RowMenuItem>
+              <RowMenuItem
+                destructive
+                onClick={() => {
+                  close();
+                  onDelete();
+                }}
+              >
+                <TrashIcon className="h-4 w-4 shrink-0" />
+                {t("delete")}
+              </RowMenuItem>
+            </>
+          )}
+        </RowMenu>
       </div>
     </div>
   );
@@ -367,18 +428,6 @@ function Thumbnail({
         }`}
       />
     </div>
-  );
-}
-
-function ArBadge({ label }: { label: string }) {
-  return (
-    <span
-      title={label}
-      aria-label={label}
-      className="inline-flex shrink-0 items-center rounded-full border border-border/70 p-1 text-muted-foreground"
-    >
-      <ArCubeIcon className="h-3.5 w-3.5" />
-    </span>
   );
 }
 
