@@ -9,6 +9,10 @@ type ModelViewerJSX = DetailedHTMLProps<
     "ar-modes"?: string;
     "camera-controls"?: boolean;
     "auto-rotate"?: boolean;
+    "camera-orbit"?: string;
+    "min-camera-orbit"?: string;
+    "max-camera-orbit"?: string;
+    "ar-placement"?: string;
     "shadow-intensity"?: string;
     poster?: string;
     reveal?: string;

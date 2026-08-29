@@ -44,10 +44,13 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
   // la lecture attendue.
   const maxScans = Math.max(0, ...rows.map((r) => r.scans30d));
 
-  // Tant qu'aucun plat n'a été vu, il n'y a rien à comparer : des barres
-  // toutes vides n'apprennent rien et se lisent comme des filets de
-  // séparation. Les nombres suffisent, et l'écran le dit.
-  const showBars = maxScans > 0;
+  // Une barre sert à **comparer**. Avec un seul plat vu, il n'y a rien à
+  // comparer : le plat de tête tirait un trait plein d'un bord à l'autre et
+  // les autres affichaient une piste vide, soit quatre filets horizontaux
+  // empilés qui se confondaient avec les séparateurs de lignes. Il faut au
+  // moins deux plats vus pour qu'une comparaison existe.
+  const seenDishes = rows.filter((r) => r.scans30d > 0).length;
+  const showBars = seenDishes >= 2;
 
   return (
     <div className="flex flex-col gap-4">
@@ -84,16 +87,21 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
                   mérite une barre vide, pas un moignon qui laisserait
                   croire à quelques vues. */}
               <div className="flex items-center gap-3">
-                {showBars && (
-                  <div className="h-2 flex-1 overflow-hidden rounded-r-[4px] bg-foreground/[0.06]">
-                    {row.scans30d > 0 && (
+                {showBars &&
+                  (row.scans30d > 0 ? (
+                    <div className="h-2 flex-1 overflow-hidden rounded-r-[4px] bg-foreground/[0.06]">
                       <div
                         className="h-full rounded-r-[4px] bg-foreground/70"
                         style={{ width: `${(row.scans30d / maxScans) * 100}%` }}
                       />
-                    )}
-                  </div>
-                )}
+                    </div>
+                  ) : (
+                    // Aucune piste pour un plat jamais vu : une piste vide
+                    // ne porte aucune information et ajoute un filet de
+                    // plus à l'écran. L'espace est simplement réservé pour
+                    // que les lignes gardent la même hauteur.
+                    <div className="h-2 flex-1" />
+                  ))}
                 <span
                   className={`font-heading text-lg leading-none tabular-nums ${
                     showBars ? "w-10 shrink-0 text-right" : "ml-auto"

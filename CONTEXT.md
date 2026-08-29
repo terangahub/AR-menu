@@ -534,6 +534,14 @@ concerné - cette liste est un résumé, pas la seule source.
   second est resté hors de l'écran de paramètres et attend son ticket
   (`S8-10`) : offrir un sélecteur de couleur qui ne change rien serait
   plus dommageable que de ne rien offrir.
+- **La taille d'un modèle en réalité augmentée vient du fichier, jamais du
+  visualiseur.** `camera-orbit` cadre l'objet **dans la page** et n'a
+  aucun effet une fois l'AR lancée : là, un GLB est interprété en mètres
+  (1 unité = 1 m), donc une reconstruction photogrammétrique à l'échelle
+  arbitraire pose une assiette de trois mètres sur une vraie table.
+  `ar-scale` ne fait qu'autoriser ou interdire le redimensionnement au
+  doigt, il ne redimensionne rien. Le seul correctif est de normaliser le
+  maillage à l'ingestion (`S9-09`).
 - **Une barre de données doit se distinguer d'un filet de séparation.**
   Trois choses l'y aident, et leur absence a fait lire une barre de scans
   comme un trait de séparation : elle ne doit jamais s'étaler d'un bord à

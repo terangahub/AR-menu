@@ -17,6 +17,22 @@ import { ArCubeIcon } from "./ar-cube-icon";
 // confort mais un filet contre un modèle qui ne se chargerait jamais.
 const LOAD_TIMEOUT_MS = 25000;
 
+// Cadrage initial du modèle dans la page.
+//
+// Le défaut de model-viewer est `0deg 75deg 105%`, où le pourcentage est un
+// multiple de la distance qui fait tout juste tenir le modèle dans le
+// cadre : à 105 %, l'objet remplit l'écran et on ne voit plus ce qu'on
+// regarde. À 170 %, il occupe environ 60 % de la hauteur, avec de l'air
+// autour, ce qui permet de reconnaître le plat avant de lancer l'AR.
+//
+// `min`/`max-camera-orbit` bornent ensuite le zoom manuel : sans borne
+// basse, un doigt maladroit envoie la caméra à l'intérieur du maillage, et
+// le convive se retrouve devant un écran uni sans comprendre pourquoi.
+// `auto` conserve le comportement par défaut sur les deux angles.
+const INITIAL_ORBIT = "0deg 75deg 170%";
+const MIN_ORBIT = "auto auto 90%";
+const MAX_ORBIT = "auto auto 400%";
+
 type Medium = "model" | "photo";
 
 export function ArViewer({
@@ -122,6 +138,9 @@ export function ArViewer({
           ar-modes="webxr scene-viewer quick-look"
           camera-controls
           auto-rotate
+          camera-orbit={INITIAL_ORBIT}
+          min-camera-orbit={MIN_ORBIT}
+          max-camera-orbit={MAX_ORBIT}
           poster={imageUrl ?? undefined}
           shadow-intensity="1"
           style={{ width: "100%", height: "100%", backgroundColor: "transparent" }}
