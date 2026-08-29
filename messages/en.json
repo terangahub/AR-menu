@@ -230,7 +230,9 @@
       "analytics": "Analytics",
       "billing": "Billing",
       "settings": "Settings",
-      "publicMenu": "View the public menu"
+      "publicMenu": "View the public menu",
+      "openMenu": "Open the menu",
+      "closeMenu": "Close the menu"
     },
     "overview": {
       "title": "Overview",

@@ -34,24 +34,15 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function DashboardNav({
-  labels,
-  orientation,
-}: {
-  labels: Record<NavKey, string>;
-  orientation: "sidebar" | "bar";
-}) {
+// Colonne de gauche, au-delà de 1024 px uniquement. Sur téléphone la
+// navigation vit dans un tiroir (`DashboardMobileNav`) : la variante
+// horizontale qui existait ici défilait latéralement, ce qui laissait deux
+// rubriques hors de l'écran sans rien pour les signaler.
+export function DashboardNav({ labels }: { labels: Record<NavKey, string> }) {
   const pathname = usePathname();
-  const isSidebar = orientation === "sidebar";
 
   return (
-    <nav
-      className={
-        isSidebar
-          ? "flex flex-col gap-0.5"
-          : "scrollbar-none -mx-4 flex gap-1 overflow-x-auto px-4"
-      }
-    >
+    <nav className="flex flex-col gap-0.5">
       {ITEMS.map(({ key, href, Icon }) => {
         const active = isActive(pathname, href);
         return (
@@ -59,9 +50,7 @@ export function DashboardNav({
             key={key}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`nav-item ${active ? "nav-item-active" : ""} ${
-              isSidebar ? "" : "shrink-0 whitespace-nowrap"
-            }`}
+            className={`nav-item ${active ? "nav-item-active" : ""}`}
           >
             <Icon className="h-[18px] w-[18px] shrink-0" />
             {labels[key]}

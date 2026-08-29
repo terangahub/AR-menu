@@ -230,7 +230,9 @@
       "analytics": "Analytics",
       "billing": "Facturation",
       "settings": "Paramètres",
-      "publicMenu": "Voir le menu public"
+      "publicMenu": "Voir le menu public",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu"
     },
     "overview": {
       "title": "Vue d'ensemble",

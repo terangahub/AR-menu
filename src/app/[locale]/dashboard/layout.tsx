@@ -5,6 +5,7 @@ import { getCurrentRestaurantUser } from "@/lib/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleSwitch } from "@/components/locale-switch";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { ExternalIcon } from "@/components/dashboard/nav-icons";
 
 // Dashboard restaurateur (section 10) - protégé par le middleware Clerk
@@ -75,7 +76,7 @@ export default async function DashboardLayout({
             Vorae
           </Link>
           <div className="px-1">{identity}</div>
-          <DashboardNav labels={labels} orientation="sidebar" />
+          <DashboardNav labels={labels} />
         </div>
 
         <div className="flex flex-col gap-3">
@@ -104,16 +105,21 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
-      <header className="border-b border-border/70 px-4 py-3 lg:hidden print:hidden">
-        <div className="flex items-center justify-between gap-3 pb-3">
-          {identity}
-          <div className="flex shrink-0 items-center gap-2">
-            <LocaleSwitch />
-            <ThemeToggle />
-            <UserButton />
-          </div>
-        </div>
-        <DashboardNav labels={labels} orientation="bar" />
+      {/* Sur téléphone, les six rubriques tenaient dans une barre qui
+          défilait horizontalement : les deux dernières vivaient hors de
+          l'écran et rien ne signalait leur existence. Elles passent dans un
+          tiroir, qui les montre toutes d'un coup et rend l'en-tête à sa
+          seule fonction, dire où l'on est. */}
+      <header className="flex items-center justify-between gap-3 border-b border-border/70 px-4 py-3 lg:hidden print:hidden">
+        {identity}
+        <DashboardMobileNav
+          labels={labels}
+          publicMenuLabel={t("nav.publicMenu")}
+          publicMenuHref={`/fr/${slug}`}
+          menuLabel={t("nav.openMenu")}
+          closeLabel={t("nav.closeMenu")}
+          restaurant={{ name, city, logoUrl }}
+        />
       </header>
 
       <main className="w-full flex-1 px-4 py-6 sm:px-8 sm:py-10">
