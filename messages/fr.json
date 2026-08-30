@@ -214,12 +214,15 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "Voir en AR",
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
-    "arUnavailable": "Modèle 3D indisponible pour l'instant : photo affichée",
+    "arUnavailable": "Le modèle 3D n'a pas pu être chargé : photo affichée",
     "back": "Retour au menu",
     "backToMenu": "Retour au menu de {restaurant}",
     "mediumLabel": "Affichage du plat",
     "medium3d": "Modèle 3D",
-    "mediumPhoto": "Photo"
+    "mediumPhoto": "Photo",
+    "loadingModel": "Chargement du modèle 3D... {percent} %",
+    "loadingSlow": "Ce plat est lourd, le chargement continue. La photo reste affichée en attendant.",
+    "arNotSupported": "La vue en réalité augmentée n'est pas disponible dans ce navigateur. Sur iPhone, ouvrez ce menu dans Safari ; sur Android, dans Chrome."
   },
   "Dashboard": {
     "noRestaurant": "Aucun restaurant associé à ce compte.",

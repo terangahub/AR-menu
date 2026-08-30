@@ -214,12 +214,15 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "View in AR",
     "rotateHint": "Rotate and zoom before activating AR",
-    "arUnavailable": "3D model unavailable right now: showing the photo",
+    "arUnavailable": "The 3D model could not be loaded: showing the photo",
     "back": "Back to menu",
     "backToMenu": "Back to {restaurant}'s menu",
     "mediumLabel": "Dish display",
     "medium3d": "3D model",
-    "mediumPhoto": "Photo"
+    "mediumPhoto": "Photo",
+    "loadingModel": "Loading the 3D model... {percent}%",
+    "loadingSlow": "This dish is a heavy file, loading continues. The photo stays on screen meanwhile.",
+    "arNotSupported": "Augmented reality is not available in this browser. On iPhone, open this menu in Safari; on Android, in Chrome."
   },
   "Dashboard": {
     "noRestaurant": "No restaurant linked to this account.",

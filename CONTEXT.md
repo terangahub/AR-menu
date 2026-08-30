@@ -534,6 +534,19 @@ concerné - cette liste est un résumé, pas la seule source.
   second est resté hors de l'écran de paramètres et attend son ticket
   (`S8-10`) : offrir un sélecteur de couleur qui ne change rien serait
   plus dommageable que de ne rien offrir.
+- **Un délai d'attente n'est pas un diagnostic d'échec.** Le repli 2D du
+  visualiseur basculait au bout de 25 s et démontait `<model-viewer>`, ce
+  qui **interrompait le téléchargement en cours** : un modèle lent
+  devenait un modèle "indisponible", définitivement, et le convive lisait
+  un message d'échec alors que rien n'avait échoué. Seul l'évènement
+  `error` doit produire un repli. Un fichier lourd se traite en montrant
+  la progression réelle (évènement `progress`, `detail.totalProgress`),
+  jamais en abandonnant à sa place.
+- **Le bouton AR absent n'est pas toujours un bogue.** model-viewer masque
+  son slot `ar-button` quand `canActivateAR` est faux, et sur iPhone seul
+  Safari sait ouvrir Quick Look : dans Chrome iOS, l'absence du bouton est
+  le comportement correct. Il faut l'expliquer au convive, sinon il
+  conclut à une panne du menu.
 - **La taille d'un modèle en réalité augmentée vient du fichier, jamais du
   visualiseur.** `camera-orbit` cadre l'objet **dans la page** et n'a
   aucun effet une fois l'AR lancée : là, un GLB est interprété en mètres
