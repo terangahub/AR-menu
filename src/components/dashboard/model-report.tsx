@@ -30,8 +30,20 @@ export function ModelReport({ dishId }: { dishId: string }) {
     setLoading(false);
 
     if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as { detail?: string } | null;
-      setError(body?.detail ?? t("error"));
+      // Le corps est lu en texte puis interprété : un 500 de l'App Router
+      // et un 504 de la plateforme arrivent **sans JSON**, et un
+      // `res.json()` qui échoue effaçait la seule information disponible,
+      // laissant un message générique qui n'oriente vers rien. Le code
+      // HTTP est toujours affiché, parce qu'il distingue déjà une session
+      // expirée d'une adresse morte ou d'un dépassement de délai.
+      const raw = await res.text().catch(() => "");
+      let detail = raw.slice(0, 300);
+      try {
+        detail = (JSON.parse(raw) as { detail?: string }).detail ?? detail;
+      } catch {
+        // Corps non JSON : on garde le texte brut, tronqué.
+      }
+      setError(`${t("error")} (HTTP ${res.status}${detail ? ` : ${detail}` : ""})`);
       return;
     }
     setReport((await res.json()) as Report);

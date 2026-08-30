@@ -24,37 +24,53 @@ const HEADER_WINDOW_BYTES = 4 * 1024 * 1024;
 // par une Function plafonnée en mémoire et en durée serait précisément le
 // risque identifié pour `S9-02`. Seuls les premiers mégaoctets sont lus,
 // et le flux est interrompu dès qu'on en a assez.
+// Le corps entier est sous `try` : dans l'App Router, une exception non
+// rattrapée renvoie un 500 **au corps vide**, que le client ne peut pas
+// distinguer d'une panne réseau. Ce projet s'est déjà fait piéger trois
+// fois par là (voir CONTEXT.md). Toute sortie d'ici porte donc un `detail`
+// lisible, y compris l'inattendu.
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  const restaurantUser = await getCurrentRestaurantUser();
-  if (!restaurantUser) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const dish = await prisma.dish.findUnique({
-    where: { id },
-    select: { restaurantId: true, model3dGlbUrl: true, model3dUsdzUrl: true },
-  });
-  if (!dish || dish.restaurantId !== restaurantUser.restaurantId) {
-    return NextResponse.json({ error: "Dish not found" }, { status: 404 });
-  }
-  if (!dish.model3dGlbUrl) {
-    return NextResponse.json({ error: "no_model" }, { status: 404 });
-  }
-
   try {
-    const [glb, usdzBytes] = await Promise.all([
-      readHead(dish.model3dGlbUrl),
-      dish.model3dUsdzUrl ? contentLength(dish.model3dUsdzUrl) : Promise.resolve(null),
-    ]);
+    const { id } = await params;
+    const restaurantUser = await getCurrentRestaurantUser();
+    if (!restaurantUser) {
+      return NextResponse.json(
+        { error: "unauthorized", detail: "Session absente ou expirée." },
+        { status: 401 }
+      );
+    }
+
+    const dish = await prisma.dish.findUnique({
+      where: { id },
+      select: { restaurantId: true, model3dGlbUrl: true, model3dUsdzUrl: true },
+    });
+    if (!dish || dish.restaurantId !== restaurantUser.restaurantId) {
+      return NextResponse.json(
+        { error: "not_found", detail: `Plat ${id} introuvable pour ce restaurant.` },
+        { status: 404 }
+      );
+    }
+    if (!dish.model3dGlbUrl) {
+      return NextResponse.json(
+        { error: "no_model", detail: "Ce plat n'a pas de modèle GLB enregistré." },
+        { status: 404 }
+      );
+    }
+
+    const glb = await readHead(dish.model3dGlbUrl);
+    // Le poids du USDZ est utile mais accessoire : son échec ne doit pas
+    // emporter toute l'analyse du GLB, qui est la mesure recherchée.
+    const usdzBytes = dish.model3dUsdzUrl
+      ? await contentLength(dish.model3dUsdzUrl).catch(() => null)
+      : null;
 
     return NextResponse.json({ ...inspectGlb(glb), usdzBytes });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: "inspect_failed", detail: message }, { status: 502 });
+    const detail = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    return NextResponse.json({ error: "inspect_failed", detail }, { status: 502 });
   }
 }
 
@@ -66,9 +82,17 @@ async function readHead(url: string): Promise<Buffer> {
   const response = await fetch(url, {
     headers: { Range: `bytes=0-${HEADER_WINDOW_BYTES - 1}` },
     cache: "no-store",
+    // Sans cette borne, une adresse morte laisse la Function attendre
+    // jusqu'à son propre plafond, et Vercel renvoie alors un 504 au corps
+    // vide : le client n'apprend rien.
+    signal: AbortSignal.timeout(20000),
   });
   if (!response.ok && response.status !== 206) {
-    throw new Error(`Téléchargement impossible : HTTP ${response.status}`);
+    // L'hôte est repris dans le message : une URL restée sur l'ancien
+    // stockage Cloudinary se reconnaît immédiatement.
+    throw new Error(
+      `Le fichier n'a pas pu être lu (HTTP ${response.status}) sur ${new URL(url).host}`
+    );
   }
   if (!response.body) throw new Error("Réponse sans corps.");
 
