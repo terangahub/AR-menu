@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  MAX_DURATION_SECONDS,
+  checkVideoFile,
+  formatDuration,
+} from "@/lib/video-check";
 
 import { kiriReadyVideoUrl } from "@/lib/scan-video";
 import { ACTIVE_SCAN_STATUSES } from "@/lib/scan-status";
@@ -215,6 +220,23 @@ export function DishScan({ dishId }: { dishId: string }) {
     setUploadPercent(0);
     setPrepareElapsed(0);
     setPrepareStartedAt(null);
+
+    // Vérification avant tout envoi : un scan refusé par KIRI consomme
+    // quand même ses deux crédits, et le restaurateur l'apprend au bout de
+    // plusieurs minutes de téléversement. Les métadonnées se lisent en
+    // local, instantanément, sans rien envoyer.
+    const check = await checkVideoFile(file);
+    if (!check.ok && check.reason !== "unreadable") {
+      setMessage(
+        check.reason === "too_long"
+          ? t("videoTooLong", {
+              duration: formatDuration(check.durationSeconds ?? 0),
+              max: formatDuration(MAX_DURATION_SECONDS),
+            })
+          : t("videoTooShort", { duration: formatDuration(check.durationSeconds ?? 0) })
+      );
+      return;
+    }
 
     try {
       setStep("signing");

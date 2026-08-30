@@ -377,7 +377,9 @@
       "lastChecked": "{stage} · vérifié auprès du fournisseur à {time}.",
       "stageProcessing": "Traitement en cours",
       "stageQueued": "En file d'attente",
-      "providerUnreachable": "Le fournisseur n'a pas pu être interrogé au dernier essai ({detail}). Nouvel essai automatique dans quelques secondes."
+      "providerUnreachable": "Le fournisseur n'a pas pu être interrogé au dernier essai ({detail}). Nouvel essai automatique dans quelques secondes.",
+      "videoTooLong": "Votre vidéo dure {duration}, or KIRI refuse au-delà de {max}. Refilmez plus court : aucun crédit n'a été consommé.",
+      "videoTooShort": "Votre vidéo ne dure que {duration}, c'est trop court pour reconstruire un volume. Tournez lentement tout autour du plat, sur au moins une trentaine de secondes."
     },
     "qrcodes": {
       "title": "QR codes",

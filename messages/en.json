@@ -377,7 +377,9 @@
       "lastChecked": "{stage} · checked with the provider at {time}.",
       "stageProcessing": "Processing",
       "stageQueued": "Queued",
-      "providerUnreachable": "The provider could not be reached on the last attempt ({detail}). Retrying automatically in a few seconds."
+      "providerUnreachable": "The provider could not be reached on the last attempt ({detail}). Retrying automatically in a few seconds.",
+      "videoTooLong": "Your video runs {duration}, and KIRI refuses anything over {max}. Film a shorter one: no credit was spent.",
+      "videoTooShort": "Your video is only {duration} long, too short to reconstruct a volume. Walk slowly all the way around the dish, for at least thirty seconds or so."
     },
     "qrcodes": {
       "title": "QR codes",
