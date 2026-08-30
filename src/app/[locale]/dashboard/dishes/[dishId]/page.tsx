@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArViewer } from "@/components/menu/ar-viewer";
 import { DishMedia } from "@/components/dashboard/dish-media";
 import { DishScan } from "@/components/dashboard/dish-scan";
+import { Panel } from "@/components/dashboard/ui";
 
 // Fiche plat côté dashboard : ce que contient le plat, son visuel, son
 // modèle 3D et les actions possibles, réunis au même endroit. La liste
@@ -56,16 +57,19 @@ export default async function DashboardDishPage({
   ];
 
   return (
-    <div className="flex max-w-3xl flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           <Link
             href="/dashboard/dishes"
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
+            <span aria-hidden>&larr;</span>
             {t("backToList")}
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight">{name}</h1>
+          <h1 className="font-heading text-2xl leading-tight tracking-tight sm:text-3xl">
+            {name}
+          </h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm">
@@ -80,25 +84,28 @@ export default async function DashboardDishPage({
         </div>
       </div>
 
+      {/* Photo et modèle 3D côte à côte au même ratio : c'est la seule
+          façon de voir d'un coup d'oeil si la capture rend bien le plat,
+          ce qui est exactement la question que se pose le restaurateur en
+          ouvrant cet écran. Ils étaient auparavant l'un carré et l'autre
+          en 4:3, ce qui rendait la comparaison inutilisable. */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">{t("photo")}</span>
+        <Panel title={t("photo")}>
           {dish.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={dish.imageUrl}
               alt={name}
-              className="aspect-square w-full rounded-lg border border-border object-cover"
+              className="aspect-[4/3] w-full rounded-xl border border-border/60 object-cover"
             />
           ) : (
-            <p className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
+            <div className="flex aspect-[4/3] items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
               {t("noPhoto")}
-            </p>
+            </div>
           )}
-        </div>
+        </Panel>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">{t("model")}</span>
+        <Panel title={t("model")}>
           {dish.model3dGlbUrl ? (
             <ArViewer
               glbUrl={dish.model3dGlbUrl}
@@ -107,38 +114,42 @@ export default async function DashboardDishPage({
               alt={name}
             />
           ) : (
-            <p className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
+            <div className="flex aspect-[4/3] items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
               {t("noModelYet")}
-            </p>
+            </div>
           )}
-        </div>
+        </Panel>
       </div>
 
-      <dl className="grid gap-x-6 gap-y-3 rounded-lg border border-border p-4 sm:grid-cols-2">
-        {facts.map((fact) => (
-          <div key={fact.label} className="flex flex-col">
-            <dt className="text-xs text-muted-foreground">{fact.label}</dt>
-            <dd className="text-sm">{fact.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <Panel>
+        <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-3">
+          {facts.map((fact) => (
+            <div key={fact.label} className="flex flex-col gap-0.5">
+              <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                {fact.label}
+              </dt>
+              <dd className="text-sm font-medium">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Panel>
 
-      {description && (
-        <section className="flex flex-col gap-1">
-          <h2 className="text-sm font-medium">{t("description")}</h2>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </section>
+      {(description || ingredients) && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {description && (
+            <Panel title={t("description")}>
+              <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
+            </Panel>
+          )}
+          {ingredients && (
+            <Panel title={t("ingredients")}>
+              <p className="text-sm leading-relaxed text-muted-foreground">{ingredients}</p>
+            </Panel>
+          )}
+        </div>
       )}
 
-      {ingredients && (
-        <section className="flex flex-col gap-1">
-          <h2 className="text-sm font-medium">{t("ingredients")}</h2>
-          <p className="text-sm text-muted-foreground">{ingredients}</p>
-        </section>
-      )}
-
-      <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium">{t("allergens")}</h2>
+      <Panel title={t("allergens")}>
         {dish.allergens.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("noAllergens")}</p>
         ) : (
@@ -146,14 +157,14 @@ export default async function DashboardDishPage({
             {dish.allergens.map(({ allergen }) => (
               <li
                 key={allergen.code}
-                className="rounded-full border border-border px-3 py-1 text-xs"
+                className="rounded-full border border-destructive/30 px-3 py-1 text-xs text-destructive"
               >
                 {isEn ? allergen.nameEn : allergen.nameFr}
               </li>
             ))}
           </ul>
         )}
-      </section>
+      </Panel>
 
       <DishMedia
         dishId={dish.id}

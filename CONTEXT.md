@@ -504,9 +504,14 @@ concerné - cette liste est un résumé, pas la seule source.
   sombre.** `surface-card`, et plus généralement tout ce qui est bâti sur
   `white/[0.06]`, suppose le mode sombre que la landing force
   (`[locale]/page.tsx`). Le menu public et le dashboard doivent tenir dans
-  les deux thèmes : ils utilisent `surface-menu`,
+  les deux thèmes : le menu public utilise `surface-menu`,
   `surface-menu-interactive`, `photo-scrim`, `photo-chip`, `ar-launch`,
-  `menu-aurora` et `menu-sticky-bar`, bâtis sur les tokens sémantiques.
+  `menu-aurora` et `menu-sticky-bar` ; le dashboard utilise
+  `surface-panel` et `nav-item`. Tous sont bâtis sur les tokens
+  sémantiques. Le piège s'était refermé une deuxième fois sur le variant
+  `outline` du bouton, en `border-white/25` : il passait le lint, s'affichait
+  correctement sur la landing, et devenait purement invisible sur le fond
+  clair du dashboard.
   **Ne pas réutiliser une classe de la landing sur un écran qui peut
   s'afficher en clair sans vérifier ce qu'elle contient.**
 - **L'adresse du menu (`Restaurant.slug`) est gravée dans du carton.**
@@ -529,6 +534,67 @@ concerné - cette liste est un résumé, pas la seule source.
   second est resté hors de l'écran de paramètres et attend son ticket
   (`S8-10`) : offrir un sélecteur de couleur qui ne change rien serait
   plus dommageable que de ne rien offrir.
+- **Un délai d'attente n'est pas un diagnostic d'échec.** Le repli 2D du
+  visualiseur basculait au bout de 25 s et démontait `<model-viewer>`, ce
+  qui **interrompait le téléchargement en cours** : un modèle lent
+  devenait un modèle "indisponible", définitivement, et le convive lisait
+  un message d'échec alors que rien n'avait échoué. Seul l'évènement
+  `error` doit produire un repli. Un fichier lourd se traite en montrant
+  la progression réelle (évènement `progress`, `detail.totalProgress`),
+  jamais en abandonnant à sa place.
+- **Le bouton AR absent n'est pas toujours un bogue.** model-viewer masque
+  son slot `ar-button` quand `canActivateAR` est faux, et sur iPhone seul
+  Safari sait ouvrir Quick Look : dans Chrome iOS, l'absence du bouton est
+  le comportement correct. Il faut l'expliquer au convive, sinon il
+  conclut à une panne du menu.
+- **La taille d'un modèle en réalité augmentée vient du fichier, jamais du
+  visualiseur.** `camera-orbit` cadre l'objet **dans la page** et n'a
+  aucun effet une fois l'AR lancée : là, un GLB est interprété en mètres
+  (1 unité = 1 m), donc une reconstruction photogrammétrique à l'échelle
+  arbitraire pose une assiette de trois mètres sur une vraie table.
+  `ar-scale` ne fait qu'autoriser ou interdire le redimensionnement au
+  doigt, il ne redimensionne rien. Le seul correctif est de normaliser le
+  maillage à l'ingestion (`S9-09`).
+- **Une barre de données doit se distinguer d'un filet de séparation.**
+  Trois choses l'y aident, et leur absence a fait lire une barre de scans
+  comme un trait de séparation : elle ne doit jamais s'étaler d'un bord à
+  l'autre (la borner par sa valeur chiffrée suffit), son remplissage doit
+  trancher franchement sur sa piste, et son extrémité doit être arrondie
+  côté valeur et carrée côté origine, parce qu'une barre pousse depuis une
+  ligne de départ alors qu'un filet n'a pas d'origine. Corollaire : **pas
+  de largeur minimale**. Un moignon de 2 % sur une valeur nulle laisse
+  croire à quelques vues, et un jeu de données encore vide ne mérite aucune
+  barre du tout, seulement ses nombres.
+- **Une grandeur relative se lit à une longueur, pas à un nombre.** L'écran
+  analytics alignait quatre colonnes de chiffres : pour répondre à "quel
+  plat marche", le restaurateur devait lire chaque ligne et comparer de
+  tête. Barres proportionnelles au plat le plus vu, jauge sur piste pour un
+  taux (la piste rappelle que 100 % existe). Deux règles à ne pas
+  transgresser en y retouchant : **toutes les barres gardent la même
+  couleur**, les foncer à mesure qu'elles s'allongent doublerait l'encodage
+  de la longueur par la teinte sur des catégories sans ordre naturel ; et
+  **un graphique se peint en tokens sémantiques**, jamais aux valeurs par
+  défaut de la librairie, dont l'infobulle est une boîte blanche à texte
+  noir qui disparaît en mode sombre.
+- **`VERCEL_URL` est l'adresse d'un déploiement, pas celle du produit.**
+  Elle change à chaque `git push`. C'est acceptable pour un lien qu'on
+  clique, jamais pour une valeur **gravée dans une image imprimée** : le
+  chemin stocké dans `QrCode.targetUrl` est relatif, donc portable, mais
+  l'URL absolue est figée dans le PNG au moment de la génération, et un
+  carton collé sur une table ne se corrige pas à distance. L'ordre de
+  résolution est donc `NEXT_PUBLIC_APP_URL`, puis
+  `VERCEL_PROJECT_PRODUCTION_URL` **en production seulement** (l'alias
+  stable du domaine, celui dont Next.js se sert pour `metadataBase`), puis
+  `VERCEL_URL` en preview, pour qu'un QR généré pendant un test ne renvoie
+  pas le testeur vers la production.
+- **Forcer une carte en blanc ne rend pas une page imprimable.** Le `body`
+  porte `bg-background`, qui vaut #030014 en mode sombre : une page
+  imprimée depuis le thème sombre sort en feuille noire, même si le
+  gabarit qu'elle contient est blanc. Toute vue destinée à l'impression a
+  besoin du bloc `@media print` global de `globals.css`, qui neutralise
+  `html` et `body`, et de `print-color-adjust: exact`, sans lequel
+  certains navigateurs suppriment justement l'aplat blanc imposé. Vérifier
+  une page imprimable veut dire l'imprimer **depuis le mode sombre**.
 - **Discipline chromatique du menu public : neutre partout, le violet
   réservé à la seule réalité augmentée, le rouge aux seuls allergènes.**
   La première version du Sprint 6 laissait cohabiter trois violets sur un

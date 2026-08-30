@@ -3,6 +3,7 @@ import { redirect } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { BillingPanel } from "@/components/dashboard/billing-panel";
+import { PageHeader } from "@/components/dashboard/ui";
 
 // Facturation (section 10.6) : palier actuel, cycle, renouvellement,
 // historique de factures, changement de palier / portail Stripe.
@@ -31,7 +32,7 @@ export default async function DashboardBillingPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+      <PageHeader title={t("title")} description={t("subtitle")} />
       <BillingPanel
         locale={locale as "fr" | "en"}
         subscription={

@@ -300,7 +300,7 @@ export function DishScan({ dishId }: { dishId: string }) {
       : "failed";
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+    <div className="surface-panel flex flex-col gap-3 p-5">
       <span className="text-sm font-medium">{t("title")}</span>
       <p className="text-xs text-muted-foreground">{t("help")}</p>
       <input ref={videoInput} type="file" accept="video/*" disabled={busy || blocked} />
@@ -328,15 +328,15 @@ export function DishScan({ dishId }: { dishId: string }) {
       )}
 
       {job && (
-        <div className="rounded-lg border border-border bg-muted/30 p-3">
+        <div className="rounded-xl border border-border/60 bg-foreground/[0.03] p-3">
           <div className="flex items-center gap-2">
             <span
               aria-hidden
               className={`h-2 w-2 shrink-0 rounded-full ${
                 jobActive
-                  ? "animate-pulse bg-primary"
+                  ? "animate-pulse bg-foreground"
                   : job.status === "successful"
-                    ? "bg-primary"
+                    ? "bg-foreground"
                     : "bg-destructive"
               }`}
             />
@@ -379,21 +379,21 @@ export function DishScan({ dishId }: { dishId: string }) {
           aria-labelledby="scan-progress-title"
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg">
+          <div className="surface-panel w-full max-w-md p-6 shadow-2xl">
             <h2 id="scan-progress-title" className="text-lg font-semibold">
               {t("modalTitle")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">{t("modalIntro")}</p>
 
             <div
-              className="mt-5 h-2 w-full overflow-hidden rounded-full bg-muted"
+              className="mt-5 h-2 w-full overflow-hidden rounded-full bg-foreground/10"
               role="progressbar"
               aria-valuenow={percent}
               aria-valuemin={0}
               aria-valuemax={100}
             >
               <div
-                className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
+                className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
                 style={{ width: `${percent}%` }}
               />
             </div>
@@ -409,7 +409,7 @@ export function DishScan({ dishId }: { dishId: string }) {
               </p>
             )}
 
-            <p className="mt-5 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+            <p className="mt-5 rounded-xl border border-border/60 bg-foreground/[0.03] p-3 text-xs text-muted-foreground">
               {t("modalWarning")}
             </p>
           </div>

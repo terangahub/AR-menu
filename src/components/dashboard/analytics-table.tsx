@@ -7,6 +7,16 @@ import type { GlobalDishRow } from "@/lib/analytics";
 
 type SortKey = "name" | "scans30d" | "arRate" | "trend7dPct";
 
+// Le tableau brut posait quatre colonnes de chiffres alignées : pour savoir
+// quel plat marchait, le restaurateur devait lire chaque ligne et comparer
+// mentalement. La question qu'il se pose est une question de grandeur
+// relative, et une grandeur relative se lit à la longueur d'une barre, pas
+// à un nombre. Chaque plat porte donc une barre proportionnelle au plat le
+// plus vu, et le taux d'activation AR une jauge sur la même échelle.
+//
+// Toutes les barres ont la même couleur. Les foncer à mesure qu'elles
+// s'allongent doublerait l'encodage de la longueur par la teinte, sur des
+// catégories (des plats) qui n'ont aucun ordre naturel.
 export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
   const t = useTranslations("Dashboard.analytics");
   const [sortKey, setSortKey] = useState<SortKey>("scans30d");
@@ -29,58 +39,157 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
     return (av - bv) * dir;
   });
 
+  // L'échelle est celle du plat le plus vu, pas un maximum arbitraire : une
+  // barre pleine veut dire "c'est le plat vedette", ce qui est exactement
+  // la lecture attendue.
+  const maxScans = Math.max(0, ...rows.map((r) => r.scans30d));
+
+  // Une barre sert à **comparer**. Avec un seul plat vu, il n'y a rien à
+  // comparer : le plat de tête tirait un trait plein d'un bord à l'autre et
+  // les autres affichaient une piste vide, soit quatre filets horizontaux
+  // empilés qui se confondaient avec les séparateurs de lignes. Il faut au
+  // moins deux plats vus pour qu'une comparaison existe.
+  const seenDishes = rows.filter((r) => r.scans30d > 0).length;
+  const showBars = seenDishes >= 2;
+
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-border text-left text-muted-foreground">
-            <Th label={t("dish")} active={sortKey === "name"} desc={sortDesc} onClick={() => toggleSort("name")} />
-            <Th
-              label={t("scans30d")}
-              active={sortKey === "scans30d"}
-              desc={sortDesc}
-              onClick={() => toggleSort("scans30d")}
-            />
-            <Th label={t("arRate")} active={sortKey === "arRate"} desc={sortDesc} onClick={() => toggleSort("arRate")} />
-            <Th
-              label={t("trend7d")}
-              active={sortKey === "trend7dPct"}
-              desc={sortDesc}
-              onClick={() => toggleSort("trend7dPct")}
-            />
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((row) => (
-            <tr key={row.id} className="border-b border-border last:border-0">
-              <td className="p-3">
-                <Link
-                  href={`/dashboard/analytics/${row.id}`}
-                  className="hover:underline"
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs uppercase tracking-wide text-muted-foreground">
+          {t("sortBy")}
+        </span>
+        <SortChip label={t("scans30d")} active={sortKey === "scans30d"} desc={sortDesc} onClick={() => toggleSort("scans30d")} />
+        <SortChip label={t("arRate")} active={sortKey === "arRate"} desc={sortDesc} onClick={() => toggleSort("arRate")} />
+        <SortChip label={t("trend7d")} active={sortKey === "trend7dPct"} desc={sortDesc} onClick={() => toggleSort("trend7dPct")} />
+        <SortChip label={t("dish")} active={sortKey === "name"} desc={sortDesc} onClick={() => toggleSort("name")} />
+      </div>
+
+      <ul className="surface-panel divide-y divide-border/60">
+        {sorted.map((row) => (
+          <li key={row.id}>
+            <Link
+              href={`/dashboard/analytics/${row.id}`}
+              className="flex flex-col gap-2.5 p-4 transition-colors hover:bg-foreground/[0.03]"
+            >
+              <span className="truncate font-medium">{row.name}</span>
+
+              {/* La barre et son nombre sur la même ligne. Isolée sur sa
+                  propre ligne et étalée sur toute la largeur, elle se
+                  lisait comme un filet de séparation, d'autant que le plat
+                  de tête, par définition à 100 %, produisait un trait
+                  plein d'un bord à l'autre. Bornée par le nombre à sa
+                  droite, elle se termine toujours avant le bord, donc elle
+                  se lit comme une mesure.
+
+                  Extrémité arrondie côté valeur, carrée côté origine : une
+                  barre pousse depuis une ligne de départ, un filet n'a pas
+                  d'origine. Et aucune largeur minimale : un plat jamais vu
+                  mérite une barre vide, pas un moignon qui laisserait
+                  croire à quelques vues. */}
+              <div className="flex items-center gap-3">
+                {showBars &&
+                  (row.scans30d > 0 ? (
+                    <div className="h-2 flex-1 overflow-hidden rounded-r-[4px] bg-foreground/[0.06]">
+                      <div
+                        className="h-full rounded-r-[4px] bg-foreground/70"
+                        style={{ width: `${(row.scans30d / maxScans) * 100}%` }}
+                      />
+                    </div>
+                  ) : (
+                    // Aucune piste pour un plat jamais vu : une piste vide
+                    // ne porte aucune information et ajoute un filet de
+                    // plus à l'écran. L'espace est simplement réservé pour
+                    // que les lignes gardent la même hauteur.
+                    <div className="h-2 flex-1" />
+                  ))}
+                <span
+                  className={`font-heading text-lg leading-none tabular-nums ${
+                    showBars ? "w-10 shrink-0 text-right" : "ml-auto"
+                  }`}
                 >
-                  {row.name}
-                </Link>
-              </td>
-              <td className="p-3">{row.scans30d}</td>
-              <td className="p-3">{row.arRate != null ? `${row.arRate}%` : "-"}</td>
-              <td className="p-3">
-                {row.trend7dPct != null ? (
-                  <span className={row.trend7dPct >= 0 ? "text-success" : "text-destructive"}>
-                    {row.trend7dPct >= 0 ? "↑" : "↓"} {Math.abs(row.trend7dPct)}%
-                  </span>
-                ) : (
-                  "-"
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {row.scans30d}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
+                <ArMeter label={t("arRate")} rate={row.arRate} noneLabel={t("noValue")} />
+                <Trend label={t("trend7d")} pct={row.trend7dPct} noneLabel={t("noValue")} />
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-function Th({
+// Un taux est un rapport à une limite connue (100 %) : une jauge sur piste,
+// pas une barre libre. La piste rappelle que 100 % existe, ce qu'un nombre
+// nu ne dit pas.
+function ArMeter({
+  label,
+  rate,
+  noneLabel,
+}: {
+  label: string;
+  rate: number | null;
+  noneLabel: string;
+}) {
+  return (
+    <span className="flex items-center gap-2">
+      <span>{label}</span>
+      {rate == null ? (
+        <span className="text-muted-foreground/70">{noneLabel}</span>
+      ) : (
+        <>
+          <span className="h-1.5 w-16 overflow-hidden rounded-full bg-foreground/[0.06]">
+            {rate > 0 && (
+              <span
+                className="block h-full rounded-full bg-foreground/70"
+                style={{ width: `${Math.min(100, rate)}%` }}
+              />
+            )}
+          </span>
+          <span className="font-medium tabular-nums text-foreground">{rate}%</span>
+        </>
+      )}
+    </span>
+  );
+}
+
+// La flèche et le signe portent le sens, la couleur ne fait que le
+// confirmer : un restaurateur daltonien, ou qui consulte son téléphone au
+// soleil, lit la même information.
+function Trend({
+  label,
+  pct,
+  noneLabel,
+}: {
+  label: string;
+  pct: number | null;
+  noneLabel: string;
+}) {
+  return (
+    <span className="flex items-center gap-2">
+      <span>{label}</span>
+      {pct == null ? (
+        <span className="text-muted-foreground/70">{noneLabel}</span>
+      ) : (
+        <span
+          className={`font-medium tabular-nums ${
+            pct >= 0 ? "text-success" : "text-destructive"
+          }`}
+        >
+          <span aria-hidden>{pct >= 0 ? "↑" : "↓"} </span>
+          {pct >= 0 ? "+" : ""}
+          {pct}%
+        </span>
+      )}
+    </span>
+  );
+}
+
+function SortChip({
   label,
   active,
   desc,
@@ -92,11 +201,18 @@ function Th({
   onClick: () => void;
 }) {
   return (
-    <th className="p-3 font-medium">
-      <button onClick={onClick} className="flex items-center gap-1 hover:text-foreground">
-        {label}
-        {active && <span className="text-xs">{desc ? "↓" : "↑"}</span>}
-      </button>
-    </th>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+        active
+          ? "border-foreground bg-foreground text-background"
+          : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+      }`}
+    >
+      {label}
+      {active && <span aria-hidden className="text-[10px]">{desc ? "↓" : "↑"}</span>}
+    </button>
   );
 }

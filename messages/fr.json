@@ -214,12 +214,15 @@
     "prepTimeMinutes": "{minutes} min",
     "viewInAr": "Voir en AR",
     "rotateHint": "Faites pivoter et zoomez avant d'activer l'AR",
-    "arUnavailable": "Modèle 3D indisponible pour l'instant : photo affichée",
+    "arUnavailable": "Le modèle 3D n'a pas pu être chargé : photo affichée",
     "back": "Retour au menu",
     "backToMenu": "Retour au menu de {restaurant}",
     "mediumLabel": "Affichage du plat",
     "medium3d": "Modèle 3D",
-    "mediumPhoto": "Photo"
+    "mediumPhoto": "Photo",
+    "loadingModel": "Chargement du modèle 3D... {percent} %",
+    "loadingSlow": "Ce plat est lourd, le chargement continue. La photo reste affichée en attendant.",
+    "arNotSupported": "La vue en réalité augmentée n'est pas disponible dans ce navigateur. Sur iPhone, ouvrez ce menu dans Safari ; sur Android, dans Chrome."
   },
   "Dashboard": {
     "noRestaurant": "Aucun restaurant associé à ce compte.",
@@ -229,7 +232,10 @@
       "qrcodes": "QR codes",
       "analytics": "Analytics",
       "billing": "Facturation",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "publicMenu": "Voir le menu public",
+      "openMenu": "Ouvrir le menu",
+      "closeMenu": "Fermer le menu"
     },
     "overview": {
       "title": "Vue d'ensemble",
@@ -243,7 +249,11 @@
       "noArData": "Pas encore de données.",
       "missingModelTitle": "Plats sans modèle 3D",
       "missingModelEmpty": "Tous les plats disponibles ont un modèle 3D.",
-      "viewAnalytics": "Voir les analytics détaillées"
+      "viewAnalytics": "Voir les analytics détaillées",
+      "subtitle": "L'activité de {restaurant} depuis les QR codes de vos tables.",
+      "scansCount": "{count, plural, one {# scan} other {# scans}}",
+      "missingModelHint": "Ces plats s'affichent en photo seule sur le menu. Lancez une capture 3D pour qu'ils passent en réalité augmentée.",
+      "missingModelAction": "Ouvrir la fiche"
     },
     "analytics": {
       "title": "Analytics",
@@ -262,7 +272,13 @@
       "busiestHour": "Heure la plus consultée",
       "busiestHourValue": "{hour}h",
       "noBusiestHour": "Pas encore de données.",
-      "noData": "Aucun scan enregistré pour l'instant."
+      "noData": "Aucun scan enregistré pour l'instant.",
+      "subtitle": "Quels plats vos convives regardent, et lesquels ils font apparaître sur leur table.",
+      "noDataHint": "Les statistiques se remplissent dès qu'un convive scanne un QR code de votre salle.",
+      "goToQrCodes": "Gérer mes QR codes",
+      "sortBy": "Trier par",
+      "noValue": "pas de donnée",
+      "scansLabel": "scans"
     },
     "dishes": {
       "title": "Plats",
@@ -276,7 +292,16 @@
       "delete": "Supprimer",
       "confirmDelete": "Supprimer ce plat définitivement ?",
       "arReady": "AR prêt",
-      "noModel": "Pas de modèle 3D"
+      "noModel": "Pas de modèle 3D",
+      "subtitle": "Ce que voient vos convives, dans l'ordre où ils le voient.",
+      "emptyFirst": "Votre carte est encore vide",
+      "emptyFirstHint": "Ajoutez un premier plat : nom, prix, photo. La capture 3D viendra ensuite, depuis sa fiche.",
+      "emptyFiltered": "Aucun plat ne correspond",
+      "emptyFilteredHint": "Élargissez votre recherche ou changez de catégorie.",
+      "viewLabel": "Affichage",
+      "viewGrid": "Vue en grille, avec photos",
+      "viewList": "Vue en liste, compacte",
+      "rowActions": "Actions sur ce plat"
     },
     "dishForm": {
       "newTitle": "Nouveau plat",
@@ -306,7 +331,22 @@
       "savePhoto": "Enregistrer la photo",
       "saveModel": "Enregistrer le modèle",
       "noPhotoSelected": "Choisissez d'abord une photo.",
-      "noGlbSelected": "Ce bouton enregistre le modèle 3D. Choisissez un fichier .glb, ou utilisez le bouton de la section Photo pour enregistrer une photo."
+      "noGlbSelected": "Ce bouton enregistre le modèle 3D. Choisissez un fichier .glb, ou utilisez le bouton de la section Photo pour enregistrer une photo.",
+      "newSubtitle": "Le nom et le prix suffisent pour commencer. La photo et la capture 3D s'ajoutent ensuite depuis la fiche du plat.",
+      "editSubtitle": "Cette page ne modifie que les champs. La photo, le modèle 3D et la capture vivent sur la fiche du plat.",
+      "mediaTitle": "Photo et modèle 3D",
+      "mediaHint": "L'envoi manuel reste disponible si vous avez déjà vos fichiers. Sinon, utilisez la capture 3D plus bas : elle produit les deux formats à partir d'une simple vidéo.",
+      "chooseFile": "Choisir un fichier",
+      "noFileChosen": "Aucun fichier choisi",
+      "mediaPresent": "En place",
+      "mediaMissing": "Manquant",
+      "usdzHint": "Le format USDZ est celui qu'exige iPhone. Sans lui, le bouton de réalité augmentée n'apparaît pas sur iOS.",
+      "sectionEssentials": "L'essentiel",
+      "sectionEssentialsHint": "Sans nom ni prix, un plat ne peut pas s'afficher sur le menu.",
+      "sectionDetails": "Description",
+      "sectionDetailsHint": "Facultatif, et modifiable à tout moment. L'anglais peut attendre : le menu retombe sur le français quand il manque.",
+      "allergensHint": "Sélectionnez ce que contient le plat. Vos convives filtrent le menu là-dessus, c'est une information de santé.",
+      "availableHint": "Un plat indisponible disparaît du menu public sans être supprimé. Pratique pour un plat du jour ou une rupture."
     },
     "dishScan": {
       "title": "Scan 3D automatisé",
@@ -350,7 +390,16 @@
       "confirmDelete": "Supprimer ce QR code définitivement ?",
       "scans": "{count} scans",
       "empty": "Aucun QR code pour l'instant.",
-      "error": "Une erreur est survenue. Réessayez."
+      "error": "Une erreur est survenue. Réessayez.",
+      "subtitle": "Un QR code par table : c'est lui qui rattache chaque visite à un endroit précis de votre salle.",
+      "createTitle": "Générer un QR code",
+      "createHint": "Le numéro de table apparaît sur le carton imprimé et dans vos statistiques.",
+      "tableNumberPlaceholder": "12, Terrasse 3, Bar...",
+      "generating": "Génération...",
+      "emptyTitle": "Aucun QR code pour l'instant",
+      "emptyHint": "Générez-en un par table. Sans QR code, votre menu existe mais personne ne peut l'ouvrir depuis la salle.",
+      "printInstruction": "Pointez l'appareil photo de votre téléphone vers ce code pour voir le menu, et certains plats en taille réelle sur votre table.",
+      "printFooter": "Propulsé par Vorae"
     },
     "billing": {
       "title": "Facturation",
@@ -375,7 +424,8 @@
         "active": "Actif",
         "past_due": "Paiement en retard",
         "canceled": "Annulé"
-      }
+      },
+      "subtitle": "Votre abonnement, vos factures, et le palier qui correspond à votre carte."
     },
     "dishDetail": {
       "backToList": "Retour aux plats",
@@ -429,7 +479,8 @@
       "saving": "Enregistrement...",
       "saved": "Modifications enregistrées.",
       "reset": "Annuler les modifications",
-      "error": "Les modifications n'ont pas pu être enregistrées. Réessayez."
+      "error": "Les modifications n'ont pas pu être enregistrées. Réessayez.",
+      "slugPreview": "Votre menu sera à cette adresse :"
     }
   },
   "Legal": {

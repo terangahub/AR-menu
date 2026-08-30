@@ -5,6 +5,7 @@ import { getCurrentRestaurantUser } from "@/lib/auth";
 import { Link } from "@/i18n/navigation";
 import { DishForm, type DishFormValues } from "@/components/dashboard/dish-form";
 import { getExistingCategories } from "@/lib/dish-categories";
+import { PageHeader } from "@/components/dashboard/ui";
 
 export default async function EditDishPage({
   params,
@@ -50,11 +51,12 @@ export default async function EditDishPage({
           cette page ne sert qu'à modifier les champs. */}
       <Link
         href={`/dashboard/dishes/${dish.id}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
+        <span aria-hidden>&larr;</span>
         {t("backToDish")}
       </Link>
-      <h1 className="text-2xl font-semibold tracking-tight">{t("editTitle")}</h1>
+      <PageHeader title={t("editTitle")} description={t("editSubtitle")} />
       <DishForm
         mode="edit"
         dishId={dish.id}

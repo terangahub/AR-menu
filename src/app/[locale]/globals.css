@@ -92,9 +92,46 @@
   }
 }
 
+/* --- Impression ---
+   Le `body` porte `bg-background`, qui vaut #030014 en mode sombre : une
+   page imprimée depuis le thème sombre sortait donc en carton blanc posé
+   sur une feuille entièrement noire. Forcer la seule carte en blanc ne
+   suffisait pas, c'est la page qu'il faut neutraliser.
+
+   `print-color-adjust: exact` est nécessaire dans l'autre sens : sans
+   lui, certains navigateurs suppriment les aplats à l'impression, y
+   compris le fond blanc que l'on impose ici.
+
+   Aucune marge de page : le gabarit gère lui-même son cadrage, et une
+   marge de navigateur par-dessus décentrait le carton. */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  @page {
+    margin: 12mm;
+  }
+}
+
 @layer components {
+  /* Champ de formulaire. Le rayon suit celui des panneaux (12 px contre
+     16 px, un cran en dessous, comme un objet posé dedans) et non plus le
+     `--radius` de 7 px hérité des boutons. L'anneau de focus est
+     obligatoire : sans lui, un restaurateur qui navigue au clavier ne sait
+     jamais où il est. */
   .input {
-    @apply rounded-md border border-input bg-background px-3 py-1.5 text-sm;
+    @apply rounded-xl border border-input bg-background px-3 py-2 text-sm transition-colors;
+  }
+  .input:hover {
+    @apply border-foreground/30;
+  }
+  .input:focus,
+  .input:focus-visible {
+    @apply border-foreground/40 outline-none ring-2 ring-ring/40;
   }
 
   /* Zone qui défile sans montrer sa barre de défilement : utilisé à
@@ -269,6 +306,74 @@
   .menu-sticky-bar {
     @apply sticky top-0 z-30 -mx-4 border-b border-border/60 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6;
     background: hsl(var(--background) / 0.85);
+  }
+
+  /* --- Surfaces du dashboard (Sprint 6, S6-04) ---
+     Même discipline que le menu public : en sombre, un panneau est un
+     voile blanc très faible sur le fond quasi noir, pas l'aplat indigo
+     de `--card` (#181848). Séparé de `surface-menu` malgré la parenté :
+     un panneau de dashboard ne se soulève jamais, ne contient pas de
+     photo, et son rayon est plus sobre que celui des cartes du menu, qui
+     est calibré pour encadrer un cliché de plat. */
+  .surface-panel {
+    @apply rounded-2xl border border-border/60 bg-card;
+  }
+  [data-theme="dark"] .surface-panel {
+    background-color: hsl(var(--background));
+    background-image: linear-gradient(
+      to bottom,
+      hsl(0 0% 100% / 0.045),
+      hsl(0 0% 100% / 0.015)
+    );
+    border-color: hsl(0 0% 100% / 0.08);
+  }
+
+  /* Entrée de navigation du dashboard. L'état actif est en encre pleine,
+     comme les états actifs du menu public : c'est la même règle appliquée
+     des deux côtés du produit, et elle survit au mode clair comme au mode
+     sombre, ce qu'un aplat de marque ne faisait pas. */
+  .nav-item {
+    @apply flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors;
+  }
+  .nav-item:hover {
+    @apply bg-foreground/[0.06] text-foreground;
+  }
+  .nav-item-active,
+  .nav-item-active:hover {
+    @apply bg-foreground text-background;
+  }
+
+  /* Tiroir de navigation du dashboard sur téléphone. L'entrée est animée,
+     la sortie ne l'est pas : le panneau est démonté à la fermeture, ce qui
+     évite d'avoir à synchroniser une durée d'animation avec un démontage,
+     source classique de panneaux fantômes qui bloquent les clics.
+
+     `prefers-reduced-motion` supprime le glissement : un mouvement
+     latéral rapide est précisément ce qui déclenche une gêne chez les
+     personnes sensibles au mouvement. */
+  .drawer-scrim {
+    background: hsl(250 45% 4% / 0.55);
+    animation: drawer-fade 180ms ease-out;
+  }
+  .drawer-panel {
+    animation: drawer-slide 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: -24px 0 60px -30px hsl(250 45% 4% / 0.7);
+  }
+  @keyframes drawer-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes drawer-slide {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .drawer-scrim,
+    .drawer-panel {
+      animation: none;
+    }
   }
 
   /* Halo diffus derrière un élément (orbe lumineuse). */

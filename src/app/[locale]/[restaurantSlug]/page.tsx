@@ -4,7 +4,7 @@ import { redirect } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { recordScan } from "@/lib/scan";
 import { MenuClient, type MenuDish } from "@/components/menu/menu-client";
-import { LocaleSwitch } from "@/components/menu/locale-switch";
+import { LocaleSwitch } from "@/components/locale-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 // Menu 2D public (F02) - fallback obligatoire, jamais bloqué par l'AR
@@ -100,28 +100,34 @@ export default async function RestaurantMenuPage({
       />
 
       <main className="relative mx-auto flex max-w-5xl flex-col px-4 pb-20 sm:px-6">
-        <header className="flex flex-col gap-6 pb-2 pt-8 sm:pt-12">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-4">
-              {restaurant.logoUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={restaurant.logoUrl}
-                  alt=""
-                  className="h-14 w-14 rounded-2xl border border-border/60 object-cover sm:h-16 sm:w-16"
-                />
-              )}
-              <div className="flex flex-col gap-1">
-                <h1 className="font-heading text-3xl leading-tight tracking-tight sm:text-4xl">
-                  {restaurant.name}
-                </h1>
-                <p className="text-sm text-muted-foreground">{restaurant.city}</p>
-              </div>
-            </div>
+        {/* Les commandes passent sur leur propre ligne, au-dessus. Elles
+            partageaient auparavant la ligne du nom, qui n'avait donc plus
+            que la moitié de la largeur : sur un téléphone, "Vorae Demo" se
+            cassait en deux lignes sous le logo. Le nom dispose maintenant
+            de toute la largeur et tient sur une ligne, avec le logo à sa
+            gauche et la ville juste dessous. */}
+        <header className="flex flex-col gap-5 pb-2 pt-6 sm:pt-10">
+          <div className="flex items-center justify-end gap-2">
+            <LocaleSwitch />
+            <ThemeToggle />
+          </div>
 
-            <div className="flex shrink-0 items-center gap-2">
-              <LocaleSwitch />
-              <ThemeToggle />
+          <div className="flex items-center gap-4">
+            {restaurant.logoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={restaurant.logoUrl}
+                alt=""
+                className="h-14 w-14 shrink-0 rounded-2xl border border-border/60 object-cover sm:h-16 sm:w-16"
+              />
+            )}
+            <div className="flex min-w-0 flex-col gap-0.5">
+              {/* `text-balance` et une taille qui démarre plus bas : un nom
+                  long reste lisible sans jamais se casser en escalier. */}
+              <h1 className="text-balance font-heading text-[26px] leading-none tracking-tight sm:text-4xl">
+                {restaurant.name}
+              </h1>
+              <p className="text-sm text-muted-foreground">{restaurant.city}</p>
             </div>
           </div>
 

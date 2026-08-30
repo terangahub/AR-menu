@@ -4,6 +4,7 @@ import { absoluteMenuUrl } from "@/lib/qrcode";
 import { routing } from "@/i18n/routing";
 import { RestaurantSettings } from "@/components/dashboard/restaurant-settings";
 import { Link } from "@/i18n/navigation";
+import { PageHeader } from "@/components/dashboard/ui";
 
 // Paramètres du restaurant (section 10.5). Le nom, la ville, le logo et
 // l'adresse du menu ne se modifiaient jusqu'ici qu'en base de données :
@@ -26,18 +27,18 @@ export default async function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-heading text-2xl">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-        </div>
-        <Link
-          href={`/${slug}`}
-          className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-        >
-          {t("viewMenu")}
-        </Link>
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <Link
+            href={`/${slug}`}
+            className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+          >
+            {t("viewMenu")}
+          </Link>
+        }
+      />
 
       <RestaurantSettings
         initialValues={{ name, slug, city, email, defaultLocale, logoUrl }}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { TIERS, type TierId, type BillingCycle } from "@/lib/billing";
+import { Panel } from "@/components/dashboard/ui";
 
 type SubscriptionInfo = {
   tier: string;
@@ -92,12 +93,16 @@ export function BillingPanel({
     return (
       <div className="flex flex-col gap-6">
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <div className="rounded-lg border border-border p-6">
+        <div className="surface-panel p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">{t("currentPlan")}</p>
-              <p className="mt-1 text-xl font-semibold capitalize">{subscription.tier}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                {t("currentPlan")}
+              </p>
+              <p className="mt-1.5 font-heading text-2xl capitalize leading-none">
+                {subscription.tier}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
                 {t(subscription.billingCycle === "annual" ? "cycleAnnual" : "cycleMonthly")}
                 {" · "}
                 {statusLabel}
@@ -118,29 +123,42 @@ export function BillingPanel({
           </div>
         </div>
 
-        <div className="rounded-lg border border-border p-6">
-          <h2 className="mb-4 text-sm font-medium text-muted-foreground">{t("invoices")}</h2>
+        <Panel title={t("invoices")}>
           {invoices.length === 0 ? (
-            <p className="text-muted-foreground">{t("noInvoices")}</p>
+            <p className="text-sm text-muted-foreground">{t("noInvoices")}</p>
           ) : (
-            <div className="flex flex-col divide-y divide-border">
+            <ul className="flex flex-col divide-y divide-border/60">
               {invoices.map((inv) => (
-                <div key={inv.id} className="flex items-center justify-between py-3 text-sm">
-                  <span>{new Date(inv.issuedAt).toLocaleDateString(locale === "fr" ? "fr-CA" : "en-CA")}</span>
-                  <span>{currencyFormatter.format(inv.amount)}</span>
-                  <span className="text-muted-foreground">{inv.status}</span>
+                <li
+                  key={inv.id}
+                  className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 py-3 text-sm sm:grid-cols-[1fr_auto_auto_auto]"
+                >
+                  <span className="tabular-nums">
+                    {new Date(inv.issuedAt).toLocaleDateString(
+                      locale === "fr" ? "fr-CA" : "en-CA"
+                    )}
+                  </span>
+                  <span className="text-right font-medium tabular-nums">
+                    {currencyFormatter.format(inv.amount)}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{inv.status}</span>
                   {inv.pdfUrl ? (
-                    <a href={inv.pdfUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                    <a
+                      href={inv.pdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-right underline underline-offset-4 transition-opacity hover:opacity-70"
+                    >
                       {t("downloadInvoice")}
                     </a>
                   ) : (
                     <span />
                   )}
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
-        </div>
+        </Panel>
       </div>
     );
   }
@@ -149,12 +167,15 @@ export function BillingPanel({
     <div className="flex flex-col gap-6">
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <div className="flex items-center justify-center gap-2">
+      <div className="mx-auto inline-flex items-center rounded-full border border-border p-0.5">
         <button
           type="button"
           onClick={() => setCycle("monthly")}
-          className={`rounded-full px-4 py-1.5 text-sm ${
-            cycle === "monthly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+          aria-pressed={cycle === "monthly"}
+          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            cycle === "monthly"
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           {t("cycleMonthly")}
@@ -162,8 +183,11 @@ export function BillingPanel({
         <button
           type="button"
           onClick={() => setCycle("annual")}
-          className={`rounded-full px-4 py-1.5 text-sm ${
-            cycle === "annual" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+          aria-pressed={cycle === "annual"}
+          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            cycle === "annual"
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           {t("cycleAnnual")} · {t("cycleAnnualBadge")}
@@ -176,17 +200,17 @@ export function BillingPanel({
           return (
             <div
               key={tier.id}
-              className="flex flex-col gap-4 rounded-lg border border-border p-6"
+              className="surface-panel flex flex-col justify-between gap-5 p-5 sm:p-6"
             >
               <div>
-                <h3 className="text-lg font-semibold capitalize">{tier.id}</h3>
-                <p className="mt-1 text-2xl font-semibold">
+                <h3 className="font-heading text-lg capitalize leading-none">{tier.id}</h3>
+                <p className="mt-3 font-heading text-3xl leading-none tabular-nums">
                   {currencyFormatter.format(price)}
-                  <span className="text-sm font-normal text-muted-foreground">
+                  <span className="font-sans text-sm font-normal text-muted-foreground">
                     /{cycle === "annual" ? t("perYear") : t("perMonth")}
                   </span>
                 </p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-2 text-sm text-muted-foreground">
                   {tier.includedDishSlots === -1
                     ? t("unlimitedDishes")
                     : t("includedDishes", { count: tier.includedDishSlots })}

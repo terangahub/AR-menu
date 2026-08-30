@@ -147,7 +147,7 @@ export function RestaurantSettings({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-      <section className="flex flex-col gap-4">
+      <section className="surface-panel flex flex-col gap-4 p-5">
         <SectionTitle title={t("identity")} hint={t("identityHint")} />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -195,11 +195,11 @@ export function RestaurantSettings({
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="surface-panel flex flex-col gap-4 p-5">
         <SectionTitle title={t("logo")} hint={t("logoHint")} />
 
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted/40">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-foreground/[0.04]">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoUrl} alt="" className="h-full w-full object-cover" />
@@ -249,20 +249,33 @@ export function RestaurantSettings({
         {logoError && <p className="text-sm text-destructive">{logoError}</p>}
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="surface-panel flex flex-col gap-4 p-5">
         <SectionTitle title={t("address")} hint={t("addressHint")} />
 
+        {/* Le domaine était collé devant le champ, en `shrink-0` : sur une
+            adresse de preview Vercel (une soixantaine de caractères), il
+            poussait la saisie hors de l'écran et le restaurateur ne voyait
+            plus ce qu'il tapait. Le champ est donc seul, et l'adresse
+            complète s'affiche dessous, où elle peut revenir à la ligne
+            quel que soit le domaine. */}
         <Field label={t("slug")} required>
-          <div className="flex items-center gap-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm focus-within:ring-1 focus-within:ring-ring">
-            <span className="shrink-0 text-muted-foreground">{menuBaseUrl}/</span>
-            <input
-              required
-              value={values.slug}
-              onChange={(e) => set("slug", slugify(e.target.value))}
-              className="min-w-0 flex-1 bg-transparent outline-none"
-            />
-          </div>
+          <input
+            required
+            value={values.slug}
+            onChange={(e) => set("slug", slugify(e.target.value))}
+            className="input"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
         </Field>
+
+        <p className="-mt-2 text-xs text-muted-foreground">
+          {t("slugPreview")}{" "}
+          <span className="break-all font-medium text-foreground">
+            {menuBaseUrl}/{values.slug}
+          </span>
+        </p>
 
         {!slugIsValid && values.slug.length > 0 && (
           <p className="text-sm text-destructive">{t("slugInvalid")}</p>
