@@ -113,6 +113,7 @@ export default async function DashboardDishPage({
               usdzUrl={dish.model3dUsdzUrl}
               imageUrl={dish.imageUrl}
               alt={name}
+              diagnostics
             />
           ) : (
             <div className="flex aspect-[4/3] items-center justify-center rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
