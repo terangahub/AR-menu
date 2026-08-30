@@ -91,3 +91,24 @@ describe("formatBytes", () => {
     expect(formatBytes(94 * 1024 * 1024)).toBe("94.0 Mo");
   });
 });
+
+describe("inspectGlb sur un tampon tronqué", () => {
+  it("mesure tout sans lire le binaire", () => {
+    const full = buildGlb(SAMPLE, 9800);
+    // On coupe dans le morceau binaire : c'est exactement ce que récupère
+    // une lecture partielle sur le réseau.
+    const truncated = full.subarray(0, full.length - 9000);
+
+    const report = inspectGlb(truncated);
+    expect(report.headerOnly).toBe(true);
+    expect(report.fileBytes).toBe(full.length);
+    expect(report.textureBytes).toBe(8000);
+    expect(report.geometryBytes).toBe(1800);
+    expect(report.triangles).toBe(50);
+    expect(report.dimensions).toEqual({ x: 4, y: 1.5, z: 4 });
+  });
+
+  it("marque un fichier complet comme non tronqué", () => {
+    expect(inspectGlb(buildGlb(SAMPLE, 9800)).headerOnly).toBe(false);
+  });
+});

@@ -22,6 +22,8 @@ const CHUNK_BIN = 0x004e4942; // "BIN\0"
 
 export type GlbReport = {
   fileBytes: number;
+  /** Vrai si seul l'en-tête a été analysé, le binaire n'ayant pas été lu. */
+  headerOnly: boolean;
   jsonBytes: number;
   binBytes: number;
   /** Octets des bufferViews référencés par des images. */
@@ -52,11 +54,22 @@ type GltfJson = {
   nodes?: { scale?: number[]; matrix?: number[] }[];
 };
 
+// Accepte un tampon **tronqué** : tout ce que ce rapport mesure vit dans
+// l'en-tête et le morceau JSON, jamais dans le binaire lui-même. Les
+// longueurs des `bufferView` sont déclarées dans le JSON, et celle du
+// morceau binaire dans son propre en-tête de 8 octets. Lire les premiers
+// mégaoctets suffit donc, ce qui évite de faire transiter 94 Mo par une
+// Vercel Function pour n'en lire que le premier pour cent.
 export function inspectGlb(buffer: Buffer): GlbReport {
   if (buffer.byteLength < 12) throw new Error("Fichier trop court pour être un GLB.");
   if (buffer.readUInt32LE(0) !== MAGIC_GLTF) {
     throw new Error("Ce fichier n'est pas un GLB (signature glTF absente).");
   }
+
+  // La taille totale est déclarée dans l'en-tête : elle reste juste même
+  // quand le tampon s'arrête au milieu du fichier.
+  const declaredFileBytes = buffer.readUInt32LE(8);
+  const headerOnly = buffer.byteLength < declaredFileBytes;
 
   let offset = 12;
   let json: GltfJson | null = null;
@@ -67,19 +80,31 @@ export function inspectGlb(buffer: Buffer): GlbReport {
     const chunkType = buffer.readUInt32LE(offset + 4);
     const start = offset + 8;
     const end = start + chunkLength;
+
+    if (chunkType === CHUNK_BIN) {
+      // Sa longueur est déclarée dans l'en-tête du morceau : on la retient
+      // sans exiger que ses données soient présentes.
+      binBytes = chunkLength;
+      break;
+    }
+
     if (end > buffer.byteLength) break;
 
     if (chunkType === CHUNK_JSON) {
       json = JSON.parse(buffer.subarray(start, end).toString("utf8")) as GltfJson;
-    } else if (chunkType === CHUNK_BIN) {
-      binBytes = chunkLength;
     }
 
     // Chaque morceau est aligné sur 4 octets.
     offset = end + ((4 - (chunkLength % 4)) % 4);
   }
 
-  if (!json) throw new Error("Morceau JSON introuvable dans le GLB.");
+  if (!json) {
+    throw new Error(
+      headerOnly
+        ? "Morceau JSON absent des premiers octets lus : le descripteur du modèle dépasse la fenêtre analysée."
+        : "Morceau JSON introuvable dans le GLB."
+    );
+  }
 
   const bufferViews = json.bufferViews ?? [];
   const accessors = json.accessors ?? [];
@@ -157,10 +182,11 @@ export function inspectGlb(buffer: Buffer): GlbReport {
       (node.matrix != null && node.matrix.length === 16)
   );
 
-  const jsonBytes = buffer.byteLength - binBytes - 12 - 8 * (binBytes > 0 ? 2 : 1);
+  const jsonBytes = declaredFileBytes - binBytes - 12 - 8 * (binBytes > 0 ? 2 : 1);
 
   return {
-    fileBytes: buffer.byteLength,
+    fileBytes: declaredFileBytes,
+    headerOnly,
     jsonBytes,
     binBytes,
     textureBytes,

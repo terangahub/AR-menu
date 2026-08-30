@@ -8,6 +8,7 @@ import { ArViewer } from "@/components/menu/ar-viewer";
 import { DishMedia } from "@/components/dashboard/dish-media";
 import { DishScan } from "@/components/dashboard/dish-scan";
 import { Panel } from "@/components/dashboard/ui";
+import { ModelReport } from "@/components/dashboard/model-report";
 
 // Fiche plat côté dashboard : ce que contient le plat, son visuel, son
 // modèle 3D et les actions possibles, réunis au même endroit. La liste
@@ -173,6 +174,7 @@ export default async function DashboardDishPage({
         model3dUsdzUrl={dish.model3dUsdzUrl}
       />
       <DishScan dishId={dish.id} />
+      {dish.model3dGlbUrl && <ModelReport dishId={dish.id} />}
     </div>
   );
 }
