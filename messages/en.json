@@ -504,7 +504,13 @@
       "sizeWithTransform": "A node in the file carries a scale: the real size may differ from this measurement.",
       "verdictTextures": "The weight comes mostly from textures. Lead: lower their resolution and recompress them, before touching the mesh.",
       "verdictGeometry": "The weight comes mostly from geometry. Lead: decimate the mesh, then compress it.",
-      "verdictBoth": "Textures and geometry weigh the same order. Both jobs are needed, neither will be enough alone."
+      "verdictBoth": "Textures and geometry weigh the same order. Both jobs are needed, neither will be enough alone.",
+      "vertices": "Vertices",
+      "indexedLabel": "Indexed vertices",
+      "indexedYes": "Yes",
+      "indexedNo": "No, they are repeated",
+      "attributes": "Geometry breakdown",
+      "indices": "Indices"
     }
   },
   "Legal": {

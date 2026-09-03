@@ -504,7 +504,13 @@
       "sizeWithTransform": "Un noeud du fichier porte une échelle : la taille réelle peut différer de cette mesure.",
       "verdictTextures": "Le poids vient surtout des textures. Piste : réduire leur résolution et les recompresser, avant de toucher au maillage.",
       "verdictGeometry": "Le poids vient surtout de la géométrie. Piste : décimer le maillage, puis le compresser.",
-      "verdictBoth": "Textures et géométrie pèsent du même ordre. Les deux chantiers sont nécessaires, aucun ne suffira seul."
+      "verdictBoth": "Textures et géométrie pèsent du même ordre. Les deux chantiers sont nécessaires, aucun ne suffira seul.",
+      "vertices": "Sommets",
+      "indexedLabel": "Sommets indexés",
+      "indexedYes": "Oui",
+      "indexedNo": "Non, ils sont répétés",
+      "attributes": "Détail de la géométrie",
+      "indices": "Indices"
     }
   },
   "Legal": {

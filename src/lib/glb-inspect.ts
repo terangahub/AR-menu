@@ -16,6 +16,30 @@
 // longueur et d'un type. Le premier morceau est le JSON glTF, le second
 // (facultatif) le tampon binaire.
 
+// Tailles imposées par la spécification glTF. Elles servent à mesurer le
+// poids **logique** d'un attribut depuis son accesseur, indépendamment du
+// `bufferView` qui le porte : quand plusieurs attributs sont entrelacés
+// dans un même `bufferView`, la longueur de celui-ci ne dit pas lequel
+// pèse.
+const COMPONENT_BYTES: Record<number, number> = {
+  5120: 1, // BYTE
+  5121: 1, // UNSIGNED_BYTE
+  5122: 2, // SHORT
+  5123: 2, // UNSIGNED_SHORT
+  5125: 4, // UNSIGNED_INT
+  5126: 4, // FLOAT
+};
+
+const TYPE_COMPONENTS: Record<string, number> = {
+  SCALAR: 1,
+  VEC2: 2,
+  VEC3: 3,
+  VEC4: 4,
+  MAT2: 4,
+  MAT3: 9,
+  MAT4: 16,
+};
+
 const MAGIC_GLTF = 0x46546c67; // "glTF"
 const CHUNK_JSON = 0x4e4f534a; // "JSON"
 const CHUNK_BIN = 0x004e4942; // "BIN\0"
@@ -33,6 +57,13 @@ export type GlbReport = {
   /** Octets du tampon qu'aucune des deux catégories ne réclame. */
   otherBytes: number;
   triangles: number;
+  vertices: number;
+  /** Faux si le maillage répète ses sommets au lieu de les indexer. */
+  indexed: boolean;
+  /** Poids logique de chaque attribut de sommet, calculé depuis les
+      accesseurs : il explique la ligne "géométrie" en la détaillant. */
+  attributeBytes: { name: string; bytes: number }[];
+  indexBytes: number;
   meshes: number;
   primitives: number;
   images: { mimeType: string; bytes: number }[];
@@ -45,7 +76,14 @@ export type GlbReport = {
 
 type GltfJson = {
   asset?: { generator?: string };
-  accessors?: { bufferView?: number; count?: number; type?: string; min?: number[]; max?: number[] }[];
+  accessors?: {
+    bufferView?: number;
+    count?: number;
+    type?: string;
+    componentType?: number;
+    min?: number[];
+    max?: number[];
+  }[];
   bufferViews?: { byteLength?: number }[];
   images?: { bufferView?: number; mimeType?: string; uri?: string }[];
   meshes?: {
@@ -124,31 +162,53 @@ export function inspectGlb(buffer: Buffer): GlbReport {
     });
   }
 
+  const accessorBytes = (index: number | undefined): number => {
+    if (index == null) return 0;
+    const accessor = accessors[index];
+    if (!accessor) return 0;
+    const component = COMPONENT_BYTES[accessor.componentType ?? 5126] ?? 4;
+    const components = TYPE_COMPONENTS[accessor.type ?? "SCALAR"] ?? 1;
+    return (accessor.count ?? 0) * component * components;
+  };
+
   const geometryViews = new Set<number>();
+  const perAttribute = new Map<string, number>();
   let triangles = 0;
+  let vertices = 0;
   let primitives = 0;
+  let indexBytes = 0;
+  let indexedPrimitives = 0;
 
   for (const mesh of json.meshes ?? []) {
     for (const primitive of mesh.primitives ?? []) {
       primitives += 1;
 
-      for (const accessorIndex of Object.values(primitive.attributes ?? {})) {
+      for (const [name, accessorIndex] of Object.entries(primitive.attributes ?? {})) {
         const view = accessors[accessorIndex]?.bufferView;
         if (view != null) geometryViews.add(view);
+        perAttribute.set(name, (perAttribute.get(name) ?? 0) + accessorBytes(accessorIndex));
       }
 
+      const positionAccessor = primitive.attributes?.POSITION;
+      vertices += positionAccessor != null ? (accessors[positionAccessor]?.count ?? 0) : 0;
+
       if (primitive.indices != null) {
+        indexedPrimitives += 1;
         const accessor = accessors[primitive.indices];
         if (accessor?.bufferView != null) geometryViews.add(accessor.bufferView);
+        indexBytes += accessorBytes(primitive.indices);
         // mode 4 (TRIANGLES) est le défaut quand `mode` est absent.
         if ((primitive.mode ?? 4) === 4) triangles += Math.floor((accessor?.count ?? 0) / 3);
       } else {
-        const positionAccessor = primitive.attributes?.POSITION;
         const count = positionAccessor != null ? (accessors[positionAccessor]?.count ?? 0) : 0;
         if ((primitive.mode ?? 4) === 4) triangles += Math.floor(count / 3);
       }
     }
   }
+
+  const attributeBytes = Array.from(perAttribute.entries())
+    .map(([name, bytes]) => ({ name, bytes }))
+    .sort((a, b) => b.bytes - a.bytes);
 
   const sumViews = (views: Set<number>) =>
     Array.from(views).reduce((total, index) => total + viewBytes(index), 0);
@@ -193,6 +253,12 @@ export function inspectGlb(buffer: Buffer): GlbReport {
     geometryBytes,
     otherBytes: Math.max(0, binBytes - textureBytes - geometryBytes),
     triangles,
+    vertices,
+    // Un maillage non indexé répète chaque sommet pour chaque triangle qui
+    // le touche : à géométrie égale, il pèse plusieurs fois plus lourd.
+    indexed: primitives > 0 && indexedPrimitives === primitives,
+    attributeBytes,
+    indexBytes,
     meshes: (json.meshes ?? []).length,
     primitives,
     images,

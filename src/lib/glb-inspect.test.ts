@@ -34,8 +34,15 @@ const SAMPLE = {
     { byteLength: 8000 }, // texture
   ],
   accessors: [
-    { bufferView: 0, count: 100, type: "VEC3", min: [-1, 0, -2], max: [3, 1.5, 2] },
-    { bufferView: 1, count: 150, type: "SCALAR" },
+    {
+      bufferView: 0,
+      count: 100,
+      type: "VEC3",
+      componentType: 5126,
+      min: [-1, 0, -2],
+      max: [3, 1.5, 2],
+    },
+    { bufferView: 1, count: 150, type: "SCALAR", componentType: 5125 },
   ],
   images: [{ bufferView: 2, mimeType: "image/jpeg" }],
   meshes: [{ primitives: [{ attributes: { POSITION: 0 }, indices: 1 }] }],
@@ -110,5 +117,25 @@ describe("inspectGlb sur un tampon tronqué", () => {
 
   it("marque un fichier complet comme non tronqué", () => {
     expect(inspectGlb(buildGlb(SAMPLE, 9800)).headerOnly).toBe(false);
+  });
+});
+
+describe("détail de la géométrie", () => {
+  it("mesure chaque attribut depuis son accesseur, pas depuis son bufferView", () => {
+    const report = inspectGlb(buildGlb(SAMPLE, 9800));
+    // 100 sommets x VEC3 x FLOAT = 100 x 3 x 4.
+    expect(report.attributeBytes).toEqual([{ name: "POSITION", bytes: 1200 }]);
+    // 150 indices x SCALAR x UNSIGNED_INT.
+    expect(report.indexBytes).toBe(600);
+    expect(report.vertices).toBe(100);
+  });
+
+  it("signale un maillage non indexé, qui répète ses sommets", () => {
+    const unindexed = {
+      ...SAMPLE,
+      meshes: [{ primitives: [{ attributes: { POSITION: 0 } }] }],
+    };
+    expect(inspectGlb(buildGlb(unindexed, 9800)).indexed).toBe(false);
+    expect(inspectGlb(buildGlb(SAMPLE, 9800)).indexed).toBe(true);
   });
 });

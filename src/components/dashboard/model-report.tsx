@@ -84,8 +84,38 @@ export function ModelReport({ dishId }: { dishId: string }) {
               value={`${formatBytes(report.geometryBytes)} · ${share(report.geometryBytes)}`}
             />
             <Row label={t("triangles")} value={report.triangles.toLocaleString()} />
+            <Row label={t("vertices")} value={report.vertices.toLocaleString()} />
+            <Row
+              label={t("indexedLabel")}
+              value={report.indexed ? t("indexedYes") : t("indexedNo")}
+            />
             <Row label={t("generator")} value={report.generator ?? t("unknown")} />
           </dl>
+
+          {/* Le détail par attribut est ce qui transforme "la géométrie
+              pèse" en une action : un COLOR_0 lourd est du poids gratuit
+              quand une texture existe déjà, et des normales représentent
+              souvent le tiers du fichier pour un gain visuel nul sur une
+              assiette. */}
+          {report.attributeBytes.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                {t("attributes")}
+              </span>
+              <ul className="flex flex-col gap-1 text-sm">
+                {report.attributeBytes.map((attribute) => (
+                  <li key={attribute.name} className="flex justify-between gap-4 tabular-nums">
+                    <span className="text-muted-foreground">{attribute.name}</span>
+                    <span>{formatBytes(attribute.bytes)}</span>
+                  </li>
+                ))}
+                <li className="flex justify-between gap-4 tabular-nums">
+                  <span className="text-muted-foreground">{t("indices")}</span>
+                  <span>{formatBytes(report.indexBytes)}</span>
+                </li>
+              </ul>
+            </div>
+          )}
 
           {report.images.length > 0 && (
             <div className="flex flex-col gap-1.5">
