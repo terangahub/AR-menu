@@ -23,11 +23,20 @@ import { applyKiriStatus } from "@/lib/scan-finalize";
 // rien supposer de leur implémentation. À enregistrer sous la forme
 // `.../api/webhooks/kiri?token=<KIRI_WEBHOOK_SECRET>`.
 //
-// Refus strict quand le jeton manque ou ne correspond pas, y compris si
-// le secret n'est pas configuré : ce webhook n'est plus indispensable
-// depuis que le suivi interroge KIRI directement (S7-08), donc le fermer
-// ne fait rien perdre, alors qu'un webhook ouvert laisse n'importe qui
+// Refus strict quand le jeton manque ou ne correspond pas, y compris si le
+// secret n'est pas configuré : un webhook ouvert laisserait n'importe qui
 // déclarer un scan réussi ou échoué.
+//
+// **Correction d'une affirmation fausse qui vivait ici** : ce commentaire
+// disait que le webhook n'était plus indispensable puisque le suivi
+// interroge KIRI directement (`S7-08`). C'est faux, et l'erreur a coûté un
+// scan. Ce suivi est **piloté par le navigateur** : il ne tourne que tant
+// que le restaurateur garde la fiche du plat ouverte. Une reconstruction
+// prend plusieurs minutes, il referme donc souvent l'onglet avant la fin,
+// et plus rien ne finalise le job. Le webhook est la seule voie qui
+// fonctionne quand personne ne regarde. Tant que `KIRI_WEBHOOK_SECRET`
+// n'est pas renseigné, cette route refuse tout, et un scan payé peut
+// rester sans modèle (voir `S9-11`).
 export const maxDuration = 60;
 
 function isAuthorized(req: NextRequest): boolean {

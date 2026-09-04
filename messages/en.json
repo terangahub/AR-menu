@@ -377,7 +377,9 @@
       "lastChecked": "{stage} · checked with the provider at {time}.",
       "stageProcessing": "Processing",
       "stageQueued": "Queued",
-      "providerUnreachable": "The provider could not be reached on the last attempt ({detail}). Retrying automatically in a few seconds."
+      "providerUnreachable": "The provider could not be reached on the last attempt ({detail}). Retrying automatically in a few seconds.",
+      "videoTooLong": "Your video runs {duration}, and KIRI refuses anything over {max}. Film a shorter one: no credit was spent.",
+      "videoTooShort": "Your video is only {duration} long, too short to reconstruct a volume. Walk slowly all the way around the dish, for at least thirty seconds or so."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -481,6 +483,34 @@
       "reset": "Discard changes",
       "error": "Your changes could not be saved. Please try again.",
       "slugPreview": "Your menu will live at:"
+    },
+    "modelReport": {
+      "title": "Where the model's weight comes from",
+      "hint": "Analyses the 3D file to say what weighs: textures, geometry, or both. Only the first few megabytes are read, the whole model is not downloaded.",
+      "run": "Analyse",
+      "rerun": "Analyse again",
+      "running": "Analysing...",
+      "error": "The analysis failed. Please try again.",
+      "file": "GLB file",
+      "usdz": "USDZ file (iPhone)",
+      "textures": "Textures",
+      "geometry": "Geometry",
+      "triangles": "Triangles",
+      "generator": "Produced by",
+      "unknown": "not stated",
+      "images": "Images inside",
+      "sizeInAr": "Size on the guest's table",
+      "sizeHint": "A 3D model is read in metres. A plausible plate is around 26 cm.",
+      "sizeWithTransform": "A node in the file carries a scale: the real size may differ from this measurement.",
+      "verdictTextures": "The weight comes mostly from textures. Lead: lower their resolution and recompress them, before touching the mesh.",
+      "verdictGeometry": "The weight comes mostly from geometry. Lead: decimate the mesh, then compress it.",
+      "verdictBoth": "Textures and geometry weigh the same order. Both jobs are needed, neither will be enough alone.",
+      "vertices": "Vertices",
+      "indexedLabel": "Indexed vertices",
+      "indexedYes": "Yes",
+      "indexedNo": "No, they are repeated",
+      "attributes": "Geometry breakdown",
+      "indices": "Indices"
     }
   },
   "Legal": {

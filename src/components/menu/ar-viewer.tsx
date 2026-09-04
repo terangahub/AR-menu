@@ -27,18 +27,22 @@ export function ArViewer({
   imageUrl,
   alt,
   onArActivated,
+  diagnostics = false,
 }: {
   glbUrl?: string | null;
   usdzUrl?: string | null;
   imageUrl?: string | null;
   alt: string;
   onArActivated?: () => void;
+  /** Affiche la cause technique d'un échec. Réservé au dashboard : un
+      convive n'a que faire d'un message d'erreur de chargement. */
+  diagnostics?: boolean;
 }) {
   const t = useTranslations("Dish");
   const ref = useRef<HTMLElement>(null);
   const [ready, setReady] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
   const [slow, setSlow] = useState(false);
   const [progress, setProgress] = useState(0);
   const [medium, setMedium] = useState<Medium>("model");
@@ -70,7 +74,22 @@ export function ArViewer({
       setProgress(1);
       readArSupport();
     };
-    const handleError = () => setFailed(true);
+    // `detail` porte le type d'échec et l'erreur d'origine. Sans elle, un
+    // modèle qui ne s'affiche pas se résume à "indisponible", ce qui
+    // n'oriente vers rien : une URL morte, un fichier tronqué et une
+    // mémoire graphique saturée se corrigent de trois façons différentes.
+    const handleError = (event: Event) => {
+      const detail = (event as CustomEvent<{ type?: string; sourceError?: unknown }>).detail;
+      const source = detail?.sourceError;
+      const reason = [
+        detail?.type,
+        source instanceof Error ? source.message : source ? String(source) : null,
+      ]
+        .filter(Boolean)
+        .join(" : ");
+      console.error("[Vorae] chargement du modèle 3D échoué", { glbUrl, detail });
+      setFailure(reason || "erreur inconnue");
+    };
     // `totalProgress` va de 0 à 1. L'afficher évite l'attente aveugle :
     // devant un écran figé, un convive conclut à une panne au bout de
     // quelques secondes, alors qu'un compteur qui monte se supporte.
@@ -100,13 +119,18 @@ export function ArViewer({
   }, [glbUrl, ready, onArActivated, readArSupport]);
 
   // Repli définitif : pas de modèle, ou un échec avéré.
-  if (!glbUrl || failed) {
+  if (!glbUrl || failure) {
     return (
       <div className="surface-menu aspect-[4/3] w-full">
         <DishImage imageUrl={imageUrl} alt={alt} />
         {glbUrl && (
           <p className="absolute inset-x-0 bottom-0 bg-background/85 px-4 py-2 text-center text-xs text-muted-foreground backdrop-blur">
             {t("arUnavailable")}
+            {diagnostics && failure && (
+              <span className="mt-0.5 block break-words font-mono text-[10px] text-destructive">
+                {failure}
+              </span>
+            )}
           </p>
         )}
       </div>

@@ -377,7 +377,9 @@
       "lastChecked": "{stage} · vérifié auprès du fournisseur à {time}.",
       "stageProcessing": "Traitement en cours",
       "stageQueued": "En file d'attente",
-      "providerUnreachable": "Le fournisseur n'a pas pu être interrogé au dernier essai ({detail}). Nouvel essai automatique dans quelques secondes."
+      "providerUnreachable": "Le fournisseur n'a pas pu être interrogé au dernier essai ({detail}). Nouvel essai automatique dans quelques secondes.",
+      "videoTooLong": "Votre vidéo dure {duration}, or KIRI refuse au-delà de {max}. Refilmez plus court : aucun crédit n'a été consommé.",
+      "videoTooShort": "Votre vidéo ne dure que {duration}, c'est trop court pour reconstruire un volume. Tournez lentement tout autour du plat, sur au moins une trentaine de secondes."
     },
     "qrcodes": {
       "title": "QR codes",
@@ -481,6 +483,34 @@
       "reset": "Annuler les modifications",
       "error": "Les modifications n'ont pas pu être enregistrées. Réessayez.",
       "slugPreview": "Votre menu sera à cette adresse :"
+    },
+    "modelReport": {
+      "title": "D'où vient le poids du modèle",
+      "hint": "Analyse le fichier 3D pour dire ce qui pèse : les textures, la géométrie, ou les deux. Seuls les premiers mégaoctets sont lus, le modèle entier n'est pas téléchargé.",
+      "run": "Analyser",
+      "rerun": "Analyser à nouveau",
+      "running": "Analyse...",
+      "error": "L'analyse a échoué. Réessayez.",
+      "file": "Fichier GLB",
+      "usdz": "Fichier USDZ (iPhone)",
+      "textures": "Textures",
+      "geometry": "Géométrie",
+      "triangles": "Triangles",
+      "generator": "Produit par",
+      "unknown": "non renseigné",
+      "images": "Images contenues",
+      "sizeInAr": "Taille sur la table du convive",
+      "sizeHint": "Un modèle 3D est interprété en mètres. Une assiette plausible fait de l'ordre de 26 cm.",
+      "sizeWithTransform": "Un noeud du fichier porte une échelle : la taille réelle peut différer de cette mesure.",
+      "verdictTextures": "Le poids vient surtout des textures. Piste : réduire leur résolution et les recompresser, avant de toucher au maillage.",
+      "verdictGeometry": "Le poids vient surtout de la géométrie. Piste : décimer le maillage, puis le compresser.",
+      "verdictBoth": "Textures et géométrie pèsent du même ordre. Les deux chantiers sont nécessaires, aucun ne suffira seul.",
+      "vertices": "Sommets",
+      "indexedLabel": "Sommets indexés",
+      "indexedYes": "Oui",
+      "indexedNo": "Non, ils sont répétés",
+      "attributes": "Détail de la géométrie",
+      "indices": "Indices"
     }
   },
   "Legal": {
