@@ -613,6 +613,23 @@ concerné - cette liste est un résumé, pas la seule source.
   le même indigo saturé** ; un `bg-card` ou un `bg-muted/30` posé sur un
   écran du menu réintroduit exactement la teinte que cette règle bannit.
   Utiliser `surface-menu`, qui l'écrase explicitement.
+- **Un modèle 3D trop lourd ne produit pas une erreur, il tue la page.**
+  Sur iPhone, ouvrir la fiche d'un plat de 86 Mo et 840 000 triangles
+  faisait afficher à Safari "A problem repeatedly occurred" : iOS tue le
+  processus de l'onglet quand le maillage décodé dépasse son budget
+  mémoire, et le JavaScript meurt avec lui, donc aucun `error` ni repli 2D
+  ne peut réagir. Règle qui en découle : **le visualiseur ne charge jamais
+  un modèle sans geste explicite** (`ArViewer`). Et sur iPhone, l'AR passe
+  directement par Quick Look avec le USDZ (`<a rel="ar">` contenant une
+  image), qui s'exécute dans un processus natif séparé et ne charge pas le
+  GLB dans l'onglet. Ne pas "simplifier" en revenant à un `<model-viewer>`
+  monté d'office : c'est ce qui faisait planter la production.
+- **model-viewer considère Chrome iOS comme compatible Quick Look.** Sa
+  détection (`IS_AR_QUICKLOOK_CANDIDATE`) accepte les navigateurs tiers
+  iOS listés (`CriOS`, `EdgiOS`, `FxiOS`, `GSA`, `DuckDuckGo`). Ce projet a
+  un temps affirmé l'inverse sans vérifier. Sur iPhone, ce sont les
+  navigateurs intégrés aux applications (Instagram, Facebook) qui ne
+  savent pas ouvrir l'AR.
 - **Le sélecteur du mode sombre de ce projet est `[data-theme="dark"]`,
   pas `.dark`.** Fixé par `tailwind.config.ts`
   (`darkMode: ["selector", '[data-theme="dark"]']`) et posé par

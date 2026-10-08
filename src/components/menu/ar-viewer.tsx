@@ -7,20 +7,55 @@ import { ArCubeIcon } from "./ar-cube-icon";
 // Fallback 2D non-négociable (section 17.1, 25) : si le modèle 3D échoue,
 // on retombe sur l'image.
 //
-// **Ce repli ne doit se déclencher que sur un échec réel.** La version
-// précédente basculait aussi au bout d'un simple délai de 25 s, et ce
+// **Ce repli ne doit se déclencher que sur un échec réel.** Une version
+// antérieure basculait aussi au bout d'un simple délai de 25 s, et ce
 // faisant démontait le visualiseur, donc **interrompait le
-// téléchargement** : un modèle qui serait arrivé à la quarantième seconde
-// était déclaré indisponible pour toujours, et le convive lisait
-// "Modèle 3D indisponible" alors que rien n'avait échoué. Sur des fichiers
-// de l'ordre de 90 Mo (voir Sprint 9), c'était le cas courant en 4G.
-//
-// Le délai ci-dessous ne coupe donc plus rien : il change seulement le
-// message, pour dire que c'est long sans prétendre que c'est cassé.
+// téléchargement** : un modèle lent devenait "indisponible" pour toujours.
+// Le délai ci-dessous ne coupe donc rien : il change seulement le message.
 const SLOW_LOAD_MS = 30000;
 
 type Medium = "model" | "photo";
 
+// Détection de AR Quick Look, recopiée de model-viewer
+// (`IS_AR_QUICKLOOK_CANDIDATE`, src/constants.ts) plutôt que réinventée :
+// sur iOS, les navigateurs tiers listés (Chrome, Edge, Firefox, appli
+// Google, DuckDuckGo) savent ouvrir Quick Look, et Safari l'annonce par
+// `relList.supports("ar")`. Les navigateurs intégrés aux applications
+// (Instagram, Facebook) n'en sont pas capables.
+function isQuickLookCandidate(): boolean {
+  const ua = navigator.userAgent;
+  const isIos =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (!isIos) return false;
+  if (/CriOS\/|EdgiOS\/|FxiOS\/|GSA\/|DuckDuckGo\//.test(ua)) return true;
+  const anchor = document.createElement("a");
+  return Boolean(anchor.relList?.supports?.("ar"));
+}
+
+// **Le modèle ne se charge plus jamais tout seul.**
+//
+// Ouvrir la fiche d'un plat dont le modèle pesait 86 Mo et 840 000
+// triangles faisait **planter l'onglet Safari** sur iPhone ("A problem
+// repeatedly occurred") : une fois décodé et monté sur le GPU, le maillage
+// dépasse le budget mémoire que iOS accorde à une page, et le système tue
+// le processus avant que le moindre JavaScript puisse réagir. Aucune
+// gestion d'erreur ne rattrape cela. Le convive qui scannait le QR code
+// tombait sur une page morte, sans même voir le prix ni les allergènes.
+//
+// La fiche affiche donc d'abord la photo, et le modèle n'est chargé que sur
+// un geste explicite. Le module model-viewer lui-même (de l'ordre du
+// mégaoctet) n'est importé qu'à ce moment-là, ce qui allège aussi la page
+// pour tous ceux qui ne le demandent jamais.
+//
+// Sur iPhone, la réalité augmentée passe **directement** par Quick Look
+// avec le fichier USDZ, exactement comme model-viewer le fait en interne
+// (`<a rel="ar">` contenant une image) : Quick Look s'exécute dans un
+// processus natif séparé, si bien que l'AR ne charge jamais le GLB dans
+// l'onglet et ne peut pas le faire planter.
+//
+// Ceci est un garde-fou, pas la solution : le vrai correctif est
+// d'alléger les modèles (Sprint 9, `S9-02`).
 export function ArViewer({
   glbUrl,
   usdzUrl,
@@ -36,23 +71,32 @@ export function ArViewer({
 }) {
   const t = useTranslations("Dish");
   const ref = useRef<HTMLElement>(null);
+  const [active, setActive] = useState(false);
   const [ready, setReady] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [slow, setSlow] = useState(false);
   const [progress, setProgress] = useState(0);
   const [medium, setMedium] = useState<Medium>("model");
+  const [quickLook, setQuickLook] = useState(false);
   // `null` tant que model-viewer n'a pas fini de sonder l'appareil : sans
   // ce troisième état, on annoncerait l'AR indisponible pendant la seconde
   // qui précède sa détection.
   const [arAvailable, setArAvailable] = useState<boolean | null>(null);
 
-  // @google/model-viewer touche `customElements`/`window` - import
-  // dynamique côté client uniquement, jamais pendant le rendu serveur.
+  // `navigator` n'existe pas au rendu serveur : la détection attend le
+  // montage. Le bouton AR apparaît donc une image plus tard, ce qui est
+  // préférable à un rendu serveur qui annoncerait une capacité supposée.
   useEffect(() => {
-    if (!glbUrl) return;
+    setQuickLook(Boolean(usdzUrl) && isQuickLookCandidate());
+  }, [usdzUrl]);
+
+  // @google/model-viewer touche `customElements`/`window` : import dynamique
+  // côté client uniquement, et seulement une fois le 3D demandé.
+  useEffect(() => {
+    if (!glbUrl || !active) return;
     import("@google/model-viewer").then(() => setReady(true));
-  }, [glbUrl]);
+  }, [glbUrl, active]);
 
   const readArSupport = useCallback(() => {
     const el = ref.current as (HTMLElement & { canActivateAR?: boolean }) | null;
@@ -99,15 +143,77 @@ export function ArViewer({
     };
   }, [glbUrl, ready, onArActivated, readArSupport]);
 
-  // Repli définitif : pas de modèle, ou un échec avéré.
-  if (!glbUrl || failed) {
+  // Même mécanique que model-viewer (`openQuickLook`, src/features/ar.ts) :
+  // Safari n'honore `rel="ar"` que si le lien contient une image. L'ancre
+  // est attachée au document le temps du clic, un lien détaché n'étant pas
+  // garanti d'être suivi.
+  function launchQuickLook() {
+    if (!usdzUrl) return;
+    const anchor = document.createElement("a");
+    anchor.setAttribute("rel", "ar");
+    anchor.setAttribute("href", usdzUrl);
+    anchor.style.display = "none";
+    anchor.appendChild(document.createElement("img"));
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    // L'activation AR alimente le taux d'activation des statistiques
+    // (section 10.3). Sans cet appel, tous les convives iPhone passant par
+    // Quick Look direct disparaîtraient de cette mesure.
+    onArActivated?.();
+  }
+
+  // Repli définitif : ni modèle ni AR possible, ou un échec avéré.
+  if ((!glbUrl && !quickLook) || failed) {
     return (
       <div className="surface-menu aspect-[4/3] w-full">
         <DishImage imageUrl={imageUrl} alt={alt} />
-        {glbUrl && (
+        {failed && (
           <p className="absolute inset-x-0 bottom-0 bg-background/85 px-4 py-2 text-center text-xs text-muted-foreground backdrop-blur">
             {t("arUnavailable")}
           </p>
+        )}
+      </div>
+    );
+  }
+
+  // État initial : la photo, et des gestes explicites. Rien n'est chargé.
+  if (!active) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="surface-menu aspect-[4/3] w-full">
+          <DishImage imageUrl={imageUrl} alt={alt} />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {quickLook && (
+            <button
+              type="button"
+              onClick={launchQuickLook}
+              className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background shadow-lg transition-opacity hover:opacity-90"
+            >
+              <ArCubeIcon className="h-4 w-4" />
+              {t("viewInAr")}
+            </button>
+          )}
+          {glbUrl && (
+            <button
+              type="button"
+              onClick={() => setActive(true)}
+              className={
+                quickLook
+                  ? "rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-foreground/40"
+                  : "inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background shadow-lg transition-opacity hover:opacity-90"
+              }
+            >
+              {!quickLook && <ArCubeIcon className="h-4 w-4" />}
+              {t("view3d")}
+            </button>
+          )}
+        </div>
+
+        {glbUrl && (
+          <p className="text-center text-xs text-muted-foreground/80">{t("loadOnDemandHint")}</p>
         )}
       </div>
     );
@@ -124,22 +230,24 @@ export function ArViewer({
   return (
     <div className="flex flex-col gap-3">
       {/* Le visualiseur est masqué en CSS et non démonté quand le convive
-          revient à la photo : un modèle issu de photogrammétrie pèse
-          plusieurs dizaines de mégaoctets, le démonter le ferait
-          retélécharger à chaque aller-retour entre les deux onglets. */}
+          revient à la photo : le démonter ferait retélécharger le modèle à
+          chaque aller-retour entre les deux onglets. */}
       <div
         className={`surface-menu aspect-[4/3] w-full ${showingPhoto ? "hidden" : ""}`}
         aria-hidden={showingPhoto}
       >
         <model-viewer
           ref={ref}
-          src={glbUrl}
+          src={glbUrl ?? undefined}
           ios-src={usdzUrl ?? undefined}
           alt={alt}
           ar
           ar-modes="webxr scene-viewer quick-look"
           camera-controls
           auto-rotate
+          // `eager` : le chargement a été demandé explicitement, inutile
+          // d'attendre que model-viewer constate la visibilité du cadre.
+          loading="eager"
           camera-orbit="0deg 75deg 170%"
           min-camera-orbit="auto auto 90%"
           max-camera-orbit="auto auto 400%"
@@ -198,12 +306,12 @@ export function ArViewer({
           ) : (
             <>
               <p className="text-xs text-muted-foreground">{t("rotateHint")}</p>
-              {/* Le bouton d'activation est masqué par model-viewer quand
-                  l'appareil ne peut pas lancer l'AR, et le convive se
-                  retrouve alors devant une absence qu'il ne s'explique
-                  pas : sur iPhone, seul Safari sait ouvrir Quick Look,
-                  Chrome n'en est pas capable. Le dire vaut mieux que de ne
-                  rien afficher. */}
+              {/* model-viewer masque son bouton AR quand l'appareil ne peut
+                  pas lancer l'AR, ce qui laisse le convive devant une
+                  absence inexpliquée. Sur iPhone, cela arrive surtout dans
+                  les navigateurs intégrés aux applications (Instagram,
+                  Facebook), où ouvrir le menu dans Safari règle le
+                  problème : c'est ce que dit le message. */}
               {arAvailable === false && (
                 <p className="max-w-sm text-xs leading-relaxed text-muted-foreground/70">
                   {t("arNotSupported")}

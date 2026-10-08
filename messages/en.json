@@ -222,7 +222,9 @@
     "mediumPhoto": "Photo",
     "loadingModel": "Loading the 3D model... {percent}%",
     "loadingSlow": "This dish is a heavy file, loading continues. The photo stays on screen meanwhile.",
-    "arNotSupported": "Augmented reality is not available in this browser. On iPhone, open this menu in Safari; on Android, in Chrome."
+    "arNotSupported": "Augmented reality is not available in this browser. On iPhone, open this menu in Safari; on Android, in Chrome.",
+    "view3d": "View in 3D",
+    "loadOnDemandHint": "The 3D model is a large file: it only loads when you ask for it."
   },
   "Dashboard": {
     "noRestaurant": "No restaurant linked to this account.",
