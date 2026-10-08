@@ -222,7 +222,9 @@
     "mediumPhoto": "Photo",
     "loadingModel": "Chargement du modèle 3D... {percent} %",
     "loadingSlow": "Ce plat est lourd, le chargement continue. La photo reste affichée en attendant.",
-    "arNotSupported": "La vue en réalité augmentée n'est pas disponible dans ce navigateur. Sur iPhone, ouvrez ce menu dans Safari ; sur Android, dans Chrome."
+    "arNotSupported": "La vue en réalité augmentée n'est pas disponible dans ce navigateur. Sur iPhone, ouvrez ce menu dans Safari ; sur Android, dans Chrome.",
+    "view3d": "Voir en 3D",
+    "loadOnDemandHint": "Le modèle 3D est volumineux : il ne se charge que si vous le demandez."
   },
   "Dashboard": {
     "noRestaurant": "Aucun restaurant associé à ce compte.",
