@@ -54,6 +54,11 @@ export async function POST(req: NextRequest) {
       metadata: { restaurantId: restaurant.id, tier, cycle },
     },
     metadata: { restaurantId: restaurant.id, tier, cycle },
+    // Entrée générique `/dashboard`, pas `/<slug>/dashboard` : Stripe peut
+    // renvoyer ici bien après l'ouverture de la session, et si l'adresse du
+    // restaurant a changé entre-temps, un slug gravé dans l'URL ferait perdre
+    // la page Facturation. L'entrée résout toujours le slug actuel du compte
+    // et conserve `?checkout=...`.
     success_url: `${appUrl}/${locale}/dashboard/billing?checkout=success`,
     cancel_url: `${appUrl}/${locale}/dashboard/billing?checkout=cancelled`,
   });

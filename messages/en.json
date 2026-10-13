@@ -474,13 +474,15 @@
       "slugInvalid": "Only unaccented letters, digits and hyphens.",
       "slugTaken": "That address is already taken by another restaurant. Pick a different one.",
       "slugWarningTitle": "Your printed QR codes will point to a new address",
-      "slugWarningBody": "QR codes you reprint will point to the new address. The ones already on your tables will keep working: they are redirected automatically. Reprint them when you can.",
+      "slugWarningBody": "QR codes you reprint will point to the new address. The ones already on your tables will keep working: they are redirected automatically. Reprint them when you can. Your admin address changes too; the old one will redirect you to the new one.",
       "save": "Save",
       "saving": "Saving...",
       "saved": "Changes saved.",
       "reset": "Discard changes",
       "error": "Your changes could not be saved. Please try again.",
-      "slugPreview": "Your menu will live at:"
+      "slugPreview": "Your menu will live at:",
+      "slugAdminPreview": "Your admin:",
+      "slugReserved": "This address is reserved by Vorae. Pick a different one."
     }
   },
   "Legal": {

@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { EmptyState, Panel } from "@/components/dashboard/ui";
 import { DeleteButton } from "@/components/dashboard/delete-button";
+import { useDashboardPath } from "@/components/dashboard/use-dashboard-path";
 
 export type QrCodeItem = {
   id: string;
@@ -16,6 +17,7 @@ export type QrCodeItem = {
 
 export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
   const t = useTranslations("Dashboard.qrcodes");
+  const dash = useDashboardPath();
   const router = useRouter();
   const [qrCodes, setQrCodes] = useState(initial);
   const [tableNumber, setTableNumber] = useState("");
@@ -106,7 +108,7 @@ export function QrCodeList({ qrCodes: initial }: { qrCodes: QrCodeItem[] }) {
                   <a href={`/api/qrcodes/${qr.id}/png`}>{t("download")}</a>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <Link href={`/dashboard/qrcodes/${qr.id}/print`}>{t("print")}</Link>
+                  <Link href={dash(`/qrcodes/${qr.id}/print`)}>{t("print")}</Link>
                 </Button>
                 <DeleteButton label={t("delete")} onClick={() => handleDelete(qr)} />
               </div>

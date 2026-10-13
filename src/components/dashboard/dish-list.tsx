@@ -11,6 +11,7 @@ import { GridViewIcon, ListViewIcon } from "@/components/menu/menu-icons";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { RowMenu, RowMenuItem } from "@/components/dashboard/row-menu";
 import { EditIcon, TrashIcon } from "@/components/dashboard/nav-icons";
+import { useDashboardPath } from "@/components/dashboard/use-dashboard-path";
 
 export type DashboardDish = {
   id: string;
@@ -39,6 +40,7 @@ export function DishList({
   locale: string;
 }) {
   const t = useTranslations("Dashboard.dishes");
+  const dash = useDashboardPath();
   const router = useRouter();
   const [dishes, setDishes] = useState(initialDishes);
   const [search, setSearch] = useState("");
@@ -180,7 +182,7 @@ export function DishList({
           </div>
 
           <Button asChild className="ml-auto shrink-0 sm:ml-0">
-            <Link href="/dashboard/dishes/new">{t("addDish")}</Link>
+            <Link href={dash("/dishes/new")}>{t("addDish")}</Link>
           </Button>
         </div>
       </div>
@@ -199,7 +201,7 @@ export function DishList({
             title={t("emptyFirst")}
             description={t("emptyFirstHint")}
             actionLabel={t("addDish")}
-            actionHref="/dashboard/dishes/new"
+            actionHref={dash("/dishes/new")}
           />
         )
       ) : view === "list" ? (
@@ -257,6 +259,7 @@ type ItemProps = {
 // redeviennent des boutons dès qu'il y a la place.
 function DishRow({ dish, name, category, onToggle, onDelete, deleting }: ItemProps) {
   const t = useTranslations("Dashboard.dishes");
+  const dash = useDashboardPath();
   const router = useRouter();
 
   const meta = [category, `${dish.price.toFixed(2)} $`].filter(Boolean).join(" · ");
@@ -268,7 +271,7 @@ function DishRow({ dish, name, category, onToggle, onDelete, deleting }: ItemPro
       }`}
     >
       <Link
-        href={`/dashboard/dishes/${dish.id}`}
+        href={dash(`/dishes/${dish.id}`)}
         className="flex min-w-0 flex-1 items-center gap-3 transition-opacity hover:opacity-75"
       >
         <Thumbnail imageUrl={dish.imageUrl} name={name} className="h-11 w-11" />
@@ -302,7 +305,7 @@ function DishRow({ dish, name, category, onToggle, onDelete, deleting }: ItemPro
 
       <div className="hidden shrink-0 items-center gap-2 md:flex">
         <Button asChild variant="outline" size="sm">
-          <Link href={`/dashboard/dishes/${dish.id}/edit`}>{t("edit")}</Link>
+          <Link href={dash(`/dishes/${dish.id}/edit`)}>{t("edit")}</Link>
         </Button>
         <DeleteButton label={t("delete")} onClick={onDelete} disabled={deleting} />
       </div>
@@ -314,7 +317,7 @@ function DishRow({ dish, name, category, onToggle, onDelete, deleting }: ItemPro
               <RowMenuItem
                 onClick={() => {
                   close();
-                  router.push(`/dashboard/dishes/${dish.id}/edit`);
+                  router.push(dash(`/dishes/${dish.id}/edit`));
                 }}
               >
                 <EditIcon className="h-4 w-4 shrink-0" />
@@ -343,11 +346,12 @@ function DishRow({ dish, name, category, onToggle, onDelete, deleting }: ItemPro
 // qu'une liste de lignes ne montre pas.
 function DishCard({ dish, name, category, onToggle, onDelete, deleting }: ItemProps) {
   const t = useTranslations("Dashboard.dishes");
+  const dash = useDashboardPath();
 
   return (
     <div className="surface-panel flex h-full flex-col overflow-hidden">
       <Link
-        href={`/dashboard/dishes/${dish.id}`}
+        href={dash(`/dishes/${dish.id}`)}
         className="group relative block aspect-[4/3] w-full overflow-hidden"
       >
         <Thumbnail
@@ -369,7 +373,7 @@ function DishCard({ dish, name, category, onToggle, onDelete, deleting }: ItemPr
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <Link
-          href={`/dashboard/dishes/${dish.id}`}
+          href={dash(`/dishes/${dish.id}`)}
           className="flex min-w-0 flex-col gap-0.5 transition-opacity hover:opacity-75"
         >
           <span className="truncate font-medium">{name}</span>
@@ -386,7 +390,7 @@ function DishCard({ dish, name, category, onToggle, onDelete, deleting }: ItemPr
             onChange={onToggle}
           />
           <Button asChild variant="outline" size="sm" className="ml-auto">
-            <Link href={`/dashboard/dishes/${dish.id}/edit`}>{t("edit")}</Link>
+            <Link href={dash(`/dishes/${dish.id}/edit`)}>{t("edit")}</Link>
           </Button>
           <DeleteButton label={t("delete")} onClick={onDelete} disabled={deleting} />
         </div>

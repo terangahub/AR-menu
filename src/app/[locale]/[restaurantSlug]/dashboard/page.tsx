@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { getOverviewStats } from "@/lib/analytics";
 import { PageHeader, Panel, StatTile } from "@/components/dashboard/ui";
+import { dashboardPath } from "@/lib/dashboard-path";
 
 // Vue d'ensemble (section 10.1) : scans avec variation, plat le plus vu de
 // la semaine, taux d'activation AR, alerte modèles 3D manquants.
@@ -24,6 +25,10 @@ export default async function DashboardOverviewPage({
   const stats = await getOverviewStats(restaurantUser.restaurantId, locale);
   const missing = stats.dishesMissingModel;
 
+  // Liens construits sur le slug du compte connecté, jamais sur celui de
+  // l'URL : c'est le compte qui fait foi (voir lib/dashboard-path.ts).
+  const dash = (path = "") => dashboardPath(restaurantUser.restaurant.slug, path);
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
@@ -31,7 +36,7 @@ export default async function DashboardOverviewPage({
         description={t("subtitle", { restaurant: restaurantUser.restaurant.name })}
         actions={
           <Link
-            href="/dashboard/analytics"
+            href={dash("/analytics")}
             className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
           >
             {t("viewAnalytics")}
@@ -104,7 +109,7 @@ export default async function DashboardOverviewPage({
             {missing.map((d) => (
               <li key={d.id}>
                 <Link
-                  href={`/dashboard/dishes/${d.id}`}
+                  href={dash(`/dishes/${d.id}`)}
                   className="flex items-center justify-between gap-3 py-2.5 text-sm transition-colors hover:text-foreground"
                 >
                   <span className="truncate">{d.name}</span>

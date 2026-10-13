@@ -4,6 +4,7 @@ import { getCurrentRestaurantUser } from "@/lib/auth";
 import { getGlobalDishTable } from "@/lib/analytics";
 import { AnalyticsTable } from "@/components/dashboard/analytics-table";
 import { EmptyState, PageHeader } from "@/components/dashboard/ui";
+import { dashboardPath } from "@/lib/dashboard-path";
 
 // Vue globale analytics (section 10.3) : tableau triable + export CSV.
 export default async function DashboardAnalyticsPage({
@@ -21,6 +22,10 @@ export default async function DashboardAnalyticsPage({
   }
 
   const rows = await getGlobalDishTable(restaurantUser.restaurantId, locale);
+
+  // Liens construits sur le slug du compte connecté, jamais sur celui de
+  // l'URL : c'est le compte qui fait foi (voir lib/dashboard-path.ts).
+  const dash = (path = "") => dashboardPath(restaurantUser.restaurant.slug, path);
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,7 +49,7 @@ export default async function DashboardAnalyticsPage({
           title={t("noData")}
           description={t("noDataHint")}
           actionLabel={t("goToQrCodes")}
-          actionHref="/dashboard/qrcodes"
+          actionHref={dash("/qrcodes")}
         />
       ) : (
         <AnalyticsTable rows={rows} />

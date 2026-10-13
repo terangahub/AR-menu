@@ -474,13 +474,15 @@
       "slugInvalid": "Uniquement des lettres sans accent, des chiffres et des tirets.",
       "slugTaken": "Cette adresse est déjà prise par un autre restaurant. Choisissez-en une autre.",
       "slugWarningTitle": "Vos QR codes déjà imprimés vont changer d'adresse",
-      "slugWarningBody": "Les QR codes que vous réimprimerez pointeront vers la nouvelle adresse. Ceux déjà collés sur vos tables continueront de fonctionner : ils seront redirigés automatiquement. Réimprimez-les quand vous le pourrez.",
+      "slugWarningBody": "Les QR codes que vous réimprimerez pointeront vers la nouvelle adresse. Ceux déjà collés sur vos tables continueront de fonctionner : ils seront redirigés automatiquement. Réimprimez-les quand vous le pourrez. L'adresse de votre administration change aussi ; l'ancienne vous redirigera vers la nouvelle.",
       "save": "Enregistrer",
       "saving": "Enregistrement...",
       "saved": "Modifications enregistrées.",
       "reset": "Annuler les modifications",
       "error": "Les modifications n'ont pas pu être enregistrées. Réessayez.",
-      "slugPreview": "Votre menu sera à cette adresse :"
+      "slugPreview": "Votre menu sera à cette adresse :",
+      "slugAdminPreview": "Votre administration :",
+      "slugReserved": "Cette adresse est réservée par Vorae. Choisissez-en une autre."
     }
   },
   "Legal": {

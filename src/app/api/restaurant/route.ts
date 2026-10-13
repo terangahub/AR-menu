@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { routing } from "@/i18n/routing";
 import { qrTargetPath } from "@/lib/qr-target";
+import { isReservedSlug } from "@/lib/reserved-slugs";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,13 @@ export async function PATCH(req: NextRequest) {
   const restaurantId = restaurantUser.restaurantId;
   const slugChanged = slug !== restaurantUser.restaurant.slug;
   const localeChanged = defaultLocale !== restaurantUser.restaurant.defaultLocale;
+
+  // Un slug réservé occuperait l'adresse d'une page fixe du site (voir
+  // lib/reserved-slugs.ts). Contrôlé seulement quand il change, pour ne pas
+  // bloquer l'enregistrement des autres champs d'un restaurant existant.
+  if (slugChanged && isReservedSlug(slug)) {
+    return NextResponse.json({ error: "slug_reserved" }, { status: 400 });
+  }
 
   try {
     // Toutes les écritures dans la même transaction : une adresse de menu

@@ -1,15 +1,24 @@
 import { UserButton } from "@clerk/nextjs";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { getCurrentRestaurantUser } from "@/lib/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleSwitch } from "@/components/locale-switch";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { ExternalIcon } from "@/components/dashboard/nav-icons";
+import { dashboardPath } from "@/lib/dashboard-path";
 
-// Dashboard restaurateur (section 10) - protégé par le middleware Clerk
-// (src/middleware.ts) sur /:locale/dashboard(.*).
+// Dashboard restaurateur (section 10), sous `/<slug>/dashboard` - protégé
+// par le middleware Clerk (src/middleware.ts).
+//
+// **Le slug de l'URL n'est pas une autorisation.** Le restaurant affiché est
+// toujours celui du compte connecté, et chaque page charge ses données à
+// partir de ce compte. Si le slug de l'URL n'est pas celui du compte (lien
+// d'un autre restaurant, favori d'avant un changement d'adresse, faute de
+// frappe), on redirige vers l'administration du compte : on ne répond
+// jamais "ce restaurant existe mais il n'est pas à vous", ce qui servirait
+// à deviner quels restaurants utilisent Vorae.
 //
 // force-dynamic (hérité par toutes les routes filles) : contenu propre à
 // chaque utilisateur connecté - sans ça, Next pré-génère ces pages une
@@ -19,9 +28,12 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string; restaurantSlug: string }>;
 }) {
+  const { locale, restaurantSlug } = await params;
   const t = await getTranslations("Dashboard");
   const restaurantUser = await getCurrentRestaurantUser();
 
@@ -34,6 +46,10 @@ export default async function DashboardLayout({
   }
 
   const { name, city, slug, logoUrl } = restaurantUser.restaurant;
+
+  if (restaurantSlug !== slug) {
+    redirect({ href: dashboardPath(slug), locale });
+  }
 
   const labels = {
     overview: t("nav.overview"),
@@ -72,7 +88,7 @@ export default async function DashboardLayout({
     <div className="flex min-h-screen flex-col lg:flex-row">
       <aside className="hidden w-[248px] shrink-0 flex-col justify-between border-r border-border/70 p-4 lg:flex print:hidden">
         <div className="flex flex-col gap-6">
-          <Link href="/dashboard" className="px-2 font-heading text-lg tracking-tight">
+          <Link href={dashboardPath(slug)} className="px-2 font-heading text-lg tracking-tight">
             Vorae
           </Link>
           <div className="px-1">{identity}</div>

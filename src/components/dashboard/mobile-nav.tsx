@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { usePathname } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
+import { useDashboardPath } from "./use-dashboard-path";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleSwitch } from "@/components/locale-switch";
 import { CloseIcon } from "@/components/menu/menu-icons";
@@ -23,16 +24,16 @@ type NavKey = "overview" | "dishes" | "qrcodes" | "analytics" | "billing" | "set
 // une rubrique de travail. Le gabarit de référence le place lui aussi en
 // bas, séparé par un filet, et cette séparation dit quelque chose de vrai
 // sur la nature de l'entrée.
-const MAIN: { key: NavKey; href: string; Icon: (p: { className?: string }) => JSX.Element }[] = [
-  { key: "overview", href: "/dashboard", Icon: OverviewIcon },
-  { key: "dishes", href: "/dashboard/dishes", Icon: DishesIcon },
-  { key: "qrcodes", href: "/dashboard/qrcodes", Icon: QrIcon },
-  { key: "analytics", href: "/dashboard/analytics", Icon: AnalyticsIcon },
-  { key: "billing", href: "/dashboard/billing", Icon: BillingIcon },
+const MAIN: { key: NavKey; path: string; Icon: (p: { className?: string }) => JSX.Element }[] = [
+  { key: "overview", path: "", Icon: OverviewIcon },
+  { key: "dishes", path: "/dishes", Icon: DishesIcon },
+  { key: "qrcodes", path: "/qrcodes", Icon: QrIcon },
+  { key: "analytics", path: "/analytics", Icon: AnalyticsIcon },
+  { key: "billing", path: "/billing", Icon: BillingIcon },
 ];
 
-function isActive(pathname: string, href: string): boolean {
-  if (href === "/dashboard") return pathname === "/dashboard";
+function isActive(pathname: string, href: string, exact: boolean): boolean {
+  if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -74,6 +75,7 @@ export function DashboardMobileNav({
   restaurant: { name: string; city: string; logoUrl: string | null };
 }) {
   const pathname = usePathname();
+  const dash = useDashboardPath();
   const [open, setOpen] = useState(false);
 
   // Fermeture au changement de page : sans ça, le tiroir resterait ouvert
@@ -163,8 +165,9 @@ export function DashboardMobileNav({
             </div>
 
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pt-2">
-              {MAIN.map(({ key, href, Icon }) => {
-                const active = isActive(pathname, href);
+              {MAIN.map(({ key, path, Icon }) => {
+                const href = dash(path);
+                const active = isActive(pathname, href, path === "");
                 return (
                   <Link
                     key={key}
@@ -181,10 +184,10 @@ export function DashboardMobileNav({
 
             <div className="flex flex-col gap-1 border-t border-border/70 px-3 py-3">
               <Link
-                href="/dashboard/settings"
-                aria-current={isActive(pathname, "/dashboard/settings") ? "page" : undefined}
+                href={dash("/settings")}
+                aria-current={isActive(pathname, dash("/settings"), false) ? "page" : undefined}
                 className={`nav-item py-2.5 ${
-                  isActive(pathname, "/dashboard/settings") ? "nav-item-active" : ""
+                  isActive(pathname, dash("/settings"), false) ? "nav-item-active" : ""
                 }`}
               >
                 <SettingsIcon className="h-[18px] w-[18px] shrink-0" />

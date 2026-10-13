@@ -7,6 +7,7 @@ import { localizedDishName } from "@/lib/dish-locale";
 import { Link } from "@/i18n/navigation";
 import { DishTrendChart } from "@/components/dashboard/dish-trend-chart";
 import { PageHeader, Panel, StatTile } from "@/components/dashboard/ui";
+import { dashboardPath } from "@/lib/dashboard-path";
 
 // Analytics par plat, individuellement (section 10.3) : scans par période,
 // taux d'activation AR, tendance, heure la plus consultée.
@@ -32,10 +33,14 @@ export default async function DishAnalyticsPage({
 
   const analytics = await getDishAnalytics(restaurantUser.restaurantId, dish.id);
 
+  // Liens construits sur le slug du compte connecté, jamais sur celui de
+  // l'URL : c'est le compte qui fait foi (voir lib/dashboard-path.ts).
+  const dash = (path = "") => dashboardPath(restaurantUser.restaurant.slug, path);
+
   return (
     <div className="flex flex-col gap-6">
       <Link
-        href="/dashboard/analytics"
+        href={dash("/analytics")}
         className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <span aria-hidden>&larr;</span>

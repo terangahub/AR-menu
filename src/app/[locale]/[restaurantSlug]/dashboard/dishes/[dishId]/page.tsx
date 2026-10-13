@@ -8,6 +8,7 @@ import { ArViewer } from "@/components/menu/ar-viewer";
 import { DishMedia } from "@/components/dashboard/dish-media";
 import { DishScan } from "@/components/dashboard/dish-scan";
 import { Panel } from "@/components/dashboard/ui";
+import { dashboardPath } from "@/lib/dashboard-path";
 
 // Fiche plat côté dashboard : ce que contient le plat, son visuel, son
 // modèle 3D et les actions possibles, réunis au même endroit. La liste
@@ -56,12 +57,16 @@ export default async function DashboardDishPage({
     { label: t("ar"), value: dish.isArReady ? tList("arReady") : tList("noModel") },
   ];
 
+  // Liens construits sur le slug du compte connecté, jamais sur celui de
+  // l'URL : c'est le compte qui fait foi (voir lib/dashboard-path.ts).
+  const dash = (path = "") => dashboardPath(restaurantUser.restaurant.slug, path);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-col gap-1.5">
           <Link
-            href="/dashboard/dishes"
+            href={dash("/dishes")}
             className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <span aria-hidden>&larr;</span>
@@ -73,10 +78,10 @@ export default async function DashboardDishPage({
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link href={`/dashboard/dishes/${dish.id}/edit`}>{tList("edit")}</Link>
+            <Link href={dash(`/dishes/${dish.id}/edit`)}>{tList("edit")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
-            <Link href={`/dashboard/analytics/${dish.id}`}>{t("analytics")}</Link>
+            <Link href={dash(`/analytics/${dish.id}`)}>{t("analytics")}</Link>
           </Button>
           <Button asChild variant="ghost" size="sm">
             <Link href={`/${dish.restaurant.slug}/dishes/${dish.id}`}>{t("publicPage")}</Link>

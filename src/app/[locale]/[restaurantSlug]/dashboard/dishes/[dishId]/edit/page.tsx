@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { DishForm, type DishFormValues } from "@/components/dashboard/dish-form";
 import { getExistingCategories } from "@/lib/dish-categories";
 import { PageHeader } from "@/components/dashboard/ui";
+import { dashboardPath } from "@/lib/dashboard-path";
 
 export default async function EditDishPage({
   params,
@@ -45,12 +46,16 @@ export default async function EditDishPage({
     allergenCodes: dish.allergens.map((a) => a.allergen.code),
   };
 
+  // Liens construits sur le slug du compte connecté, jamais sur celui de
+  // l'URL : c'est le compte qui fait foi (voir lib/dashboard-path.ts).
+  const dash = (path = "") => dashboardPath(restaurantUser.restaurant.slug, path);
+
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       {/* Les médias et le scan 3D vivent sur la fiche du plat, pas ici :
           cette page ne sert qu'à modifier les champs. */}
       <Link
-        href={`/dashboard/dishes/${dish.id}`}
+        href={dash(`/dishes/${dish.id}`)}
         className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <span aria-hidden>&larr;</span>
