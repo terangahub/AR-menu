@@ -29,6 +29,11 @@ export async function POST(req: NextRequest) {
   const stripe = getStripe();
   const session = await stripe.billingPortal.sessions.create({
     customer: restaurant.stripeCustomerId,
+    // Entrée générique `/dashboard`, pas `/<slug>/dashboard` : Stripe peut
+    // renvoyer ici bien après l'ouverture de la session, et si l'adresse du
+    // restaurant a changé entre-temps, un slug gravé dans l'URL ferait perdre
+    // la page Facturation. L'entrée résout toujours le slug actuel du compte
+    // et conserve `?checkout=...`.
     return_url: `${appUrl}/${locale}/dashboard/billing`,
   });
 

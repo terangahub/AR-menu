@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { useDashboardPath } from "@/components/dashboard/use-dashboard-path";
 
 type Allergen = { code: string; nameFr: string; nameEn: string };
 type CategoryOption = { category: string; categoryEn: string | null };
@@ -54,6 +55,7 @@ export function DishForm({
   existingCategories: CategoryOption[];
 }) {
   const t = useTranslations("Dashboard.dishForm");
+  const dash = useDashboardPath();
   const locale = useLocale();
   const router = useRouter();
   const [values, setValues] = useState<DishFormValues>({
@@ -135,9 +137,9 @@ export function DishForm({
       // photo et le modèle 3D - pas de champ fichier avant que le plat
       // n'existe (il faut son id pour les uploads).
       const created = (await res.json()) as { id: string };
-      router.push(`/dashboard/dishes/${created.id}/edit`);
+      router.push(dash(`/dishes/${created.id}/edit`));
     } else {
-      router.push("/dashboard/dishes");
+      router.push(dash("/dishes"));
     }
     router.refresh();
   }
@@ -320,7 +322,7 @@ export function DishForm({
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/dishes")}
+          onClick={() => router.push(dash("/dishes"))}
         >
           {t("cancel")}
         </Button>

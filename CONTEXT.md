@@ -65,13 +65,15 @@ src/
       page.tsx                   ← landing marketing (section 12, direction reflect.app - voir section 4)
       [restaurantSlug]/          ← menu public 2D (F02)
         dishes/[dishId]/         ← fiche plat + AR (F03-F05)
-      dashboard/                 ← protégé par middleware Clerk, force-dynamic
-        page.tsx                 ← vue d'ensemble (10.1)
-        dishes/                  ← CRUD plats (10.2)
-        qrcodes/                 ← génération QR (10.4)
-        analytics/               ← tableau global triable + export CSV (10.3)
-        analytics/[dishId]/      ← analytics par plat : tendance, heure de pointe (10.3)
-        billing/                 ← palier actuel, factures, checkout/portail Stripe (10.6)
+        dashboard/               ← administration du restaurant (/fr/<slug>/dashboard), protégé par middleware Clerk, force-dynamic
+          page.tsx               ← vue d'ensemble (10.1)
+          dishes/                ← CRUD plats (10.2)
+          qrcodes/               ← génération QR (10.4)
+          analytics/             ← tableau global triable + export CSV (10.3)
+          analytics/[dishId]/    ← analytics par plat : tendance, heure de pointe (10.3)
+          billing/               ← palier actuel, factures, checkout/portail Stripe (10.6)
+          settings/              ← nom, logo, adresse du menu
+      dashboard/[[...rest]]/     ← porte d'entrée générique, redirige vers /<slug>/dashboard du compte connecté
     api/
       menu/[restaurantSlug]/     ← GET menu public
       dishes/                    ← GET liste (dashboard) / POST création
@@ -661,6 +663,27 @@ concerné - cette liste est un résumé, pas la seule source.
    simplification Sprint 2 : fonctionne tant qu'il n'y a qu'un seul
    restaurant. À remplacer par un vrai flux d'invitation (section 10.7)
    avant d'ouvrir à plusieurs restaurants/organisations.
+
+**Adresse d'administration par restaurant.** Le dashboard vit sous
+`/<langue>/<slug>/dashboard` (`src/app/[locale]/[restaurantSlug]/dashboard/`).
+Règles à ne jamais casser :
+
+- **Le slug de l'adresse n'autorise rien.** Aucune page du dashboard ne
+  doit charger de données depuis `params.restaurantSlug`. Tout passe par
+  `getCurrentRestaurantUser()`, donc par le compte connecté. Le layout
+  compare simplement le slug de l'adresse à celui du compte et redirige
+  vers le bon s'ils diffèrent, sans dire si l'autre restaurant existe.
+- Les liens se construisent avec `dashboardPath(slug, chemin)`
+  (`src/lib/dashboard-path.ts`), ou `useDashboardPath()` côté client. Côté
+  serveur, toujours avec le slug du **compte**, pas celui de l'adresse.
+- `/<langue>/dashboard` reste une porte d'entrée générique
+  (`dashboard/[[...rest]]`). Les retours Stripe et les redirections de
+  garde y pointent volontairement : le slug a pu changer entre-temps.
+- Un segment statique sous `[locale]` passe avant `[restaurantSlug]` : un
+  restaurant dont le slug vaudrait `privacy` ou `superadmin` serait
+  inaccessible. **Toute nouvelle page statique sous `[locale]` doit être
+  ajoutée à `RESERVED_SLUGS`** (`src/lib/reserved-slugs.ts`) ; le test
+  `reserved-slugs.test.ts` échoue sinon.
 
 ---
 

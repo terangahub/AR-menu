@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { GlobalDishRow } from "@/lib/analytics";
+import { useDashboardPath } from "@/components/dashboard/use-dashboard-path";
 
 type SortKey = "name" | "scans30d" | "arRate" | "trend7dPct";
 
@@ -19,6 +20,7 @@ type SortKey = "name" | "scans30d" | "arRate" | "trend7dPct";
 // catégories (des plats) qui n'ont aucun ordre naturel.
 export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
   const t = useTranslations("Dashboard.analytics");
+  const dash = useDashboardPath();
   const [sortKey, setSortKey] = useState<SortKey>("scans30d");
   const [sortDesc, setSortDesc] = useState(true);
 
@@ -68,7 +70,7 @@ export function AnalyticsTable({ rows }: { rows: GlobalDishRow[] }) {
         {sorted.map((row) => (
           <li key={row.id}>
             <Link
-              href={`/dashboard/analytics/${row.id}`}
+              href={dash(`/analytics/${row.id}`)}
               className="flex flex-col gap-2.5 p-4 transition-colors hover:bg-foreground/[0.03]"
             >
               <span className="truncate font-medium">{row.name}</span>

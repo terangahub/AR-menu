@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { dashboardPath } from "@/lib/dashboard-path";
+import { isReservedSlug } from "@/lib/reserved-slugs";
 import { Button } from "@/components/ui/button";
 
 export type RestaurantSettingsValues = {
@@ -68,8 +70,12 @@ export function RestaurantSettings({
     setSaved(false);
   }
 
-  const slugIsValid = SLUG_PATTERN.test(values.slug);
   const slugChanged = values.slug !== savedSlug;
+  // Signalé à la frappe plutôt qu'au retour du serveur : l'API refuse de
+  // toute façon, mais le restaurateur doit comprendre pourquoi avant
+  // d'appuyer sur Enregistrer.
+  const slugReserved = slugChanged && isReservedSlug(values.slug);
+  const slugIsValid = SLUG_PATTERN.test(values.slug) && !slugReserved;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,7 +99,13 @@ export function RestaurantSettings({
       const body = (await res.json().catch(() => null)) as { error?: string } | null;
       // Le conflit d'adresse est le seul cas que le restaurateur peut
       // corriger lui-même : il mérite son propre message, pas le générique.
-      setError(body?.error === "slug_taken" ? t("slugTaken") : t("error"));
+      setError(
+        body?.error === "slug_taken"
+          ? t("slugTaken")
+          : body?.error === "slug_reserved"
+            ? t("slugReserved")
+            : t("error")
+      );
       setSaving(false);
       return;
     }
@@ -101,6 +113,15 @@ export function RestaurantSettings({
     setSavedSlug(values.slug);
     setSaving(false);
     setSaved(true);
+
+    // L'adresse de l'administration contient le slug : s'il vient de
+    // changer, la page courante porte l'ancien. On rejoint la nouvelle
+    // adresse plutôt que de laisser le layout rediriger vers l'accueil du
+    // dashboard, ce qui ferait quitter l'écran Paramètres sans raison.
+    if (slugChanged) {
+      router.replace(dashboardPath(values.slug, "/settings"));
+      return;
+    }
     // Le nom du restaurant s'affiche dans l'en-tête du dashboard, rendu
     // côté serveur : sans rafraîchissement, il resterait l'ancien.
     router.refresh();
@@ -270,15 +291,28 @@ export function RestaurantSettings({
           />
         </Field>
 
-        <p className="-mt-2 text-xs text-muted-foreground">
-          {t("slugPreview")}{" "}
-          <span className="break-all font-medium text-foreground">
-            {menuBaseUrl}/{values.slug}
-          </span>
-        </p>
+        {/* Les deux adresses qui découlent du slug, l'une sous l'autre :
+            celle que voient les convives, et celle de l'administration. */}
+        <div className="-mt-2 flex flex-col gap-1 text-xs text-muted-foreground">
+          <p>
+            {t("slugPreview")}{" "}
+            <span className="break-all font-medium text-foreground">
+              {menuBaseUrl}/{values.slug}
+            </span>
+          </p>
+          <p>
+            {t("slugAdminPreview")}{" "}
+            <span className="break-all font-medium text-foreground">
+              {menuBaseUrl}/{values.slug}/dashboard
+            </span>
+          </p>
+        </div>
 
-        {!slugIsValid && values.slug.length > 0 && (
-          <p className="text-sm text-destructive">{t("slugInvalid")}</p>
+        {slugReserved ? (
+          <p className="text-sm text-destructive">{t("slugReserved")}</p>
+        ) : (
+          !slugIsValid &&
+          values.slug.length > 0 && <p className="text-sm text-destructive">{t("slugInvalid")}</p>
         )}
 
         {/* Avertissement affiché seulement quand le changement est réel :
